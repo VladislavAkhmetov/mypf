@@ -19,6 +19,10 @@ import {
   ControlPanelIcon,
   TelegramIcon,
   SolitaireIcon,
+  ToolsIcon,
+  WordDocIcon,
+  MinesweeperIcon,
+  PaintIcon,
 } from "./xp-icons";
 
 interface StartMenuProps {
@@ -176,6 +180,75 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             <span className="font-semibold text-xs">Командная строка</span>
           </div>
 
+          {/* Tools */}
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "tools",
+                type: "tools",
+                title: "Инструменты — Плагины и скрипты",
+                iconType: "tools",
+                x: 80,
+                y: 45,
+                width: 760,
+                height: 520,
+              });
+            }}
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <ToolsIcon className="w-7 h-7 flex-shrink-0" />
+            <span className="font-semibold text-xs">Инструменты и скрипты</span>
+          </div>
+
+          {/* Word Documents */}
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "word",
+                type: "word",
+                title: "Документы — Влад Ахметов",
+                iconType: "word",
+                x: 85,
+                y: 45,
+                width: 740,
+                height: 540,
+              });
+            }}
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <WordDocIcon className="w-7 h-7 flex-shrink-0" />
+            <span className="font-semibold text-xs">Документы Word</span>
+          </div>
+
+          {/* Paint Studio */}
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "paint",
+                type: "paint",
+                title: "Paint Studio — Постеры и эскизы",
+                iconType: "paint",
+                x: 90,
+                y: 45,
+                width: 780,
+                height: 540,
+              });
+            }}
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <PaintIcon className="w-7 h-7 flex-shrink-0" />
+            <span className="font-semibold text-xs">Paint Studio</span>
+          </div>
+
           {/* Stories */}
           <div
             onClick={() => {
@@ -289,6 +362,28 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               <SolitaireIcon className="w-5 h-5 flex-shrink-0" />
               <span className="truncate">Косынка (Solitaire)</span>
             </div>
+
+            <div
+              onClick={() => {
+                xpSound.click();
+                onClose();
+                openWindow({
+                  id: "minesweeper",
+                  type: "minesweeper",
+                  title: "Сапёр",
+                  iconType: "minesweeper",
+                  x: 120,
+                  y: 75,
+                  width: 340,
+                  height: 450,
+                });
+              }}
+              className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
+              style={{ cursor: xpCursors.pointer }}
+            >
+              <MinesweeperIcon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Сапёр (Minesweeper)</span>
+            </div>
           </div>
         )}
 
@@ -336,6 +431,50 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <MyComputerIcon className="w-6 h-6 flex-shrink-0" />
             <span className="font-bold text-xs">Мой компьютер</span>
+          </div>
+
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "tools",
+                type: "tools",
+                title: "Инструменты — Плагины и скрипты",
+                iconType: "tools",
+                x: 80,
+                y: 45,
+                width: 760,
+                height: 520,
+              });
+            }}
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <ToolsIcon className="w-6 h-6 flex-shrink-0" />
+            <span className="font-bold text-xs">Инструменты</span>
+          </div>
+
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "word",
+                type: "word",
+                title: "Документы — Влад Ахметов",
+                iconType: "word",
+                x: 85,
+                y: 45,
+                width: 740,
+                height: 540,
+              });
+            }}
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <WordDocIcon className="w-6 h-6 flex-shrink-0" />
+            <span className="font-bold text-xs">Документы (Word)</span>
           </div>
 
           <div className="h-[1px] bg-[#9bbfe8] my-1 mx-2" />

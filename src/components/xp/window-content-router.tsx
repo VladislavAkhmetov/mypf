@@ -15,6 +15,10 @@ import { PropertiesDialog } from "./apps/properties-dialog";
 import { ResumeWindow } from "./apps/resume-window";
 import { StarterWindow } from "./apps/starter-window";
 import { SolitaireWindow } from "./apps/solitaire-window";
+import { ToolsWindow } from "./apps/tools-window";
+import { WordWindow } from "./apps/word-window";
+import { MinesweeperWindow } from "./apps/minesweeper-window";
+import { PaintWindow } from "./apps/paint-window";
 
 export function WindowContentRouter({ window: win }: { window: WindowItem }) {
   switch (win.type) {
@@ -22,6 +26,14 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
       return <StarterWindow />;
     case "solitaire":
       return <SolitaireWindow />;
+    case "tools":
+      return <ToolsWindow />;
+    case "word":
+      return <WordWindow initialDocSlug={(win.props?.initialSlug as string) || (win.props?.slug as string)} />;
+    case "minesweeper":
+      return <MinesweeperWindow />;
+    case "paint":
+      return <PaintWindow />;
     case "media-player":
       return <MediaPlayerWindow />;
     case "project":

@@ -323,3 +323,85 @@ export function DisplayThemeIcon({ className = "w-8 h-8" }: { className?: string
   );
 }
 
+export function ToolsIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* Toolbox base */}
+      <rect x="6" y="14" width="36" height="26" rx="3" fill="#ea580c" stroke="#9a3412" strokeWidth="1.8" />
+      <path d="M6 22 L42 22" stroke="#9a3412" strokeWidth="1.5" />
+      {/* Silver handle */}
+      <path d="M18 14 L18 8 C18 6.5 19.5 5 21 5 L27 5 C28.5 5 30 6.5 30 8 L30 14" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" />
+      {/* Metal latch */}
+      <rect x="21" y="20" width="6" height="7" rx="1" fill="#cbd5e1" stroke="#475467" strokeWidth="1.2" />
+      {/* Screwdriver & ruler crossed badge */}
+      <line x1="12" y1="28" x2="18" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
+      <line x1="36" y1="28" x2="30" y2="34" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.8" />
+    </svg>
+  );
+}
+
+export function WordDocIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* White page */}
+      <rect x="10" y="5" width="28" height="38" rx="2" fill="#ffffff" stroke="#94a3b8" strokeWidth="1.5" />
+      {/* Ruled lines */}
+      <line x1="15" y1="14" x2="33" y2="14" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="15" y1="20" x2="33" y2="20" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="15" y1="26" x2="33" y2="26" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="15" y1="32" x2="27" y2="32" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Blue 'W' badge for Microsoft Word */}
+      <rect x="6" y="16" width="18" height="18" rx="2.5" fill="#2563eb" stroke="#1d4ed8" strokeWidth="1.2" filter="drop-shadow(1px 2px 2px rgba(0,0,0,0.3))" />
+      <text x="15" y="30" fill="#ffffff" fontSize="13" fontWeight="900" fontFamily="sans-serif" textAnchor="middle">
+        W
+      </text>
+    </svg>
+  );
+}
+
+export function MinesweeperIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* 3D Beveled Cell */}
+      <rect x="6" y="6" width="36" height="36" rx="2" fill="#cbd5e1" stroke="#475467" strokeWidth="1.5" />
+      <path d="M7 7 L41 7 L37 11 L11 11 L11 37 L7 41 Z" fill="#f8fafc" />
+      <path d="M41 7 L41 41 L7 41 L11 37 L37 37 L37 11 Z" fill="#64748b" />
+      {/* Mine Body */}
+      <circle cx="24" cy="24" r="8" fill="#0f172a" />
+      {/* Spikes */}
+      <line x1="24" y1="12" x2="24" y2="36" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="12" y1="24" x2="36" y2="24" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="15" y1="15" x2="33" y2="33" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+      <line x1="15" y1="33" x2="33" y2="15" stroke="#0f172a" strokeWidth="2" strokeLinecap="round" />
+      {/* Shiny highlight */}
+      <circle cx="22" cy="21" r="2" fill="#ffffff" />
+    </svg>
+  );
+}
+
+export function PaintIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* Paint palette */}
+      <path
+        d="M24 7 C14 7, 7 14, 7 24 C7 31 11 36 17 38 C19 38.6 20 37.5 20 36 C20 34.5 19 33.5 19 31 C19 28.5 21 26.5 24 26.5 L28 26.5 C35 26.5 41 21 41 14 C41 10 33 7 24 7 Z"
+        fill="#fef08a"
+        stroke="#ca8a04"
+        strokeWidth="1.5"
+      />
+      {/* Paint color spots */}
+      <circle cx="15" cy="16" r="3" fill="#ef4444" />
+      <circle cx="24" cy="13" r="3" fill="#3b82f6" />
+      <circle cx="33" cy="17" r="3" fill="#22c55e" />
+      <circle cx="14" cy="27" r="2.5" fill="#a855f7" />
+      {/* Paint brush resting across palette */}
+      <g transform="rotate(35 26 28)">
+        <rect x="23" y="10" width="4" height="24" rx="1.5" fill="#78350f" />
+        <rect x="22" y="32" width="6" height="7" fill="#94a3b8" />
+        <path d="M22 39 C22 43, 28 43, 28 39 Z" fill="#0f172a" />
+      </g>
+    </svg>
+  );
+}
+
+

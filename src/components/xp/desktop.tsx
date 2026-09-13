@@ -20,6 +20,10 @@ import {
   RecycleBinIcon,
   StoriesIcon,
   SolitaireIcon,
+  ToolsIcon,
+  WordDocIcon,
+  MinesweeperIcon,
+  PaintIcon,
 } from "./xp-icons";
 
 interface IconDef {
@@ -108,6 +112,26 @@ export function Desktop() {
         id: "solitaire",
         title: "Косынка",
         icon: <SolitaireIcon className="w-12 h-12" />,
+      },
+      {
+        id: "minesweeper",
+        title: "Сапёр",
+        icon: <MinesweeperIcon className="w-12 h-12" />,
+      },
+      {
+        id: "tools",
+        title: "Инструменты",
+        icon: <ToolsIcon className="w-12 h-12" />,
+      },
+      {
+        id: "word",
+        title: "Документы Word",
+        icon: <WordDocIcon className="w-12 h-12" />,
+      },
+      {
+        id: "paint",
+        title: "Paint Studio",
+        icon: <PaintIcon className="w-12 h-12" />,
       },
     ],
     [],
@@ -447,6 +471,58 @@ export function Desktop() {
             y: 35,
             width: 840,
             height: 620,
+          });
+          break;
+
+        case "tools":
+          openWindow({
+            id: "tools",
+            type: "tools",
+            title: "Инструменты — Плагины и скрипты",
+            iconType: "tools",
+            x: 80,
+            y: 45,
+            width: 760,
+            height: 520,
+          });
+          break;
+
+        case "word":
+          openWindow({
+            id: "word",
+            type: "word",
+            title: "Документы — Влад Ахметов",
+            iconType: "word",
+            x: 85,
+            y: 45,
+            width: 740,
+            height: 540,
+          });
+          break;
+
+        case "minesweeper":
+          openWindow({
+            id: "minesweeper",
+            type: "minesweeper",
+            title: "Сапёр",
+            iconType: "minesweeper",
+            x: 120,
+            y: 75,
+            width: 340,
+            height: 450,
+          });
+          break;
+
+        case "paint":
+          openWindow({
+            id: "paint",
+            type: "paint",
+            title: "Paint Studio — Постеры и эскизы",
+            iconType: "paint",
+            x: 90,
+            y: 45,
+            width: 780,
+            height: 540,
           });
           break;
 

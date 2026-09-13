@@ -17,7 +17,11 @@ export type WindowType =
   | "display-properties"
   | "recycle-bin"
   | "properties"
-  | "resume";
+  | "resume"
+  | "tools"
+  | "word"
+  | "minesweeper"
+  | "paint";
 
 export interface WindowItem {
   id: string;

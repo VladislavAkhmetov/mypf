@@ -12,6 +12,10 @@ import {
   WindowsMediaPlayerIcon,
   InternetExplorerIcon,
   SolitaireIcon,
+  ToolsIcon,
+  WordDocIcon,
+  MinesweeperIcon,
+  PaintIcon,
 } from "./xp-icons";
 
 interface TaskbarProps {
@@ -165,6 +169,10 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
               <div className="w-3.5 h-3.5 flex-shrink-0">
                 {win.type === "starter" && <span>🪟</span>}
                 {win.type === "solitaire" && <SolitaireIcon className="w-3.5 h-3.5" />}
+                {win.type === "tools" && <ToolsIcon className="w-3.5 h-3.5" />}
+                {win.type === "word" && <WordDocIcon className="w-3.5 h-3.5" />}
+                {win.type === "minesweeper" && <MinesweeperIcon className="w-3.5 h-3.5" />}
+                {win.type === "paint" && <PaintIcon className="w-3.5 h-3.5" />}
                 {win.type === "resume" && <span>📄</span>}
                 {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
                 {win.type === "project" && <span>📁</span>}
