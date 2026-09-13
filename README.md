@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Design documentation
+
+[Подробный дизайн-документ портфолио в стиле Windows XP](docs/design/xp-portfolio-design-doc.md) — аудит с позиций HR, арт-директора и технического лида, концепция, визуальная система, сценарии, идеи игр, требования и план реализации.
+
 ## Getting Started
 
 First, run the development server:
