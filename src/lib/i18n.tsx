@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -22,12 +21,13 @@ const LocaleCtx = createContext<Ctx | null>(null);
 const KEY = "amazi-locale";
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("ru");
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(KEY);
-    if (saved === "ru" || saved === "en") setLocaleState(saved);
-  }, []);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem(KEY);
+      if (saved === "ru" || saved === "en") return saved;
+    }
+    return "ru";
+  });
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
