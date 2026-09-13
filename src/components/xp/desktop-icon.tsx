@@ -121,30 +121,42 @@ export function DesktopIcon({
     [id, onPositionChange, onOpen, onSelect],
   );
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onSelect(id);
-    onContextMenu(e, id);
-  };
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onOpen(id);
+      }
+    };
 
-  return (
-    <div
-      ref={iconRef}
-      className={`xp-desktop-icon absolute ${isSelected ? "is-selected" : ""}`}
-      style={{
-        transform: `translate3d(${x}px, ${y}px, 0)`,
-        cursor: xpCursors.pointer,
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onContextMenu={handleContextMenu}
-    >
-      <div className="xp-desktop-icon-img flex items-center justify-center pointer-events-none">
-        {icon}
+    const handleContextMenu = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onSelect(id);
+      onContextMenu(e, id);
+    };
+
+    return (
+      <div
+        ref={iconRef}
+        role="button"
+        tabIndex={0}
+        aria-label={title}
+        className={`xp-desktop-icon absolute ${isSelected ? "is-selected" : ""}`}
+        style={{
+          transform: `translate3d(${x}px, ${y}px, 0)`,
+          cursor: xpCursors.pointer,
+        }}
+        onKeyDown={handleKeyDown}
+        onFocus={() => onSelect(id)}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onContextMenu={handleContextMenu}
+      >
+        <div className="xp-desktop-icon-img flex items-center justify-center pointer-events-none">
+          {icon}
+        </div>
+        <div className="xp-desktop-icon-label pointer-events-none">{title}</div>
       </div>
-      <div className="xp-desktop-icon-label pointer-events-none">{title}</div>
-    </div>
-  );
-}
+    );
+  }

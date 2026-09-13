@@ -18,6 +18,7 @@ import {
   MyComputerIcon,
   ControlPanelIcon,
   TelegramIcon,
+  SolitaireIcon,
 } from "./xp-icons";
 
 interface StartMenuProps {
@@ -59,20 +60,20 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
       <div className="xp-start-body relative">
         {/* Left Column (White) */}
         <div className="xp-start-left">
-          {/* Internet Explorer */}
+          {/* My Documents / Portfolio */}
           <div
             onClick={() => {
               xpSound.click();
               onClose();
               openWindow({
-                id: "notepad",
-                type: "notepad",
-                title: "About_Vlad.txt - Блокнот",
-                iconType: "notepad",
+                id: "my-documents",
+                type: "my-documents",
+                title: "Мои работы — Проекты",
+                iconType: "folder",
                 x: 60,
                 y: 50,
-                width: 540,
-                height: 400,
+                width: 620,
+                height: 420,
               });
             }}
             className="xp-start-item"
@@ -80,8 +81,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <InternetExplorerIcon className="w-8 h-8 flex-shrink-0" />
             <div>
-              <div className="xp-start-item-title">Internet Explorer</div>
-              <div className="xp-start-subtext">Портфолио и манифест</div>
+              <div className="xp-start-item-title">Портфолио проектов</div>
+              <div className="xp-start-subtext">Кейсы и прототипы</div>
             </div>
           </div>
 
@@ -114,7 +115,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "media-player",
                 type: "media-player",
-                title: "Windows Media Player - Showreel 2026",
+                title: "Windows Media Player — Атлас волн",
                 iconType: "wmp",
                 x: 80,
                 y: 40,
@@ -126,7 +127,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <WindowsMediaPlayerIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Windows Media Player</span>
+            <span className="font-semibold text-xs">Визуализатор волн</span>
           </div>
 
           {/* Notepad */}
@@ -149,7 +150,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <NotepadIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Блокнот (Резюме)</span>
+            <span className="font-semibold text-xs">Блокнот (Обо мне)</span>
           </div>
 
           {/* Command Prompt */}
@@ -242,7 +243,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
         {/* All Programs Flyout Menu */}
         {showAllPrograms && (
           <div
-            className="absolute left-[52%] top-0 bottom-0 w-60 bg-white border-2 border-[#0055ea] shadow-2xl z-20 p-2 overflow-y-auto"
+            className="absolute left-[52%] top-0 bottom-0 w-64 bg-white border-2 border-[#0055ea] shadow-2xl z-20 p-2 overflow-y-auto"
             onMouseLeave={() => setShowAllPrograms(false)}
           >
             <div className="text-[11px] text-slate-900 font-bold uppercase mb-2 px-1 border-b border-slate-200 pb-1">
@@ -263,6 +264,31 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 <span className="truncate">{p.title}</span>
               </div>
             ))}
+
+            <div className="text-[11px] text-slate-900 font-bold uppercase mt-3 mb-2 px-1 border-b border-slate-200 pb-1">
+              Игры и лаборатория:
+            </div>
+            <div
+              onClick={() => {
+                xpSound.click();
+                onClose();
+                openWindow({
+                  id: "solitaire",
+                  type: "solitaire",
+                  title: "Косынка — Авторская колода",
+                  iconType: "solitaire",
+                  x: 75,
+                  y: 35,
+                  width: 840,
+                  height: 620,
+                });
+              }}
+              className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
+              style={{ cursor: xpCursors.pointer }}
+            >
+              <SolitaireIcon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">Косынка (Solitaire)</span>
+            </div>
           </div>
         )}
 
@@ -321,19 +347,19 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "display-properties",
                 type: "display-properties",
-                title: "Свойства: Экран",
+                title: "Свойства: Экран и темы",
                 iconType: "control",
                 x: 100,
                 y: 70,
-                width: 440,
-                height: 380,
+                width: 540,
+                height: 490,
               });
             }}
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
             <ControlPanelIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="text-xs">Панель управления</span>
+            <span className="text-xs">Оформление и темы</span>
           </div>
 
           <a

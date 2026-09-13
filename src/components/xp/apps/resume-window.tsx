@@ -12,20 +12,32 @@ export function ResumeWindow() {
   const { t } = useLocale();
   const { openProject } = useWindowManager();
 
+  const handlePrint = () => {
+    xpSound.click();
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col bg-[#ece9d8] text-black overflow-hidden select-none">
+    <div className="flex-1 flex flex-col bg-[#ece9d8] text-black overflow-hidden select-text">
       {/* Menu bar */}
       <div className="xp-menu-bar">
-        <span className="xp-menu-item">Файл</span>
-        <span className="xp-menu-item">Правка</span>
-        <span className="xp-menu-item">Печать</span>
-        <span className="xp-menu-item">Масштаб</span>
-        <span className="xp-menu-item">Справка</span>
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="xp-menu-item hover:bg-[#316ac5] hover:text-white px-2 py-0.5 rounded-sm transition"
+          style={{ cursor: xpCursors.pointer }}
+        >
+          Печать / Сохранить в PDF
+        </button>
+        <span className="xp-menu-item text-slate-500">Масштаб (100%)</span>
+        <span className="xp-menu-item text-slate-500">Справка</span>
       </div>
 
       {/* Main Document Body (A4 sheet appearance) */}
-      <div className="flex-1 bg-slate-200 p-3 sm:p-6 overflow-y-auto flex justify-center">
-        <div className="w-full max-w-2xl bg-white shadow-lg border border-slate-300 p-6 sm:p-8 rounded text-xs space-y-6 text-slate-800">
+      <div className="flex-1 bg-slate-200 p-2 sm:p-6 overflow-y-auto flex justify-center">
+        <div className="w-full max-w-2xl bg-white shadow-lg border border-slate-300 p-4 sm:p-8 rounded text-xs space-y-6 text-slate-800">
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-blue-600 pb-5">
             <div className="flex items-center gap-4">
@@ -44,7 +56,7 @@ export function ResumeWindow() {
                   {site.name}
                 </h1>
                 <p className="text-blue-700 font-bold text-xs sm:text-sm mt-0.5">
-                  Creative Technologist / Design Engineer / AI Product Designer
+                  {t(site.role)}
                 </p>
                 <p className="text-slate-500 text-[11px] mt-0.5">
                   Москва • Удаленно / Гибрид • Независимая практика Amazi
@@ -53,7 +65,7 @@ export function ResumeWindow() {
             </div>
 
             {/* Quick Contact Buttons for HR / Leads */}
-            <div className="flex sm:flex-col gap-2 w-full sm:w-auto">
+            <div className="flex flex-wrap sm:flex-col gap-2 w-full sm:w-auto">
               <a
                 href={site.telegram}
                 target="_blank"
@@ -70,17 +82,24 @@ export function ResumeWindow() {
               >
                 {site.email}
               </a>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex-1 text-center px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded text-[11px] shadow transition"
+                style={{ cursor: xpCursors.pointer }}
+              >
+                🖨️ Печать / PDF
+              </button>
             </div>
           </div>
 
           {/* Section: Executive Summary (TL;DR) */}
           <div className="bg-blue-50/70 border border-blue-200 rounded p-3.5 space-y-1.5">
             <div className="text-[10px] uppercase font-bold text-blue-800 tracking-wider">
-              Executive Summary // Для арт-директоров и лидов
+              Executive Summary
             </div>
             <p className="text-slate-800 leading-relaxed text-xs">
-              {t(site.note)} Собираю системы, которые можно пощупать: шрифт, пространство, интерфейс.
-              Дизайн как инженерная дисциплина, а не просто картинка в Figma.
+              {t(site.note)} {t(site.roleDescription)}
             </p>
           </div>
 
@@ -204,10 +223,17 @@ export function ResumeWindow() {
       </div>
 
       {/* Status bar */}
-      <div className="xp-statusbar">
+      <div className="xp-statusbar flex items-center justify-between">
         <span>Резюме_Влад_Ахметов.pdf</span>
-        <span>Страница 1 из 1 (100%)</span>
-        <span className="font-semibold text-slate-600">Готово к печати</span>
+        <span>Формат A4 (100%)</span>
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="font-semibold text-blue-800 hover:underline"
+          style={{ cursor: xpCursors.pointer }}
+        >
+          Распечатать документ
+        </button>
       </div>
     </div>
   );

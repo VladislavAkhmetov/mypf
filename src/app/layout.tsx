@@ -11,8 +11,8 @@ const onest = Onest({
 });
 
 export const metadata: Metadata = {
-  title: `${site.name} — Microsoft Windows XP`,
-  description: `${site.role.ru} ${site.note.ru}`,
+  title: `${site.name} — ${site.role.ru} | Портфолио`,
+  description: `${site.role.ru}. ${site.roleDescription.ru}`,
 };
 
 export const viewport: Viewport = {
@@ -20,8 +20,6 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -35,7 +33,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${onest.variable} h-full antialiased`}
     >
-      <body className="h-full w-full overflow-hidden select-none bg-[#004e98]">
+      <body className="h-full w-full overflow-hidden bg-[#004e98]">
         <Providers>{children}</Providers>
       </body>
     </html>

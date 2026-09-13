@@ -10,8 +10,12 @@ export const site = {
     en: "in studio",
   },
   role: {
-    ru: "Creative Technologist / Design Engineer / AI Product Designer.",
-    en: "Creative Technologist / Design Engineer / AI Product Designer.",
+    ru: "Дизайн-инженер",
+    en: "Design Engineer",
+  },
+  roleDescription: {
+    ru: "Проектирую интерфейсы и довожу их до работающих прототипов — от визуальной системы до логики взаимодействия.",
+    en: "Designing interfaces and building them into working prototypes — from visual system to interaction logic.",
   },
   workplaceLabel: {
     ru: "место",

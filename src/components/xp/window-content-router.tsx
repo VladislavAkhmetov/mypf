@@ -13,9 +13,15 @@ import { DisplayPropertiesDialog } from "./apps/display-properties-dialog";
 import { RecycleBinWindow } from "./apps/recycle-bin-window";
 import { PropertiesDialog } from "./apps/properties-dialog";
 import { ResumeWindow } from "./apps/resume-window";
+import { StarterWindow } from "./apps/starter-window";
+import { SolitaireWindow } from "./apps/solitaire-window";
 
 export function WindowContentRouter({ window: win }: { window: WindowItem }) {
   switch (win.type) {
+    case "starter":
+      return <StarterWindow />;
+    case "solitaire":
+      return <SolitaireWindow />;
     case "media-player":
       return <MediaPlayerWindow />;
     case "project":

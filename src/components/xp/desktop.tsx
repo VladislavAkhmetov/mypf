@@ -10,7 +10,6 @@ import { DesktopIcon } from "./desktop-icon";
 import { ContextMenu, ContextMenuState } from "./context-menu";
 import { TurnOffDialog } from "./turn-off-dialog";
 import { Clippy } from "./clippy";
-import { projects } from "@/data/projects";
 import { xpCursors } from "@/lib/xp/cursors";
 import { xpSound, tryPlayStartupOnFirstGesture } from "@/lib/xp/sound";
 import {
@@ -20,7 +19,7 @@ import {
   NotepadIcon,
   RecycleBinIcon,
   StoriesIcon,
-  ProjectFileIcon,
+  SolitaireIcon,
 } from "./xp-icons";
 
 interface IconDef {
@@ -33,6 +32,7 @@ export function Desktop() {
   const {
     windows,
     wallpaper,
+    theme,
     openWindow,
     openProject,
     balloon,
@@ -62,12 +62,12 @@ export function Desktop() {
   // Refresh flicker state
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Construct all built-in desktop icons
+  // Construct focused desktop icons without cluttering with 19 files (A01, A06)
   const builtInIcons: IconDef[] = useMemo(
     () => [
       {
         id: "resume",
-        title: "Резюме (HR).pdf",
+        title: "Резюме.pdf",
         icon: (
           <div className="w-12 h-12 rounded bg-gradient-to-b from-red-600 to-red-800 border-2 border-white text-white font-black text-xs grid place-items-center shadow-lg">
             <span className="tracking-tighter">PDF</span>
@@ -75,28 +75,28 @@ export function Desktop() {
         ),
       },
       {
+        id: "my-documents",
+        title: "Мои работы",
+        icon: <MyDocumentsIcon className="w-12 h-12" />,
+      },
+      {
+        id: "notepad",
+        title: "Обо мне",
+        icon: <NotepadIcon className="w-12 h-12" />,
+      },
+      {
         id: "my-computer",
         title: "Мой компьютер",
         icon: <MyComputerIcon className="w-12 h-12" />,
       },
       {
-        id: "my-documents",
-        title: "Мои документы",
-        icon: <MyDocumentsIcon className="w-12 h-12" />,
-      },
-      {
         id: "media-player",
-        title: "Шоурил (WMP)",
+        title: "Визуализатор",
         icon: <WindowsMediaPlayerIcon className="w-12 h-12" />,
       },
       {
-        id: "notepad",
-        title: "Обо мне (Bio.txt)",
-        icon: <NotepadIcon className="w-12 h-12" />,
-      },
-      {
         id: "stories",
-        title: "Истории студии",
+        title: "Истории",
         icon: <StoriesIcon className="w-12 h-12" />,
       },
       {
@@ -104,11 +104,11 @@ export function Desktop() {
         title: "Корзина",
         icon: <RecycleBinIcon className="w-12 h-12" />,
       },
-      ...projects.map((p) => ({
-        id: `project-${p.slug}`,
-        title: `${p.title}.exe`,
-        icon: <ProjectFileIcon motif={p.motif} className="w-12 h-12" />,
-      })),
+      {
+        id: "solitaire",
+        title: "Косынка",
+        icon: <SolitaireIcon className="w-12 h-12" />,
+      },
     ],
     [],
   );
@@ -437,6 +437,19 @@ export function Desktop() {
           });
           break;
 
+        case "solitaire":
+          openWindow({
+            id: "solitaire",
+            type: "solitaire",
+            title: "Косынка — Авторская колода",
+            iconType: "solitaire",
+            x: 75,
+            y: 35,
+            width: 840,
+            height: 620,
+          });
+          break;
+
         default:
           break;
       }
@@ -474,9 +487,12 @@ export function Desktop() {
   return (
     <div
       ref={desktopRef}
+      data-xp-theme={theme}
       className={`xp-desktop xp-system ${isRefreshing ? "xp-refreshing" : ""}`}
       style={{
-        backgroundImage: wallpaper.startsWith("/") ? `url(${wallpaper})` : undefined,
+        backgroundImage: wallpaper.startsWith("/")
+          ? `url(${wallpaper}), radial-gradient(ellipse at 50% 20%, #76b5ff 0%, #2f82e8 45%, #155bb5 80%), linear-gradient(to top, #3a9718 0%, #58b628 25%, transparent 60%)`
+          : undefined,
         background: !wallpaper.startsWith("/") ? wallpaper : undefined,
         cursor: xpCursors.default,
       }}

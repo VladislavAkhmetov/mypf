@@ -73,6 +73,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
   const handleTitlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (win.isMaximized) return;
+      if (typeof window !== "undefined" && window.innerWidth < 768) return; // Disable dragging on mobile
       if ((e.target as HTMLElement).closest(".xp-btn-ctrl")) return;
 
       focusWindow(win.id);
@@ -92,13 +93,20 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
       const dx = e.clientX - dragRef.current.startX;
       const dy = e.clientY - dragRef.current.startY;
 
-      const newX = dragRef.current.currentX + dx;
-      const newY = Math.max(0, dragRef.current.currentY + dy);
+      const screenW = typeof window !== "undefined" ? window.innerWidth : 1024;
+      const screenH = typeof window !== "undefined" ? window.innerHeight : 768;
+      const minX = -(win.width - 100);
+      const maxX = screenW - 100;
+      const minY = 0;
+      const maxY = Math.max(0, screenH - 70);
+
+      const clampedX = Math.max(minX, Math.min(maxX, dragRef.current.currentX + dx));
+      const clampedY = Math.max(minY, Math.min(maxY, dragRef.current.currentY + dy));
 
       // Direct GPU transform update
-      frameRef.current.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
+      frameRef.current.style.transform = `translate3d(${clampedX}px, ${clampedY}px, 0)`;
     },
-    [],
+    [win.width],
   );
 
   const handleTitlePointerUp = useCallback(
@@ -113,21 +121,30 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
 
       const dx = e.clientX - dragRef.current.startX;
       const dy = e.clientY - dragRef.current.startY;
-      const finalX = dragRef.current.currentX + dx;
-      const finalY = Math.max(0, dragRef.current.currentY + dy);
+
+      const screenW = typeof window !== "undefined" ? window.innerWidth : 1024;
+      const screenH = typeof window !== "undefined" ? window.innerHeight : 768;
+      const minX = -(win.width - 100);
+      const maxX = screenW - 100;
+      const minY = 0;
+      const maxY = Math.max(0, screenH - 70);
+
+      const finalX = Math.max(minX, Math.min(maxX, dragRef.current.currentX + dx));
+      const finalY = Math.max(minY, Math.min(maxY, dragRef.current.currentY + dy));
 
       dragRef.current.currentX = finalX;
       dragRef.current.currentY = finalY;
 
       updateWindowBounds(win.id, { x: finalX, y: finalY });
     },
-    [win.id, updateWindowBounds],
+    [win.id, win.width, updateWindowBounds],
   );
 
   // Resize Handlers
   const handleResizePointerDown = useCallback(
     (dir: string, e: React.PointerEvent) => {
       if (win.isMaximized) return;
+      if (typeof window !== "undefined" && window.innerWidth < 768) return;
       e.stopPropagation();
       focusWindow(win.id);
 

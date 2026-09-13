@@ -137,18 +137,18 @@ export function MediaPlayerWindow() {
                   isPlaying ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"
                 }`}
               />
-              {isPlaying ? "Воспроизведение • 1080p 60fps" : "Пауза"}
+              {isPlaying ? "Визуализатор частот • Атлас волн" : "Пауза"}
             </div>
             <h2 className="text-base md:text-lg font-black text-white drop-shadow mt-1">
-              Влад Ахметов — Шоурил 2026
+              Влад Ахметов — Атлас волн
             </h2>
             <p className="text-xs text-sky-200 drop-shadow mt-0.5 font-medium">
-              Creative Technologist & Design Engineer • Live Prototypes
+              Интерактивный Canvas 2D визуализатор спектра и гармоник
             </p>
           </div>
 
           <div className="bg-black/60 border border-sky-400/40 px-2 py-1 rounded text-[11px] text-sky-300 font-mono">
-            Stereo 320 kbps
+            Canvas 2D
           </div>
         </div>
 
@@ -258,7 +258,7 @@ export function MediaPlayerWindow() {
 
         {/* Video Mode Badge */}
         <div className="text-[11px] text-sky-300 font-semibold hidden sm:block">
-          Showreel 2026.wmv
+          Wave_Atlas.canvas
         </div>
       </div>
     </div>

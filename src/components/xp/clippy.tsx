@@ -7,8 +7,8 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { site } from "@/data/site";
 
 export function Clippy() {
-  const { openWindow, openProject, focusWindow } = useWindowManager();
-  const [isOpen, setIsOpen] = useState(true);
+  const { openWindow, openProject } = useWindowManager();
+  const [isOpen, setIsOpen] = useState(false); // Calm closed state by default (A01, A10, A11)
   const [currentPose, setCurrentPose] = useState<"rest" | "eyebrow" | "look-left" | "wave">("rest");
 
   // Subtle nostalgic idle animations (blinking, raising eyebrows, looking around)
@@ -50,10 +50,11 @@ export function Clippy() {
 
   const handleOpenResume = () => {
     xpSound.click();
+    setIsOpen(false);
     openWindow({
       id: "resume",
       type: "resume",
-      title: "Резюме_Влад_Ахметов.pdf — Executive Summary",
+      title: "Резюме_Влад_Ахметов.pdf — Резюме",
       iconType: "resume",
       x: 70,
       y: 40,
@@ -64,11 +65,22 @@ export function Clippy() {
 
   const handleOpenShowreel = () => {
     xpSound.click();
-    focusWindow("media-player");
+    setIsOpen(false);
+    openWindow({
+      id: "media-player",
+      type: "media-player",
+      title: "Windows Media Player — Атлас волн",
+      iconType: "wmp",
+      x: 80,
+      y: 40,
+      width: 560,
+      height: 440,
+    });
   };
 
   const handleOpenTopProjects = () => {
     xpSound.click();
+    setIsOpen(false);
     openProject("kora");
   };
 
@@ -83,12 +95,12 @@ export function Clippy() {
 
   return (
     <div
-      className="fixed bottom-14 right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none"
+      className="fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)]"
       style={{ cursor: xpCursors.default }}
     >
       {/* Speech Bubble */}
       {isOpen && (
-        <div className="w-80 bg-[#ffffe1] text-slate-900 border-2 border-black rounded-lg p-3.5 shadow-2xl mb-2 text-xs relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="w-72 sm:w-80 max-w-[calc(100vw-24px)] bg-[#ffffe1] text-slate-900 border-2 border-black rounded-lg p-3.5 shadow-2xl mb-2 text-xs relative animate-in fade-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-amber-300 pb-1.5 mb-2.5">
             <span className="font-bold text-[12px] text-blue-950 flex items-center gap-1.5">
@@ -132,7 +144,7 @@ export function Clippy() {
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">🎬</span>
-              <span>Посмотреть шоурил 2026 (WMP)</span>
+              <span>Посмотреть визуализатор волн (WMP)</span>
             </button>
 
             <button
@@ -170,7 +182,7 @@ export function Clippy() {
         style={{ cursor: xpCursors.pointer }}
       >
         {!isOpen && (
-          <div className="absolute -top-7 right-0 bg-[#ffffe1] text-[11px] font-bold text-slate-900 border border-black px-2 py-0.5 rounded shadow-md whitespace-nowrap animate-bounce">
+          <div className="absolute -top-7 right-0 bg-[#ffffe1] text-[11px] font-bold text-slate-900 border border-black px-2 py-0.5 rounded shadow-md whitespace-nowrap">
             Помощь? 📎
           </div>
         )}

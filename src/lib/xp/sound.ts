@@ -2,7 +2,7 @@
 // Plays original 16-bit 44.1kHz Windows XP system WAV audio files
 
 let audioCtx: AudioContext | null = null;
-let isMuted = false;
+let isMuted = true; // Default muted according to design audit A24
 const audioBufferCache = new Map<string, AudioBuffer>();
 const audioLoading = new Map<string, Promise<AudioBuffer | null>>();
 
@@ -33,6 +33,7 @@ export function getMuted(): boolean {
   if (typeof window !== "undefined") {
     const stored = window.localStorage.getItem("amazi-xp-muted");
     if (stored !== null) return stored === "1";
+    return true; // default muted
   }
   return isMuted;
 }
@@ -209,6 +210,7 @@ let playedStartup = false;
 export function tryPlayStartupOnFirstGesture() {
   if (playedStartup) return;
   if (typeof window === "undefined") return;
+  if (getMuted()) return;
 
   preloadXpSounds();
 

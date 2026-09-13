@@ -82,25 +82,29 @@ export function MyComputerWindow() {
             <div className="pl-3 text-slate-500">{site.handle} • {site.email}</div>
           </div>
 
-          {/* Computer / Hardware specs */}
+          {/* Computer / Profile specs */}
           <div className="space-y-1.5">
-            <div className="font-bold text-slate-900">Спецификация рабочей станции:</div>
+            <div className="font-bold text-slate-900">Профиль специалиста:</div>
             <div className="pl-3 space-y-1 text-slate-700">
               <div>
-                <span className="font-semibold">Процессор: </span>
-                <span>Creative Intellect Core @ 4.8 GHz (Multi-threaded Design)</span>
+                <span className="font-semibold">Специализация: </span>
+                <span>{t(site.role)} (дизайн-системы, веб-интерфейсы, интерактив)</span>
               </div>
               <div>
-                <span className="font-semibold">Оперативная память: </span>
-                <span>64 GB (Infinite Creative Buffer)</span>
+                <span className="font-semibold">Практика: </span>
+                <span>{t(site.workplace)}</span>
               </div>
               <div>
-                <span className="font-semibold">Локация: </span>
-                <span>{t(site.location)} • {t(site.presence)}</span>
+                <span className="font-semibold">Текущий фокус: </span>
+                <span>{t(site.now)}</span>
               </div>
               <div>
-                <span className="font-semibold">Стек технологий: </span>
-                <span className="text-blue-700">
+                <span className="font-semibold">Локация и формат: </span>
+                <span>{t(site.location)} • {t(site.presence)} (удаленно / проектная работа)</span>
+              </div>
+              <div>
+                <span className="font-semibold">Ключевой стек: </span>
+                <span className="text-blue-700 font-medium">
                   {site.stack.map((s) => s[locale]).join(", ")}
                 </span>
               </div>

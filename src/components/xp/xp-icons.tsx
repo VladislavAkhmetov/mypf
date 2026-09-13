@@ -252,3 +252,74 @@ export function NetworkTrayIcon({ className = "w-4 h-4" }: { className?: string 
     </svg>
   );
 }
+
+export function SolitaireIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* Background card (back) */}
+      <rect
+        x="6"
+        y="10"
+        width="24"
+        height="32"
+        rx="2.5"
+        fill="#1e40af"
+        stroke="#172554"
+        strokeWidth="1.5"
+        transform="rotate(-8 6 10)"
+      />
+      <rect
+        x="8"
+        y="12"
+        width="20"
+        height="28"
+        rx="1.5"
+        fill="#2563eb"
+        stroke="#60a5fa"
+        strokeWidth="0.8"
+        transform="rotate(-8 6 10)"
+      />
+      {/* Foreground card (Ace of Spades) */}
+      <rect
+        x="16"
+        y="7"
+        width="24"
+        height="33"
+        rx="2.5"
+        fill="#ffffff"
+        stroke="#475467"
+        strokeWidth="1.5"
+        filter="drop-shadow(1px 2px 3px rgba(0,0,0,0.35))"
+      />
+      {/* Ace Index */}
+      <text x="19" y="15" fill="#0f172a" fontSize="8" fontWeight="bold" fontFamily="sans-serif">
+        A
+      </text>
+      {/* Modernist Spade Pip in Center */}
+      <path
+        d="M28 17 C28 17, 22 23, 22 26 C22 28.5 24 30 26 30 C27.2 30 28 29 28 29 C28 29 28.8 30 30 30 C32 30 34 28.5 34 26 C34 23 28 17 28 17 Z"
+        fill="#0f172a"
+      />
+      {/* Spade stem */}
+      <path d="M27 28 L26 33 L30 33 L29 28 Z" fill="#0f172a" />
+    </svg>
+  );
+}
+
+export function DisplayThemeIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} fill="none">
+      {/* Monitor frame */}
+      <rect x="7" y="7" width="34" height="26" rx="2.5" fill="#d0d5dd" stroke="#475467" strokeWidth="2" />
+      {/* Screen */}
+      <rect x="10" y="10" width="28" height="20" fill="#0f172a" />
+      {/* Color theme swatches on screen */}
+      <rect x="13" y="13" width="6" height="14" fill="#0055ea" rx="1" />
+      <rect x="21" y="13" width="6" height="14" fill="#94a3b8" rx="1" />
+      <rect x="29" y="13" width="6" height="14" fill="#008080" rx="1" />
+      {/* Monitor base */}
+      <path d="M19 33 L29 33 L32 39 L16 39 Z" fill="#98a2b3" stroke="#475467" strokeWidth="1.5" />
+    </svg>
+  );
+}
+

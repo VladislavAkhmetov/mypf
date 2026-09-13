@@ -11,6 +11,7 @@ import {
   NetworkTrayIcon,
   WindowsMediaPlayerIcon,
   InternetExplorerIcon,
+  SolitaireIcon,
 } from "./xp-icons";
 
 interface TaskbarProps {
@@ -24,7 +25,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
 
   const [timeStr, setTimeStr] = useState("");
   const [dateStr, setDateStr] = useState("");
-  const [muted, setMutedState] = useState(() => (typeof window !== "undefined" ? getMuted() : false));
+  const [muted, setMutedState] = useState(() => (typeof window !== "undefined" ? getMuted() : true));
 
   // Update clock every second
   useEffect(() => {
@@ -162,6 +163,9 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
               title={win.title}
             >
               <div className="w-3.5 h-3.5 flex-shrink-0">
+                {win.type === "starter" && <span>🪟</span>}
+                {win.type === "solitaire" && <SolitaireIcon className="w-3.5 h-3.5" />}
+                {win.type === "resume" && <span>📄</span>}
                 {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
                 {win.type === "project" && <span>📁</span>}
                 {win.type === "notepad" && <span>📝</span>}

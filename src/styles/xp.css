@@ -1,6 +1,7 @@
-/* Windows XP Luna Blue Authentic Theme Stylesheet */
+/* Windows XP Multi-Theme Authentic Design System */
 
-:root {
+:root,
+[data-xp-theme="luna-blue"] {
   --xp-font: Tahoma, "Segoe UI", "MS Sans Serif", Arial, sans-serif;
   --xp-blue-dark: #00138c;
   --xp-blue-primary: #0055ea;
@@ -8,15 +9,134 @@
   --xp-taskbar-h: 46px;
   --xp-menu-bg: #ece9d8;
   --xp-select-blue: #316ac5;
+
+  /* Window Titlebar */
+  --xp-titlebar-bg: linear-gradient(180deg, #0058ee 0%, #3593ff 4%, #288eff 6%, #127dff 8%, #036ffc 10%, #0262ee 14%, #0057e5 20%, #0054e3 40%, #0055e7 60%, #0045d6 80%, #0030b4 100%);
+  --xp-titlebar-border: #002288;
+  --xp-titlebar-text: #ffffff;
+  --xp-titlebar-text-shadow: 1px 1px 2px rgba(0, 18, 90, 0.9);
+  --xp-titlebar-inactive-bg: linear-gradient(180deg, #7697ca 0%, #a2bde6 10%, #8caad7 20%, #7696c7 60%, #617fae 100%);
+  --xp-titlebar-inactive-border: #4a648e;
+  --xp-titlebar-inactive-text: #dce4ee;
+  --xp-window-border: #0055ea;
+
+  /* Taskbar & Start */
+  --xp-taskbar-bg: linear-gradient(180deg, #316ac5 0%, #2558c4 3%, #1e4ebe 6%, #1742b6 10%, #1742b6 30%, #1946bc 60%, #1e52c8 90%, #163da8 100%);
+  --xp-taskbar-border: #5289eb;
+  --xp-start-btn-bg: linear-gradient(180deg, #44a530 0%, #3a9726 12%, #2c841a 45%, #257814 60%, #368f23 85%, #226f12 100%);
+  --xp-start-btn-hover-bg: linear-gradient(180deg, #53be3c 0%, #45ac2e 12%, #349b20 45%, #2d8c19 60%, #40a72b 85%, #2a8216 100%);
+  --xp-start-btn-shadow: 1px 1px 2px #104c08;
+  --xp-task-btn-bg: linear-gradient(180deg, #3d7ee8 0%, #2c6be0 45%, #1852c9 55%, #1f57d1 100%);
+  --xp-task-btn-hover-bg: linear-gradient(180deg, #5190f7 0%, #3e7ff0 45%, #2a64db 55%, #2860de 100%);
+  --xp-task-btn-focused-bg: linear-gradient(180deg, #183e95 0%, #15398a 45%, #102d73 55%, #133480 100%);
+  --xp-tray-bg: linear-gradient(180deg, #0c2a74 0%, #0e338c 15%, #103ba0 40%, #103ca2 60%, #0d348f 85%, #08246a 100%);
+  --xp-tray-border: #1446bd;
+}
+
+/* Luna Silver Metallic Theme */
+[data-xp-theme="luna-silver"] {
+  --xp-blue-dark: #334155;
+  --xp-blue-primary: #64748b;
+  --xp-blue-light: #94a3b8;
+  --xp-select-blue: #475569;
+
+  --xp-titlebar-bg: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 15%, #94a3b8 50%, #64748b 52%, #475569 100%);
+  --xp-titlebar-border: #334155;
+  --xp-titlebar-text: #ffffff;
+  --xp-titlebar-text-shadow: 1px 1px 2px rgba(15, 23, 42, 0.9);
+  --xp-titlebar-inactive-bg: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 30%, #cbd5e1 70%, #94a3b8 100%);
+  --xp-titlebar-inactive-border: #94a3b8;
+  --xp-titlebar-inactive-text: #475569;
+  --xp-window-border: #64748b;
+
+  --xp-taskbar-bg: linear-gradient(180deg, #94a3b8 0%, #64748b 15%, #475569 50%, #334155 100%);
+  --xp-taskbar-border: #cbd5e1;
+  --xp-start-btn-bg: linear-gradient(180deg, #64748b 0%, #475569 50%, #334155 100%);
+  --xp-start-btn-hover-bg: linear-gradient(180deg, #94a3b8 0%, #64748b 50%, #475569 100%);
+  --xp-start-btn-shadow: 1px 1px 2px #0f172a;
+  --xp-task-btn-bg: linear-gradient(180deg, #64748b 0%, #475569 50%, #334155 100%);
+  --xp-task-btn-hover-bg: linear-gradient(180deg, #94a3b8 0%, #64748b 50%, #475569 100%);
+  --xp-task-btn-focused-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --xp-tray-bg: linear-gradient(180deg, #334155 0%, #1e293b 50%, #0f172a 100%);
+  --xp-tray-border: #475569;
+}
+
+/* Windows Classic 2000 Theme */
+[data-xp-theme="classic"] {
+  --xp-blue-dark: #000080;
+  --xp-blue-primary: #000080;
+  --xp-blue-light: #1084d0;
+  --xp-select-blue: #000080;
+  --xp-menu-bg: #d4d0c8;
+
+  --xp-titlebar-bg: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+  --xp-titlebar-border: #000080;
+  --xp-titlebar-text: #ffffff;
+  --xp-titlebar-text-shadow: none;
+  --xp-titlebar-inactive-bg: linear-gradient(90deg, #808080 0%, #b5b5b5 100%);
+  --xp-titlebar-inactive-border: #808080;
+  --xp-titlebar-inactive-text: #d4d0c8;
+  --xp-window-border: #808080;
+
+  --xp-taskbar-bg: #d4d0c8;
+  --xp-taskbar-border: #ffffff;
+  --xp-start-btn-bg: #d4d0c8;
+  --xp-start-btn-hover-bg: #e0dcd4;
+  --xp-start-btn-shadow: none;
+  --xp-task-btn-bg: #d4d0c8;
+  --xp-task-btn-hover-bg: #e8e4dc;
+  --xp-task-btn-focused-bg: #ffffff;
+  --xp-tray-bg: #d4d0c8;
+  --xp-tray-border: #808080;
+}
+
+/* Royale Noir Modern Dark Theme */
+[data-xp-theme="royale-noir"] {
+  --xp-blue-dark: #020617;
+  --xp-blue-primary: #0f172a;
+  --xp-blue-light: #38bdf8;
+  --xp-select-blue: #0284c7;
+  --xp-menu-bg: #1e293b;
+
+  --xp-titlebar-bg: linear-gradient(180deg, #334155 0%, #1e293b 15%, #0f172a 50%, #020617 100%);
+  --xp-titlebar-border: #0284c7;
+  --xp-titlebar-text: #f8fafc;
+  --xp-titlebar-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  --xp-titlebar-inactive-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --xp-titlebar-inactive-border: #334155;
+  --xp-titlebar-inactive-text: #94a3b8;
+  --xp-window-border: #1e293b;
+
+  --xp-taskbar-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+  --xp-taskbar-border: #0284c7;
+  --xp-start-btn-bg: linear-gradient(180deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+  --xp-start-btn-hover-bg: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
+  --xp-start-btn-shadow: 0 1px 2px #082f49;
+  --xp-task-btn-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --xp-task-btn-hover-bg: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+  --xp-task-btn-focused-bg: linear-gradient(180deg, #0369a1 0%, #075985 100%);
+  --xp-tray-bg: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  --xp-tray-border: #1e293b;
 }
 
 /* Global XP Font and Box-Sizing */
 .xp-system,
 .xp-system * {
   font-family: var(--xp-font);
+  box-sizing: border-box;
+}
+
+/* Specific UI controls where text selection is disabled */
+.xp-desktop,
+.xp-titlebar,
+.xp-taskbar,
+.xp-start-menu,
+.xp-context-menu,
+.xp-window-controls,
+.xp-desktop-icon,
+.xp-balloon {
   user-select: none;
   -webkit-user-select: none;
-  box-sizing: border-box;
 }
 
 /* Base Desktop Screen */
@@ -130,49 +250,29 @@
 .xp-titlebar {
   height: 35px;
   min-height: 35px;
-  background: linear-gradient(
-    180deg,
-    #0058ee 0%,
-    #3593ff 4%,
-    #288eff 6%,
-    #127dff 8%,
-    #036ffc 10%,
-    #0262ee 14%,
-    #0057e5 20%,
-    #0054e3 40%,
-    #0055e7 60%,
-    #0045d6 80%,
-    #0030b4 100%
-  );
+  background: var(--xp-titlebar-bg);
   padding: 0 6px 0 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #002288;
+  border-bottom: 1px solid var(--xp-titlebar-border);
   cursor: inherit;
 }
 
 .xp-window.is-inactive .xp-titlebar {
-  background: linear-gradient(
-    180deg,
-    #7697ca 0%,
-    #a2bde6 10%,
-    #8caad7 20%,
-    #7696c7 60%,
-    #617fae 100%
-  );
-  border-bottom-color: #4a648e;
+  background: var(--xp-titlebar-inactive-bg);
+  border-bottom-color: var(--xp-titlebar-inactive-border);
 }
 
 .xp-titlebar-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffffff;
+  color: var(--xp-titlebar-text);
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.2px;
-  text-shadow: 1px 1px 2px rgba(0, 18, 90, 0.9);
+  text-shadow: var(--xp-titlebar-text-shadow);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -180,7 +280,7 @@
 }
 
 .xp-window.is-inactive .xp-titlebar-title {
-  color: #dce4ee;
+  color: var(--xp-titlebar-inactive-text);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
 }
 
@@ -453,18 +553,8 @@
   left: 0;
   right: 0;
   height: var(--xp-taskbar-h);
-  background: linear-gradient(
-    180deg,
-    #316ac5 0%,
-    #2558c4 3%,
-    #1e4ebe 6%,
-    #1742b6 10%,
-    #1742b6 30%,
-    #1946bc 60%,
-    #1e52c8 90%,
-    #163da8 100%
-  );
-  border-top: 2px solid #5289eb;
+  background: var(--xp-taskbar-bg);
+  border-top: 2px solid var(--xp-taskbar-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -479,15 +569,7 @@
   align-items: center;
   gap: 7px;
   padding: 0 16px 0 10px;
-  background: linear-gradient(
-    180deg,
-    #44a530 0%,
-    #3a9726 12%,
-    #2c841a 45%,
-    #257814 60%,
-    #368f23 85%,
-    #226f12 100%
-  );
+  background: var(--xp-start-btn-bg);
   border: 0;
   border-radius: 0 15px 15px 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 2px 0 4px rgba(0, 0, 0, 0.4);
@@ -496,26 +578,19 @@
   font-weight: 900;
   font-size: 17px;
   letter-spacing: 0.5px;
-  text-shadow: 1px 1px 2px #104c08;
+  text-shadow: var(--xp-start-btn-shadow);
   cursor: inherit;
 }
 
 .xp-start-btn:hover {
-  background: linear-gradient(
-    180deg,
-    #53be3c 0%,
-    #45ac2e 12%,
-    #349b20 45%,
-    #2d8c19 60%,
-    #40a72b 85%,
-    #2a8216 100%
-  );
+  background: var(--xp-start-btn-hover-bg);
 }
 
 .xp-start-btn.is-active,
 .xp-start-btn:active {
-  background: linear-gradient(180deg, #1b5e0e 0%, #206e12 50%, #298517 100%);
+  background: var(--xp-start-btn-bg);
   box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.6);
+  filter: brightness(0.85);
 }
 
 .xp-flag-icon {
@@ -581,17 +656,17 @@
   color: #ffffff;
   cursor: inherit;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(180deg, #3d7ee8 0%, #2c6be0 45%, #1852c9 55%, #1f57d1 100%);
+  background: var(--xp-task-btn-bg);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
   text-shadow: 1px 1px 1px #0c3384;
 }
 
 .xp-task-btn:hover {
-  background: linear-gradient(180deg, #5190f7 0%, #3e7ff0 45%, #2a64db 55%, #2860de 100%);
+  background: var(--xp-task-btn-hover-bg);
 }
 
 .xp-task-btn.is-focused {
-  background: linear-gradient(180deg, #183e95 0%, #15398a 45%, #102d73 55%, #133480 100%);
+  background: var(--xp-task-btn-focused-bg);
   border-color: #0c2666;
   box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.6);
   font-weight: 700;
@@ -607,16 +682,8 @@
 /* System Tray (Notification Area) */
 .xp-tray {
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    #0c2a74 0%,
-    #0e338c 15%,
-    #103ba0 40%,
-    #103ca2 60%,
-    #0d348f 85%,
-    #08246a 100%
-  );
-  border-left: 1px solid #1446bd;
+  background: var(--xp-tray-bg);
+  border-left: 1px solid var(--xp-tray-border);
   box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
@@ -903,3 +970,118 @@
   font-size: 13px;
   padding: 0 4px;
 }
+
+/* Accessibility: focus visible outline on desktop icons and buttons */
+.xp-desktop-icon:focus-visible {
+  outline: 1px dotted #ffffff;
+  outline-offset: 1px;
+  background-color: rgba(49, 106, 197, 0.5);
+}
+
+.xp-btn-ctrl:focus-visible,
+button.xp-btn-ctrl:focus-visible {
+  outline: 2px solid #ffcc00;
+  outline-offset: 1px;
+}
+
+/* Mobile responsive window adaptions */
+@media (max-width: 767px) {
+  .xp-window {
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: calc(100dvh - var(--xp-taskbar-h)) !important;
+    max-height: calc(100dvh - var(--xp-taskbar-h)) !important;
+    transform: none !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+}
+
+/* Clean document printing */
+@media print {
+  body {
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+  .xp-desktop,
+  .xp-taskbar,
+  .xp-start-menu,
+  .xp-balloon,
+  .xp-marquee,
+  .xp-context-menu {
+    display: none !important;
+  }
+  .xp-window {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    height: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .xp-titlebar,
+  .xp-statusbar,
+  .xp-window-controls,
+  .xp-menu-bar {
+    display: none !important;
+  }
+}
+
+/* Solitaire Tabletop and Cards */
+.xp-solitaire-board {
+  background: radial-gradient(ellipse at 50% 30%, #15803d 0%, #166534 60%, #14532d 100%);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.xp-solitaire-slot {
+  border: 1.5px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.12);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.xp-solitaire-slot.is-valid-target {
+  border-color: #38bdf8;
+  border-style: solid;
+  background-color: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.xp-solitaire-card {
+  border-radius: 5px;
+  background: #ffffff;
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid #94a3b8;
+  touch-action: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.xp-solitaire-card.is-selected {
+  outline: 2.5px solid #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.9), 0 6px 14px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px);
+  z-index: 50 !important;
+}
+
+.xp-solitaire-card.is-hinted {
+  animation: xp-card-hint-pulse 0.9s infinite alternate;
+}
+
+@keyframes xp-card-hint-pulse {
+  from {
+    outline: 2px solid #facc15;
+    box-shadow: 0 0 6px rgba(250, 204, 21, 0.6);
+  }
+  to {
+    outline: 3px solid #f59e0b;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.95);
+  }
+}
+

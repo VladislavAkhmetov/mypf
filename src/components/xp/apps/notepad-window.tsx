@@ -9,7 +9,7 @@ export function NotepadWindow() {
 
   const defaultContent = `=====================================================
 ВЛАД АХМЕТОВ // VLADISLAV AKHMETOV
-Creative Technologist / Design Engineer / AI Product
+${t(site.role)}
 =====================================================
 
 [ О СЕБЕ ]
@@ -37,7 +37,7 @@ Windows XP Notepad Edition (C) 2001-2026 Microsoft Corp.
   const [content, setContent] = useState(defaultContent);
 
   return (
-    <div className="flex-1 flex flex-col bg-white text-black overflow-hidden select-none">
+    <div className="flex-1 flex flex-col bg-white text-black overflow-hidden select-text">
       {/* Menu bar */}
       <div className="xp-menu-bar">
         <span className="xp-menu-item">Файл</span>

@@ -5,6 +5,8 @@ import { xpSound } from "@/lib/xp/sound";
 import { projects } from "@/data/projects";
 
 export type WindowType =
+  | "starter"
+  | "solitaire"
   | "media-player"
   | "project"
   | "my-computer"
@@ -32,6 +34,8 @@ export interface WindowItem {
   props?: Record<string, unknown>;
 }
 
+export type XpTheme = "luna-blue" | "luna-silver" | "classic" | "royale-noir";
+
 export interface BalloonInfo {
   title: string;
   message: string;
@@ -43,6 +47,8 @@ interface WindowManagerContextType {
   activeWindowId: string | null;
   wallpaper: string;
   setWallpaper: (wp: string) => void;
+  theme: XpTheme;
+  setTheme: (theme: XpTheme) => void;
   openWindow: (win: Omit<WindowItem, "zIndex" | "isMinimized" | "isMaximized"> & { isMinimized?: boolean; isMaximized?: boolean }) => void;
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
@@ -64,23 +70,23 @@ let topZ = 100;
 function getDefaultWindows(): WindowItem[] {
   const isClient = typeof window !== "undefined";
   const screenW = isClient ? window.innerWidth : 1024;
-  const isMobile = screenW < 840;
+  const isMobile = screenW < 768;
 
-  const wmpWidth = isMobile ? screenW - 20 : 540;
-  const wmpHeight = isMobile ? 420 : 440;
-  const wmpX = isMobile ? 10 : Math.max(30, screenW - wmpWidth - 28);
-  const wmpY = isMobile ? 14 : 24;
+  const width = isMobile ? screenW : 720;
+  const height = isMobile ? (isClient ? window.innerHeight - 46 : 520) : 480;
+  const x = isMobile ? 0 : Math.max(20, Math.round((screenW - width) / 2));
+  const y = isMobile ? 0 : 36;
 
   return [
     {
-      id: "media-player",
-      type: "media-player",
-      title: "Windows Media Player - Showreel 2026",
-      iconType: "wmp",
-      x: wmpX,
-      y: wmpY,
-      width: wmpWidth,
-      height: wmpHeight,
+      id: "starter",
+      type: "starter",
+      title: "Влад Ахметов — Портфолио",
+      iconType: "starter",
+      x,
+      y,
+      width,
+      height,
       isMinimized: false,
       isMaximized: false,
       zIndex: 100,
@@ -90,14 +96,30 @@ function getDefaultWindows(): WindowItem[] {
 
 export function WindowManagerProvider({ children }: { children: React.ReactNode }) {
   const [windows, setWindows] = useState<WindowItem[]>(getDefaultWindows);
-  const [activeWindowId, setActiveWindowId] = useState<string | null>("media-player");
+  const [activeWindowId, setActiveWindowId] = useState<string | null>("starter");
   const [wallpaper, setWallpaperState] = useState<string>(() => {
     if (typeof window !== "undefined") {
       return window.localStorage.getItem("amazi-xp-wallpaper") || "/images/bliss.jpg";
     }
     return "/images/bliss.jpg";
   });
+  const [theme, setThemeState] = useState<XpTheme>(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem("amazi-xp-theme") as XpTheme;
+      if (saved && ["luna-blue", "luna-silver", "classic", "royale-noir"].includes(saved)) {
+        return saved;
+      }
+    }
+    return "luna-blue";
+  });
   const [balloon, setBalloon] = useState<BalloonInfo | null>(null);
+
+  // Synchronize theme token attribute on root html tag
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.documentElement.setAttribute("data-xp-theme", theme);
+    }
+  }, [theme]);
 
   const showBalloon = useCallback((title: string, message: string) => {
     xpSound.balloon();
@@ -111,6 +133,14 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const setWallpaper = useCallback((wp: string) => {
     setWallpaperState(wp);
     window.localStorage.setItem("amazi-xp-wallpaper", wp);
+  }, []);
+
+  const setTheme = useCallback((newTheme: XpTheme) => {
+    setThemeState(newTheme);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("amazi-xp-theme", newTheme);
+      document.documentElement.setAttribute("data-xp-theme", newTheme);
+    }
   }, []);
 
   // Bring to front
@@ -170,6 +200,15 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       }
       return remaining;
     });
+
+    // Clear project param if closing project window
+    if (typeof window !== "undefined" && id.startsWith("project-")) {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("project")) {
+        url.searchParams.delete("project");
+        window.history.replaceState({}, "", url.toString());
+      }
+    }
   }, []);
 
   const minimizeWindow = useCallback((id: string) => {
@@ -217,10 +256,10 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       const screenH = typeof window !== "undefined" ? window.innerHeight : 768;
 
       const isMobile = screenW < 768;
-      const width = isMobile ? screenW - 16 : Math.min(840, screenW - 120);
-      const height = isMobile ? screenH - 60 : Math.min(580, screenH - 100);
-      const x = isMobile ? 8 : Math.max(30, Math.round((screenW - width) / 2) + Math.round((Math.random() * 40 - 20)));
-      const y = isMobile ? 8 : Math.max(20, Math.round((screenH - height) / 2) - 30 + Math.round((Math.random() * 40 - 20)));
+      const width = isMobile ? screenW : Math.min(840, screenW - 120);
+      const height = isMobile ? screenH - 46 : Math.min(580, screenH - 100);
+      const x = isMobile ? 0 : Math.max(30, Math.round((screenW - width) / 2));
+      const y = isMobile ? 0 : Math.max(20, Math.round((screenH - height) / 2) - 30);
 
       openWindow({
         id: `project-${slug}`,
@@ -234,31 +273,41 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
         props: { slug },
       });
 
-      // Update URL without full refresh
+      // Update URL with history entry
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
-        url.searchParams.set("project", slug);
-        window.history.replaceState({}, "", url.toString());
+        if (url.searchParams.get("project") !== slug) {
+          url.searchParams.set("project", slug);
+          window.history.pushState({ project: slug }, "", url.toString());
+        }
       }
     },
     [openWindow],
   );
 
-  // Check query params on boot or show welcome balloon
+  // Check query params on boot (without distracting unneeded welcome balloon A12)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const targetProject = params.get("project");
     if (targetProject) {
       setTimeout(() => {
         openProject(targetProject);
-      }, 200);
-    } else {
-      setTimeout(() => {
-        showBalloon("Влад Ахметов — Портфолио", "Добро пожаловать в Windows XP! Дважды щелкните по иконке проекта для открытия.");
-      }, 800);
+      }, 150);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    const handlePopState = () => {
+      const currentParams = new URLSearchParams(window.location.search);
+      const projSlug = currentParams.get("project");
+      if (projSlug) {
+        openProject(projSlug);
+      } else {
+        setWindows((prev) => prev.filter((w) => !w.id.startsWith("project-")));
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [openProject]);
 
   const value = useMemo(
     () => ({
@@ -266,6 +315,8 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       activeWindowId,
       wallpaper,
       setWallpaper,
+      theme,
+      setTheme,
       openWindow,
       closeWindow,
       minimizeWindow,
@@ -284,6 +335,8 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       activeWindowId,
       wallpaper,
       setWallpaper,
+      theme,
+      setTheme,
       openWindow,
       closeWindow,
       minimizeWindow,
