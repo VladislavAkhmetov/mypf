@@ -3,6 +3,7 @@
 import React, { useRef, useCallback, useEffect } from "react";
 import { WindowItem, useWindowManager } from "./window-manager-context";
 import { xpCursors } from "@/lib/xp/cursors";
+import notesStyles from "@/components/notes/notes-window.module.css";
 
 interface WindowFrameProps {
   window: WindowItem;
@@ -229,12 +230,13 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
   );
 
   const handleTitleDoubleClick = useCallback(() => {
+    if (win.type === "notes") return;
     if (win.isMaximized) {
       restoreWindow(win.id);
     } else {
       maximizeWindow(win.id);
     }
-  }, [win.id, win.isMaximized, maximizeWindow, restoreWindow]);
+  }, [win.id, win.type, win.isMaximized, maximizeWindow, restoreWindow]);
 
   if (win.isMinimized) return null;
 
@@ -242,7 +244,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
     <div
       ref={frameRef}
       id={`window-${win.id}`}
-      className={`xp-window ${!isFocused ? "is-inactive" : ""} ${win.isMaximized ? "is-maximized" : ""}`}
+      className={`xp-window ${win.type === "notes" ? notesStyles.frame : ""} ${!isFocused ? "is-inactive" : ""} ${win.isMaximized ? "is-maximized" : ""}`}
       style={{
         zIndex: win.zIndex,
         ...(win.isMaximized

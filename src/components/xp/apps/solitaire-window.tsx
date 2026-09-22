@@ -9,9 +9,11 @@ import { SolitaireBoard } from "./solitaire/solitaire-board";
 import { DeckGalleryModal } from "./solitaire/deck-gallery-modal";
 import { SolitaireVictory } from "./solitaire/solitaire-victory";
 import { SolitaireLeaderboardModal } from "./solitaire/solitaire-leaderboard-modal";
+import { useWindowManager } from "../window-manager-context";
 
 export function SolitaireWindow() {
   const session = useSolitaireSession();
+  const { activeWindowId } = useWindowManager();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [highlightRecordId, setHighlightRecordId] = useState<string | undefined>(undefined);
@@ -19,6 +21,7 @@ export function SolitaireWindow() {
   // Keyboard controls (Ctrl+Z for undo, F2 for new game)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeWindowId !== "solitaire" || isGalleryOpen || isLeaderboardOpen || session.isPaused) return;
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         e.preventDefault();
         solitaireStore.undo();
@@ -29,12 +32,13 @@ export function SolitaireWindow() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [activeWindowId, isGalleryOpen, isLeaderboardOpen, session.isPaused]);
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-[#16070c] overflow-hidden select-none">
+    <div className="relative w-full h-full flex flex-col bg-[#315b4e] overflow-hidden select-none">
       {/* Active Board */}
       <SolitaireBoard
+        key={session.sessionId}
         state={session.state}
         onApplyState={(nextState, isUndo) =>
           solitaireStore.applyState(nextState, isUndo)
@@ -51,17 +55,17 @@ export function SolitaireWindow() {
       />
 
       {/* 52-Card Deck Exhibition Gallery */}
-      <DeckGalleryModal
+      {isGalleryOpen && <DeckGalleryModal
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
-      />
+      />}
 
       {/* Leaderboard Modal */}
-      <SolitaireLeaderboardModal
+      {isLeaderboardOpen && <SolitaireLeaderboardModal
         isOpen={isLeaderboardOpen}
         highlightRecordId={highlightRecordId}
         onClose={() => setIsLeaderboardOpen(false)}
-      />
+      />}
 
       {/* Victory Celebration */}
       {session.state.isWon && (
@@ -79,16 +83,16 @@ export function SolitaireWindow() {
       {/* Pause Screen Overlay */}
       {session.isPaused && (
         <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="p-6 rounded-xl border border-[#d7bb7c] bg-[#1c080f] text-center shadow-2xl">
-            <h3 className="font-serif font-bold text-xl text-[#f2d999] mb-2">
+          <div className="p-8 rounded-3xl bg-[#fffcf5] text-center shadow-2xl">
+            <h3 className="font-semibold text-2xl text-[#244b40] mb-2">
               Игра на паузе
             </h3>
-            <p className="text-xs text-[#d8cca8] mb-4">
+            <p className="text-base text-[#52685d] mb-6">
               Окно было свернуто или потеряло фокус.
             </p>
             <button
               onClick={() => solitaireStore.setPaused(false)}
-              className="px-5 py-2 rounded-lg font-serif font-bold text-xs uppercase tracking-wider bg-[#d7bb7c] text-[#18070d] hover:bg-[#f2d999] transition cursor-pointer"
+              className="px-6 py-3 rounded-xl font-semibold text-base bg-[#315b4e] text-white hover:bg-[#244b40] transition cursor-pointer"
             >
               Продолжить
             </button>

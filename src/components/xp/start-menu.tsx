@@ -37,7 +37,7 @@ interface StartMenuProps {
 
 export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
   const { t } = useLocale();
-  const { openWindow, openProject, openPortfolio, openProfile } = useWindowManager();
+  const { openWindow, openProject, openPortfolio, openNotes, openProfile } = useWindowManager();
   const [showAllPrograms, setShowAllPrograms] = useState(false);
 
   if (!isOpen) return null;
@@ -256,16 +256,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             onClick={() => {
               xpSound.click();
               onClose();
-              openWindow({
-                id: "stories",
-                type: "stories",
-                title: "Истории и процессы — Picture Viewer",
-                iconType: "stories",
-                x: 90,
-                y: 70,
-                width: 580,
-                height: 430,
-              });
+              openNotes();
             }}
             data-ym-goal="start_menu_item"
             data-ym-params='{"app":"stories"}'
@@ -273,7 +264,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <StoriesIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Истории студии</span>
+            <span className="font-semibold text-xs">Заметки</span>
           </div>
 
           {/* For Employers / HR & Leads */}

@@ -15,6 +15,7 @@ import { xpSound, tryPlayStartupOnFirstGesture } from "@/lib/xp/sound";
 import { getMinesweeperWindowBounds } from "@/lib/xp/minesweeper-game";
 import { minesweeperStore } from "@/lib/xp/games/game-session-store";
 import { getWordWindowBounds } from "@/lib/xp/navigation";
+import { NotesWidget } from "@/components/notes/notes-widget";
 import {
   MyComputerIcon,
   MyDocumentsIcon,
@@ -60,6 +61,7 @@ export function Desktop() {
     openWindow,
     openProject,
     openPortfolio,
+    openNotes,
     openProfile,
     balloon,
     closeBalloon,
@@ -164,7 +166,7 @@ export function Desktop() {
       },
       {
         id: "stories",
-        title: "Истории",
+        title: "Заметки",
         icon: <StoriesIcon className="w-12 h-12" />,
       },
       {
@@ -505,16 +507,7 @@ export function Desktop() {
           break;
 
         case "stories":
-          openWindow({
-            id: "stories",
-            type: "stories",
-            title: "Истории и процессы — Picture Viewer",
-            iconType: "stories",
-            x: 90,
-            y: 70,
-            width: 580,
-            height: 430,
-          });
+          openNotes();
           break;
 
         case "recycle-bin":
@@ -534,7 +527,7 @@ export function Desktop() {
           openWindow({
             id: "solitaire",
             type: "solitaire",
-            title: "Косынка — Maison Solitaire",
+            title: "Косынка",
             iconType: "solitaire",
             x: 60,
             y: 15,
@@ -598,7 +591,7 @@ export function Desktop() {
           break;
       }
     },
-    [openProject, openPortfolio, openProfile, openWindow, customIcons],
+    [openProject, openPortfolio, openNotes, openProfile, openWindow, customIcons],
   );
 
   const handleIconContextMenu = useCallback(
@@ -643,6 +636,7 @@ export function Desktop() {
     >
       {/* Base Wallpaper Layer */}
       <div
+        data-desktop-wallpaper={displayedWallpaper}
         className="absolute inset-0 pointer-events-none z-0"
         style={getWallpaperCss(displayedWallpaper)}
         aria-hidden="true"
@@ -692,6 +686,8 @@ export function Desktop() {
           />
         );
       })}
+
+      <NotesWidget />
 
       {/* Render All Open Windows */}
       {windows.map((win) => (

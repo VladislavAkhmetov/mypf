@@ -42,9 +42,11 @@ export const ALL_PROJECT_SLUGS: string[] = [
 ];
 
 export interface ParsedNavigation {
-  target: "profile" | "portfolio";
+  target: "profile" | "portfolio" | "notes";
   projectSlug?: string;
   toolSlug?: string;
+  notes?: boolean;
+  noteId?: string;
   projectNotFound?: boolean;
   focus?: FocusDirection;
   otherParams: Record<string, string>;
@@ -68,7 +70,7 @@ export function parseNavigationParams(
 
   const otherParams: Record<string, string> = {};
   params.forEach((val, key) => {
-    if (key !== "project" && key !== "tool" && key !== "view" && key !== "focus") {
+    if (!["project", "tool", "view", "focus", "note"].includes(key)) {
       otherParams[key] = val;
     }
   });
@@ -108,6 +110,10 @@ export function parseNavigationParams(
       : { target: "portfolio", projectNotFound: true, focus, otherParams };
   }
 
+  if (rawView === "notes" || params.get("note")) {
+    return { target: "notes", notes: true, noteId: params.get("note") || undefined, otherParams };
+  }
+
   // Case 2: no project or tool, check view
   if (rawView === "portfolio") {
     return {
@@ -129,10 +135,12 @@ export function parseNavigationParams(
  * preserving extraneous parameters.
  */
 export function buildNavigationQuery(
-  target: "profile" | "portfolio",
+  target: "profile" | "portfolio" | "notes",
   options?: {
     projectSlug?: string | null;
     toolSlug?: string | null;
+    notes?: boolean;
+    noteId?: string;
     focus?: FocusDirection | null;
     otherParams?: Record<string, string>;
   }
@@ -144,6 +152,9 @@ export function buildNavigationQuery(
     if (Object.keys(options?.otherParams || {}).length > 0) {
       params.set("view", "profile");
     }
+  } else if (target === "notes") {
+    params.set("view", "notes");
+    if (options?.noteId) params.set("note", options.noteId);
   } else {
     // Portfolio target
     if (options?.projectSlug) {
@@ -154,6 +165,9 @@ export function buildNavigationQuery(
     } else if (options?.toolSlug) {
       params.set("tool", options.toolSlug);
       if (options.focus) params.set("focus", options.focus);
+    } else if (options?.notes || options?.noteId) {
+      params.set("view", "notes");
+      if (options.noteId) params.set("note", options.noteId);
     } else {
       params.set("view", "portfolio");
       if (options?.focus) {
@@ -191,6 +205,14 @@ export interface WindowBounds {
   y: number;
   width: number;
   height: number;
+}
+
+export function getNotesWindowBounds(): WindowBounds {
+  const width = typeof window === "undefined" ? 1280 : window.innerWidth;
+  const height = (typeof window === "undefined" ? 900 : window.innerHeight) - getTaskbarHeight();
+  const margin = width < 768 ? 0 : 24;
+  const windowWidth = Math.min(680, width - margin * 2);
+  return { x: Math.max(0, width - windowWidth - margin), y: margin, width: windowWidth, height: Math.max(180, height - margin * 2) };
 }
 
 /**

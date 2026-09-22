@@ -5,6 +5,7 @@ import { useWindowManager } from "./window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 import { site } from "@/data/site";
+import notesWidgetStyles from "@/components/notes/notes-widget.module.css";
 
 export function Clippy() {
   const { openWindow, openProject, activeWindowId } = useWindowManager();
@@ -98,8 +99,8 @@ export function Clippy() {
 
   return (
     <div
-      className="fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)]"
-      style={{ cursor: xpCursors.default }}
+      className={`fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)] ${!activeWindowId ? notesWidgetStyles.desktopHelper : ""}`}
+      style={{ cursor: xpCursors.default, display: activeWindowId === "notes" ? "none" : undefined }}
     >
       {/* Speech Bubble */}
       {isOpen && (

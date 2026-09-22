@@ -29,7 +29,7 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
 
     const gameWindow = page.locator("#window-solitaire");
     await expect(gameWindow).toBeVisible({ timeout: 15_000 });
-    await expect(gameWindow.getByText("Maison Solitaire", { exact: true })).toBeVisible();
+    await expect(gameWindow.getByText("Косынка", { exact: true }).last()).toBeVisible();
     await saveScreenshot(page, "solitaire-maison-table.png", "#window-solitaire");
 
     await gameWindow.getByRole("button", { name: "Запас: 24 карт" }).click();
@@ -42,12 +42,12 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
     await expect(gameWindow.getByRole("button", { name: "Запас: 24 карт" })).toBeVisible();
 
     await gameWindow.getByRole("button", { name: "Коллекция" }).click();
-    await expect(gameWindow.getByText("Maison Solitaire · 52 карты", { exact: true })).toBeVisible();
+    await expect(gameWindow.getByText("Одна колода. 52 карты.", { exact: true })).toBeVisible();
     await expect(gameWindow.getByTestId("gallery-card")).toHaveCount(52);
     await saveScreenshot(page, "solitaire-maison-collection.png", "#window-solitaire");
 
     await gameWindow.getByTestId("gallery-card").first().click();
-    await gameWindow.getByRole("button", { name: "Показать рубашку Maison" }).click();
+    await gameWindow.getByRole("button", { name: "Показать рубашку", exact: true }).click();
     await saveScreenshot(page, "solitaire-maison-card-back.png", "#window-solitaire");
     await gameWindow.getByRole("button", { name: "Закрыть просмотр карты" }).click();
     await gameWindow.getByRole("button", { name: "Вернуться к игре" }).click();

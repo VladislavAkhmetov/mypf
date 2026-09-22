@@ -1,0 +1,112 @@
+import { test, expect } from "@playwright/test";
+
+test.use({ viewport: { width: 1440, height: 1050 } });
+const viewportSelector = '#window-notes [data-notes-viewport]';
+
+test("independent newest-first feed, personal likes and bookmarks persist", async ({ page }) => {
+  await page.goto("/?view=notes");
+  await expect(page).toHaveURL(/view=notes/);
+  await expect(page.getByRole("heading", { name: "Заметки", exact: true })).toBeVisible();
+  const viewport = page.locator(viewportSelector);
+  await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeLessThan(4);
+  await expect(page.locator("[data-note-id]").first()).toHaveAttribute("data-note-id", "portfolio-in-progress");
+  await expect(page.locator("#window-portfolio")).toHaveCount(0);
+  const last = page.locator('[data-note-id="portfolio-in-progress"]');
+  await last.getByRole("button", { name: "Мне нравится", exact: true }).click();
+  await last.getByRole("button", { name: "Сохранить заметку", exact: true }).click();
+  await expect(last.getByRole("button", { name: "Мне нравится", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.reload();
+  await expect(last.getByRole("button", { name: "Мне нравится", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Сохранённые заметки", exact: true }).click();
+  await expect(page.locator("[data-note-id]")).toHaveCount(1);
+  await last.getByRole("button", { name: "Сохранить заметку", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Здесь будет то, что хочется оставить" })).toBeVisible();
+});
+
+test("search, categories, post branches, image viewer and real share links", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/?view=notes");
+  await page.getByRole("button", { name: "Поиск заметок", exact: true }).click();
+  const search = page.getByRole("searchbox", { name: "Найти в заметках" });
+  await search.fill("Kora");
+  await expect(page.locator("[data-note-id]")).toHaveCount(1);
+  await expect(search).toBeInViewport();
+  await page.getByRole("button", { name: "Закрыть поиск" }).click();
+  await page.getByRole("button", { name: "К началу ↑" }).click();
+  await page.getByRole("button", { name: "Путешествия", exact: true }).click();
+  await expect(page.locator("[data-note-id]")).toHaveCount(1);
+  await expect(page.locator("[data-note-id]")).toHaveAttribute("data-note-id", "city-notes");
+  await page.goto("/?view=notes&note=kora-process");
+  await expect(page.getByRole("heading", { name: "Ветка", exact: true })).toBeVisible();
+  await expect(page.getByText("Продолжение", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Увеличить: Графика проекта Kora" }).click();
+  await expect(page.getByRole("dialog", { name: "Просмотр изображения" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await page.getByRole("button", { name: "Скопировать ссылку на заметку" }).click();
+  await expect(page.getByRole("status")).toContainText("Ссылка на заметку скопирована");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("?view=notes&note=kora-process");
+  await page.getByRole("button", { name: "Смотреть проект ↗" }).click();
+  await expect(page).toHaveURL(/project=kora/);
+  await page.goBack();
+  await expect(page.getByRole("heading", { name: "Ветка", exact: true })).toBeVisible();
+  await page.goto("/?view=notes&note=missing");
+  await expect(page.getByRole("heading", { name: "Запись не найдена" })).toBeVisible();
+});
+
+test("widget sits below unchanged portfolio and opens a separate narrow journal; mobile fits", async ({ page }, testInfo) => {
+  await page.goto("/?view=portfolio");
+  const portfolio = page.locator("#window-portfolio");
+  const widget = page.getByRole("complementary", { name: "Виджет журнала" });
+  await expect(portfolio.getByRole("button", { name: "Заметки", exact: true })).toHaveCount(0);
+  await expect(portfolio.locator("#notes-preview-title")).toHaveCount(0);
+  const bounds = (await portfolio.boundingBox())!;
+  expect(bounds.width).toBeCloseTo(1440 * .9, 0);
+  expect(await widget.evaluate(el => { const box = el.getBoundingClientRect(); return !!document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)?.closest("#window-portfolio"); })).toBe(true);
+  await portfolio.getByTitle("Свернуть", { exact: true }).click();
+  await expect(widget.locator("[data-widget-note]").first()).toHaveAttribute("data-widget-note", "portfolio-in-progress");
+  await expect(widget.locator("img").first()).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("widget-desktop.png") });
+  await page.setViewportSize({ width: 1366, height: 768 });
+  expect(await widget.locator("[data-widget-note]").nth(1).evaluate(el => {
+    const post = el.getBoundingClientRect();
+    const clip = el.parentElement!.getBoundingClientRect();
+    return post.top + 40 < clip.bottom && post.bottom > clip.bottom;
+  })).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("widget-laptop.png") });
+  await widget.getByRole("button", { name: "Раскрыть журнал" }).click();
+  await expect(page).toHaveURL(/view=notes/);
+  await expect(widget).toHaveCount(0);
+  const journal = page.locator("#window-notes");
+  await expect(journal).toBeVisible();
+  expect((await journal.boundingBox())!.width).toBeLessThanOrEqual(680);
+  await journal.getByTitle("Закрыть", { exact: true }).click();
+  await expect(widget).toBeVisible();
+  await widget.getByRole("button", { name: "Читать последнюю запись" }).click();
+  await expect(page).toHaveURL(/note=portfolio-in-progress/);
+  await expect(journal.getByRole("heading", { name: "Ветка", exact: true })).toBeVisible();
+  await journal.getByRole("button", { name: "Назад в ленту" }).click();
+  await page.screenshot({ path: testInfo.outputPath("notes-desktop.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Заметки", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Сохранённые заметки" })).toBeInViewport();
+  const nav = await page.getByRole("button", { name: "Сохранённые заметки" }).boundingBox();
+  const viewport = await page.locator(viewportSelector).boundingBox();
+  expect(nav!.y + nav!.height).toBeLessThanOrEqual(viewport!.y + viewport!.height);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("notes-mobile.png") });
+});
+
+test("opening the journal preserves the already open portfolio case", async ({ page }) => {
+  await page.goto("/?project=kora");
+  const portfolio = page.locator("#window-portfolio");
+  await expect(portfolio.getByRole("heading", { name: "Kora", exact: true })).toBeVisible();
+  await page.locator(".xp-desktop-icon").filter({ hasText: "Заметки" }).dblclick();
+  const journal = page.locator("#window-notes");
+  await expect(journal).toBeVisible();
+  await expect(portfolio.getByRole("heading", { name: "Kora", exact: true })).toBeVisible();
+  await expect(portfolio.getByRole("heading", { name: "Влад Ахметов.", exact: true })).toHaveCount(0);
+  await journal.getByTitle("Закрыть", { exact: true }).click();
+  await expect(portfolio.getByRole("heading", { name: "Kora", exact: true })).toBeVisible();
+});

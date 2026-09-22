@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useWindowManager, XpTheme } from "../window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
+import { getWallpaperPeriod, TIME_WALLPAPERS } from "@/lib/xp/time-wallpaper";
+import { DEFAULT_WALLPAPER_SRC } from "@/lib/xp/wallpapers";
 
 interface ThemeOption {
   id: XpTheme;
@@ -61,8 +63,7 @@ export function DisplayPropertiesDialog() {
     wallpaper,
     setWallpaper,
     wallpaperSource,
-    geoInfo,
-    resetWallpaperToGeo,
+    resetWallpaperToTime,
     theme,
     setTheme,
     closeWindow,
@@ -70,34 +71,29 @@ export function DisplayPropertiesDialog() {
   const [activeTab, setActiveTab] = useState<"themes" | "wallpapers">("themes");
   const [selectedTheme, setSelectedTheme] = useState<XpTheme>(theme);
   const [selectedWp, setSelectedWp] = useState<string>(wallpaper);
-  const [isDetecting, setIsDetecting] = useState(false);
+  const [selectedMode, setSelectedMode] = useState(wallpaperSource);
+  const previewWp = selectedMode === "time" ? TIME_WALLPAPERS[getWallpaperPeriod(new Date())] : selectedWp;
 
   const currentThemeObj = themeOptions.find((t) => t.id === selectedTheme) || themeOptions[0];
 
   const handleApply = () => {
     xpSound.click();
     setTheme(selectedTheme);
-    setWallpaper(selectedWp, "user");
+    if (selectedMode === "time") resetWallpaperToTime();
+    else setWallpaper(selectedWp);
   };
 
   const handleOk = () => {
     xpSound.click();
     setTheme(selectedTheme);
-    setWallpaper(selectedWp, "user");
+    if (selectedMode === "time") resetWallpaperToTime();
+    else setWallpaper(selectedWp);
     closeWindow("display-properties");
   };
 
-  const handleAutoGeo = async () => {
+  const handleAutoTime = () => {
     xpSound.click();
-    setIsDetecting(true);
-    try {
-      const newWp = await resetWallpaperToGeo();
-      if (newWp) {
-        setSelectedWp(newWp);
-      }
-    } finally {
-      setIsDetecting(false);
-    }
+    setSelectedMode("time");
   };
 
   return (
@@ -143,7 +139,7 @@ export function DisplayPropertiesDialog() {
           <div
             className="w-full h-28 rounded border border-slate-600 overflow-hidden relative flex flex-col justify-between"
             style={{
-              background: selectedWp.startsWith("/") ? `url(${selectedWp}) center/cover` : selectedWp,
+              background: previewWp.startsWith("/") ? `url(${previewWp}) center/cover, url(${DEFAULT_WALLPAPER_SRC}) center/cover` : previewWp,
             }}
           >
             {/* Simulated Mini XP Window inside preview */}
@@ -244,34 +240,27 @@ export function DisplayPropertiesDialog() {
           </div>
         ) : (
           <div className="space-y-2">
-            {/* Geo status & auto-detection banner */}
+            {/* Automatic backgrounds use the visitor's local clock. */}
             <div className="bg-[#f0f4f9] border border-[#b2c8e6] rounded p-2 flex items-center justify-between text-[11px]">
               <div>
                 <div className="font-semibold text-slate-800">
                   Режим:{" "}
                   <span className="font-normal text-blue-900">
-                    {wallpaperSource === "user"
-                      ? "Ручной выбор (сохранен)"
-                      : wallpaperSource === "geo"
-                      ? "Автоматически по IP"
-                      : "По умолчанию"}
+                    {selectedMode === "user" ? "Ручной выбор" : "По местному времени"}
                   </span>
                 </div>
-                {geoInfo && (
-                  <div className="text-[10px] text-slate-500">
-                    Определенная локация: {geoInfo.city ? `${geoInfo.city}, ` : ""}{geoInfo.country}
-                  </div>
-                )}
+                <div className="text-[10px] text-slate-500">
+                  Утро с 6 · день с 11 · вечер с 18 · ночь с 22
+                </div>
               </div>
               <button
                 type="button"
-                onClick={handleAutoGeo}
-                disabled={isDetecting}
+                onClick={handleAutoTime}
                 className="px-2.5 py-1 bg-white hover:bg-slate-50 active:bg-slate-200 border border-[#7a9eb5] rounded text-[11px] font-medium text-slate-800 shadow-xs flex items-center gap-1 disabled:opacity-50"
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>🌍</span>
-                <span>{isDetecting ? "Определение..." : "Определить по IP"}</span>
+                <span aria-hidden="true">◷</span>
+                <span>По времени суток</span>
               </button>
             </div>
 
@@ -280,13 +269,14 @@ export function DisplayPropertiesDialog() {
             </span>
             <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
               {WALLPAPERS.map((wp) => {
-                const isSelected = selectedWp === wp.src;
+                const isSelected = selectedMode === "user" && selectedWp === wp.src;
                 return (
                   <div
                     key={wp.id}
                     onClick={() => {
                       xpSound.click();
                       setSelectedWp(wp.src);
+                      setSelectedMode("user");
                     }}
                     className={`px-2.5 py-1.5 rounded transition cursor-pointer flex items-center justify-between gap-2 ${
                       isSelected

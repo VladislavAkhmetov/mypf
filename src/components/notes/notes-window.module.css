@@ -1,0 +1,9 @@
+.viewport { flex: 1; min-height: 0; overflow: auto; background: #181916; scrollbar-width: thin; scrollbar-color: #505447 #181916; }
+.frame.frame { border: 0 !important; border-radius: 28px; background: #181916 !important; box-shadow: 0 24px 90px #0005 !important; }
+.frame :global(.xp-titlebar) { height: 64px; min-height: 64px; padding: 0 18px 0 26px; border: 0; background: #181916 !important; cursor: grab; }
+.frame :global(.xp-titlebar-title) { font-family: var(--font-onest), Arial, sans-serif !important; font-size: 17px; font-weight: 500; color: #b5b9a9; text-shadow: none; }
+.frame :global(.xp-window-controls) { gap: 6px; }
+.frame :global(.xp-btn-ctrl) { width: 36px; height: 36px; border: 0 !important; border-radius: 50%; background: #30342b !important; box-shadow: none !important; cursor: pointer !important; }
+.frame :global(.xp-btn-ctrl):hover { background: #4d5442 !important; }
+.frame :global(.xp-btn-maximize) { display: none; }
+@media (max-width: 767px) { .frame.frame { border-radius: 0; } }

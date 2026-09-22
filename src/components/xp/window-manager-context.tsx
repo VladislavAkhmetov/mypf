@@ -6,12 +6,14 @@ import {
   parseNavigationParams,
   getPrimaryWindowBounds,
   getWordWindowBounds,
+  getNotesWindowBounds,
   getTaskbarHeight,
   FocusDirection,
 } from "@/lib/xp/navigation";
-import { DEFAULT_WALLPAPER_SRC } from "@/lib/xp/wallpapers";
+import { useDesktopWallpaper, type WallpaperSource } from "@/lib/xp/use-desktop-wallpaper";
 
 export type WindowType =
+  | "notes"
   | "portfolio"
   | "starter"
   | "solitaire"
@@ -58,10 +60,9 @@ interface WindowManagerContextType {
   windows: WindowItem[];
   activeWindowId: string | null;
   wallpaper: string;
-  setWallpaper: (wp: string, source?: "user" | "geo") => void;
-  wallpaperSource: "user" | "geo" | "default";
-  geoInfo: { country: string; countryCode: string | null; city: string | null } | null;
-  resetWallpaperToGeo: () => Promise<string | null>;
+  setWallpaper: (wp: string) => void;
+  wallpaperSource: WallpaperSource;
+  resetWallpaperToTime: () => void;
   theme: XpTheme;
   setTheme: (theme: XpTheme) => void;
   openWindow: (
@@ -87,6 +88,7 @@ interface WindowManagerContextType {
     notFound?: boolean;
     pushHistory?: boolean;
   }) => void;
+  openNotes: (options?: { noteId?: string; pushHistory?: boolean }) => void;
   openProfile: (options?: { pushHistory?: boolean }) => void;
   balloon: BalloonInfo | null;
   showBalloon: (title: string, message: string) => void;
@@ -104,6 +106,10 @@ function getDefaultWindows(): WindowItem[] {
 
   const nav = parseNavigationParams(window.location.search);
   const bounds = getPrimaryWindowBounds();
+
+  if (nav.target === "notes") {
+    return [{ id: "notes", type: "notes", title: "Личный журнал", iconType: "stories", ...getNotesWindowBounds(), isMinimized: false, isMaximized: false, zIndex: 100, props: { noteId: nav.noteId } }];
+  }
 
   if (nav.target === "portfolio") {
     return [
@@ -149,32 +155,12 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const [activeWindowId, setActiveWindowId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
       const nav = parseNavigationParams(window.location.search);
-      return nav.target === "portfolio" ? "portfolio" : "word";
+      return nav.target === "notes" ? "notes" : nav.target === "portfolio" ? "portfolio" : "word";
     }
     return null;
   });
 
-  const [wallpaper, setWallpaperState] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      return window.localStorage.getItem("amazi-xp-wallpaper") || DEFAULT_WALLPAPER_SRC;
-    }
-    return DEFAULT_WALLPAPER_SRC;
-  });
-
-  const [wallpaperSource, setWallpaperSource] = useState<"user" | "geo" | "default">(() => {
-    if (typeof window !== "undefined") {
-      const src = window.localStorage.getItem("amazi-xp-wallpaper-source") as "user" | "geo" | null;
-      if (src === "user" || src === "geo") return src;
-      if (window.localStorage.getItem("amazi-xp-wallpaper")) return "user";
-    }
-    return "default";
-  });
-
-  const [geoInfo, setGeoInfo] = useState<{
-    country: string;
-    countryCode: string | null;
-    city: string | null;
-  } | null>(null);
+  const { wallpaper, wallpaperSource, setWallpaper, resetWallpaperToTime } = useDesktopWallpaper();
 
   const [theme, setThemeState] = useState<XpTheme>(() => {
     if (typeof window !== "undefined") {
@@ -202,107 +188,6 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
   const closeBalloon = useCallback(() => {
     setBalloon(null);
-  }, []);
-
-  const setWallpaper = useCallback((wp: string, source: "user" | "geo" = "user") => {
-    setWallpaperState(wp);
-    setWallpaperSource(source);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("amazi-xp-wallpaper", wp);
-      window.localStorage.setItem("amazi-xp-wallpaper-source", source);
-    }
-  }, []);
-
-  const resetWallpaperToGeo = useCallback(async (): Promise<string | null> => {
-    if (typeof window === "undefined") return null;
-
-    window.localStorage.removeItem("amazi-xp-wallpaper-source");
-    window.localStorage.removeItem("amazi-xp-wallpaper");
-    setWallpaperSource("default");
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      const res = await fetch("/api/geo", { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data?.wallpaper) {
-        setGeoInfo({
-          country: data.country,
-          countryCode: data.countryCode,
-          city: data.city,
-        });
-        const newWp = data.wallpaper.src;
-        setWallpaperState(newWp);
-        setWallpaperSource("geo");
-        window.localStorage.setItem("amazi-xp-wallpaper", newWp);
-        window.localStorage.setItem("amazi-xp-wallpaper-source", "geo");
-        return newWp;
-      }
-    } catch {
-      // ignore
-    }
-    return null;
-  }, []);
-
-  useEffect(() => {
-    let ignore = false;
-    if (typeof window === "undefined") return;
-
-    const currentSource = window.localStorage.getItem("amazi-xp-wallpaper-source");
-    const hasUserPref =
-      currentSource === "user" ||
-      (currentSource === null && window.localStorage.getItem("amazi-xp-wallpaper") !== null);
-
-    if (hasUserPref) return;
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-    fetch("/api/geo", { signal: controller.signal })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (ignore || !data?.wallpaper) return;
-
-        setGeoInfo({
-          country: data.country,
-          countryCode: data.countryCode,
-          city: data.city,
-        });
-
-        const latestSource = window.localStorage.getItem("amazi-xp-wallpaper-source");
-        const latestUserPref =
-          latestSource === "user" ||
-          (latestSource === null && window.localStorage.getItem("amazi-xp-wallpaper") !== null);
-        if (latestUserPref) return;
-
-        const newWp = data.wallpaper.src;
-        setWallpaperState(newWp);
-        setWallpaperSource("geo");
-        window.localStorage.setItem("amazi-xp-wallpaper", newWp);
-        window.localStorage.setItem("amazi-xp-wallpaper-source", "geo");
-
-        if (!data.isFallback && data.wallpaper.name) {
-          xpSound.balloon();
-          setBalloon({
-            title: "Персонализация",
-            message: `Определен регион: ${data.country || data.countryCode}. Установлены обои «${data.wallpaper.name}».`,
-            id: Date.now(),
-          });
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully on timeout or network error
-      })
-      .finally(() => {
-        clearTimeout(timeoutId);
-      });
-
-    return () => {
-      ignore = true;
-      controller.abort();
-    };
   }, []);
 
   const setTheme = useCallback((newTheme: XpTheme) => {
@@ -382,7 +267,13 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     });
 
     // Closing portfolio window clears its URL params via replaceState without opening Word immediately
-    if (typeof window !== "undefined" && (id === "portfolio" || id.startsWith("project-"))) {
+    if (typeof window !== "undefined" && id === "notes" && parseNavigationParams(window.location.search).target === "notes") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("view");
+      url.searchParams.delete("note");
+      window.history.replaceState({}, "", url.toString());
+    }
+    if (typeof window !== "undefined" && (id === "portfolio" || id.startsWith("project-")) && parseNavigationParams(window.location.search).target === "portfolio") {
       const url = new URL(window.location.href);
       url.searchParams.delete("project");
       url.searchParams.delete("tool");
@@ -432,6 +323,18 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     setActiveWindowId(null);
   }, []);
 
+  const openNotes = useCallback((options?: { noteId?: string; pushHistory?: boolean }) => {
+    openWindow({ id: "notes", type: "notes", title: "Личный журнал", iconType: "stories", ...getNotesWindowBounds(), props: { noteId: options?.noteId } });
+    if (options?.pushHistory !== false) {
+      const url = new URL(window.location.href);
+      ["project", "tool", "focus", "note"].forEach(key => url.searchParams.delete(key));
+      url.searchParams.set("view", "notes");
+      if (options?.noteId) url.searchParams.set("note", options.noteId);
+      window.history.pushState({ target: "notes" }, "", url.toString());
+      window.dispatchEvent(new Event("portfolio:navigate"));
+    }
+  }, [openWindow]);
+
   // Unified Portfolio Browser launcher
   const openPortfolio = useCallback(
     (options?: {
@@ -457,6 +360,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       if (options?.pushHistory !== false && typeof window !== "undefined") {
         const url = new URL(window.location.href);
         url.searchParams.delete("tool");
+        url.searchParams.delete("note");
         if (options?.projectSlug) {
           url.searchParams.set("project", options.projectSlug);
           if (options.focus) {
@@ -479,6 +383,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
           "",
           url.toString()
         );
+        window.dispatchEvent(new Event("portfolio:navigate"));
       }
     },
     [openWindow]
@@ -503,6 +408,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
         const url = new URL(window.location.href);
         url.searchParams.delete("project");
         url.searchParams.delete("tool");
+        url.searchParams.delete("note");
         url.searchParams.delete("focus");
         const hasOther = Array.from(url.searchParams.keys()).some(
           (k) => k !== "view" && k !== "project" && k !== "focus"
@@ -530,7 +436,9 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     const handlePopState = () => {
       const nav = parseNavigationParams(window.location.search);
-      if (nav.target === "portfolio") {
+      if (nav.target === "notes") {
+        openNotes({ noteId: nav.noteId, pushHistory: false });
+      } else if (nav.target === "portfolio") {
         openPortfolio({
           projectSlug: nav.projectSlug,
           focus: nav.focus,
@@ -546,7 +454,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [openPortfolio, openProfile]);
+  }, [openPortfolio, openProfile, openNotes]);
 
   // Keep window controls visible and accessible when viewport resizes
   useEffect(() => {
@@ -558,6 +466,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
       setWindows((prev) =>
         prev.map((w) => {
+          if (w.id === "notes") return { ...w, ...getNotesWindowBounds() };
           const isPrimary = w.id === "word" || w.id === "portfolio";
           const newW = screenW < 1024 && isPrimary ? screenW : Math.min(w.width, screenW);
           const newH = screenW < 1024 && isPrimary ? availH : Math.min(w.height, availH);
@@ -586,8 +495,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       wallpaper,
       setWallpaper,
       wallpaperSource,
-      geoInfo,
-      resetWallpaperToGeo,
+      resetWallpaperToTime,
       theme,
       setTheme,
       openWindow,
@@ -600,6 +508,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       minimizeAll,
       openProject,
       openPortfolio,
+      openNotes,
       openProfile,
       balloon,
       showBalloon,
@@ -611,8 +520,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       wallpaper,
       setWallpaper,
       wallpaperSource,
-      geoInfo,
-      resetWallpaperToGeo,
+      resetWallpaperToTime,
       theme,
       setTheme,
       openWindow,
@@ -625,6 +533,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       minimizeAll,
       openProject,
       openPortfolio,
+      openNotes,
       openProfile,
       balloon,
       showBalloon,

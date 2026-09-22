@@ -20,6 +20,7 @@ import { WordWindow } from "./apps/word-window";
 import { PaintWindow } from "./apps/paint-window";
 import { PortfolioBrowserWindow } from "./apps/portfolio-browser-window";
 import { FocusDirection } from "@/lib/xp/navigation";
+import { NotesWindow } from "@/components/notes/notes-window";
 
 const SolitaireWindow = dynamic(
   () => import("./apps/solitaire-window").then((mod) => mod.SolitaireWindow),
@@ -47,6 +48,8 @@ const MinesweeperWindow = dynamic(
 
 export function WindowContentRouter({ window: win }: { window: WindowItem }) {
   switch (win.type) {
+    case "notes":
+      return <NotesWindow noteId={win.props?.noteId as string | undefined} />;
     case "portfolio":
       return (
         <PortfolioBrowserWindow

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { catalogProjects, getProject, getAdjacent } from "@/data/projects";
 import { toolsList } from "@/data/tools";
 import { buildNavigationQuery, parseNavigationParams, PORTFOLIO_DIRECTIONS, type FocusDirection } from "@/lib/xp/navigation";
@@ -32,7 +32,10 @@ function readPositions(): Record<string, number> {
 }
 
 export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFound }: PortfolioBrowserWindowProps) {
-  const search = useSyncExternalStore(subscribeToNavigation, () => window.location.search, () => "");
+  const [search, setSearch] = useState(() => parseNavigationParams(window.location.search).target === "portfolio" ? window.location.search : "");
+  useEffect(() => subscribeToNavigation(() => {
+    if (parseNavigationParams(window.location.search).target === "portfolio") setSearch(window.location.search);
+  }), []);
   const fallback = buildNavigationQuery("portfolio", { projectSlug: initialProjectSlug, focus: initialFocus });
   const nav = useMemo(() => parseNavigationParams(search || fallback), [search, fallback]);
   const focus = nav.focus ?? null;
@@ -50,7 +53,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
     viewport.scrollTop = positions.current[routeKey] ?? 0;
     const save = () => {
       positions.current[routeKey] = viewport.scrollTop;
-      sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current));
+      try { sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
     };
     viewport.addEventListener("scroll", save, { passive: true });
     return () => viewport.removeEventListener("scroll", save);
@@ -59,7 +62,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
   const navigate = (options: { projectSlug?: string; toolSlug?: string; focus?: FocusDirection | null }) => {
     xpSound.click();
     if (contentRef.current) positions.current[routeKey] = contentRef.current.scrollTop;
-    sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current));
+    try { sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
     const query = buildNavigationQuery("portfolio", { ...options, otherParams: nav.otherParams });
     window.history.pushState({ view: "portfolio", ...options }, "", window.location.pathname + query);
     window.dispatchEvent(new Event("portfolio:navigate"));

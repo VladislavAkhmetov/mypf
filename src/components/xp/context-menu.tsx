@@ -92,6 +92,7 @@ export function ContextMenu({
         cursor: xpCursors.default,
       }}
       onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
       onContextMenu={(e) => e.preventDefault()}
     >
       {isDesktop ? (

@@ -134,7 +134,7 @@ export function PaintWindow() {
     const url = captureFrame("wallpaper");
     if (!url) return;
     try {
-      setWallpaper(url, "user");
+      setWallpaper(url);
       showBalloon("Обои установлены", "Это поле теперь на рабочем столе.");
     } catch {
       showBalloon("Не удалось сохранить", "Снимок не поместился в браузер. Попробуй ещё раз.");

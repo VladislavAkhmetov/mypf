@@ -8,6 +8,7 @@ import { toolsList } from "@/data/tools";
 import { useLocale } from "@/lib/i18n";
 import { PORTFOLIO_DIRECTIONS, type FocusDirection } from "@/lib/xp/navigation";
 import styles from "./portfolio-landing.module.css";
+import { CareerTimeline } from "./career-timeline";
 
 interface PortfolioLandingProps {
   projects: Project[];
@@ -191,6 +192,7 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
           <span className={styles.counter} aria-live="polite" aria-atomic="true">{String(activeIndex + 1).padStart(2, "0")} <span>/ {String(projects.length).padStart(2, "0")}</span></span>
         </div>
       </section>
+      <CareerTimeline scrollContainer={scrollContainer} />
       <section className={styles.tools} aria-labelledby="portfolio-tools-title">
         <h2 id="portfolio-tools-title">Меньше рутины.<br />Больше <span>дизайна.</span></h2>
         <div className={styles.toolsGrid}>

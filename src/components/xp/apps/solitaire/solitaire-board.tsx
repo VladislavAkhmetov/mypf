@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Card,
@@ -11,6 +12,8 @@ import {
   drawCard,
   findHint,
   getNextAutoFinishMove,
+  getRankNameRu,
+  getSuitNameRu,
   moveFoundationToTableau,
   moveTableauToFoundation,
   moveTableauToTableau,
@@ -19,8 +22,8 @@ import {
   tryAutoMoveCardToFoundation,
 } from "@/lib/xp/solitaire-deck";
 import { gameSound } from "@/lib/xp/games/game-sound";
-import { AtelierCardBack, SuitPip } from "./card-assets";
-import { SolitaireCard } from "./solitaire-card";
+import { SuitPip } from "./card-assets";
+import { CardBack, SolitaireCard } from "./solitaire-card";
 import styles from "./solitaire.module.css";
 
 interface SelectedCardInfo {
@@ -33,6 +36,12 @@ interface SelectedCardInfo {
 }
 
 interface DragInfo {
+  pointerId: number;
+  state: SolitaireState;
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  active: boolean;
   info: SelectedCardInfo;
   startX: number;
   startY: number;
@@ -52,6 +61,11 @@ interface SolitaireBoardProps {
 }
 
 const SUITS: Suit[] = ["spades", "hearts", "clubs", "diamonds"];
+
+function stackOffset(cards: Card[]) {
+  const open = cards.filter((card) => card.isFaceUp).length;
+  return `calc(${open} * var(--face-step) + ${cards.length - open} * var(--back-step))`;
+}
 
 function formatTime(seconds: number) {
   const minutes = Math.floor(seconds / 60);
@@ -80,11 +94,15 @@ export function SolitaireBoard({
   elapsedSeconds,
   onOpenLeaderboard,
 }: SolitaireBoardProps) {
-  const [selected, setSelected] = useState<SelectedCardInfo | null>(null);
+  const [selection, setSelection] = useState<{ info: SelectedCardInfo; state: SolitaireState } | null>(null);
+  const selected = selection?.state === state ? selection.info : null;
+  const setSelected = (info: SelectedCardInfo | null) => setSelection(info ? { info, state } : null);
   const [hint, setHint] = useState<HintMove | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isAutoFinishing, setIsAutoFinishing] = useState(false);
   const [dragging, setDragging] = useState<DragInfo | null>(null);
+  const dragRef = useRef<DragInfo | null>(null);
+  const suppressClick = useRef(false);
   const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSelection = () => {
@@ -161,24 +179,44 @@ export function SolitaireBoard({
   };
 
   const startDrag = (event: React.PointerEvent, info: SelectedCardInfo) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || !event.isPrimary || isAutoFinishing) return;
+    suppressClick.current = false;
+    const rect = event.currentTarget.getBoundingClientRect();
     event.currentTarget.setPointerCapture(event.pointerId);
-    setDragging({
+    dragRef.current = {
+      pointerId: event.pointerId,
+      state,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      width: rect.width,
+      active: false,
       info,
       startX: event.clientX,
       startY: event.clientY,
       currentX: event.clientX,
       currentY: event.clientY,
-    });
+    };
   };
 
-  const endDrag = () => {
-    if (!dragging) return;
-    const { info, startX, startY, currentX, currentY } = dragging;
-    setDragging(null);
-    if (Math.hypot(currentX - startX, currentY - startY) < 7) return;
+  const moveDrag = (event: React.PointerEvent) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const active = drag.active || Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) >= 7;
+    dragRef.current = { ...drag, currentX: event.clientX, currentY: event.clientY, active };
+    if (active) setDragging(dragRef.current);
+  };
 
-    const element = document.elementFromPoint(currentX, currentY);
+  const endDrag = (event: React.PointerEvent) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    dragRef.current = null;
+    setDragging(null);
+    if (!drag.active) return;
+    suppressClick.current = true;
+    if (drag.state !== state) return;
+    const { info } = drag;
+
+    const element = document.elementFromPoint(event.clientX, event.clientY);
     const tableau = element?.closest("[data-tableau-col]");
     if (tableau) {
       const target = Number(tableau.getAttribute("data-tableau-col"));
@@ -204,7 +242,8 @@ export function SolitaireBoard({
     }
 
     setMessage("Эта карта сюда не подходит");
-    window.setTimeout(() => setMessage(null), 1200);
+    if (messageTimer.current) clearTimeout(messageTimer.current);
+    messageTimer.current = setTimeout(() => setMessage(null), 1800);
   };
 
   const requestHint = () => {
@@ -251,16 +290,22 @@ export function SolitaireBoard({
   return (
     <div
       className={styles.shell}
-      onPointerMove={(event) => dragging && setDragging({ ...dragging, currentX: event.clientX, currentY: event.clientY })}
+      onPointerMove={moveDrag}
       onPointerUp={endDrag}
-      onPointerCancel={() => setDragging(null)}
+      onPointerCancel={() => { dragRef.current = null; setDragging(null); }}
+      onClickCapture={(event) => {
+        if (suppressClick.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          suppressClick.current = false;
+        }
+      }}
     >
       <header className={styles.header}>
         <div className={styles.brand}>
-          <span className={styles.monogram}>VA</span>
-          <span><b>Maison Solitaire</b><small>Авторская косынка · выпуск 01</small></span>
+          <SuitPip suit="spades" color="currentColor" />
+          <span><b>Косынка</b><small>Небольшой перерыв — хорошая идея</small></span>
         </div>
-        <div className={styles.rule}><i /><span>Atelier de cartes</span><i /></div>
         <div className={styles.stats}>
           <span><small>Ходы</small><b>{String(state.moveCount).padStart(2, "0")}</b></span>
           <span><small>Время</small><b>{formatTime(elapsedSeconds)}</b></span>
@@ -268,17 +313,16 @@ export function SolitaireBoard({
       </header>
 
       <main className={styles.table}>
-        <div className={styles.tableGlow} />
         <section className={styles.topRow} aria-label="Запас, сброс и основания">
           <div className={styles.stockGroup}>
             <button className={`${styles.pile} ${styles.stock}`} onClick={handleStock} aria-label={`Запас: ${state.stock.length} карт`}>
-              {state.stock.length ? <><AtelierCardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}>↻</span>}
+              {state.stock.length ? <><CardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}>↻</span>}
             </button>
             <div className={styles.waste}>
               {state.waste.length ? (
-                <div onClick={selectWaste} onPointerDown={(event) => startDrag(event, { source: "waste", card: state.waste.at(-1)!, cards: [state.waste.at(-1)!] })}>
-                  <SolitaireCard card={state.waste.at(-1)!} isSelected={selected?.source === "waste"} isHinted={hint?.sourceType === "waste"} onDoubleClick={() => doubleClick(state.waste.at(-1)!)} />
-                </div>
+                <button aria-label={`Сброс: ${getRankNameRu(state.waste.at(-1)!.rank)}, ${getSuitNameRu(state.waste.at(-1)!.suit)}`} onClick={selectWaste} onDoubleClick={() => doubleClick(state.waste.at(-1)!)} onPointerDown={(event) => startDrag(event, { source: "waste", card: state.waste.at(-1)!, cards: [state.waste.at(-1)!] })}>
+                  <SolitaireCard card={state.waste.at(-1)!} isSelected={selected?.source === "waste"} isHinted={hint?.sourceType === "waste"} />
+                </button>
               ) : <div className={`${styles.pile} ${styles.emptyPile}`}><span>Сброс</span></div>}
             </div>
           </div>
@@ -295,7 +339,7 @@ export function SolitaireBoard({
                   onPointerDown={(event) => card && startDrag(event, { source: "foundation", foundationIndex: index, card, cards: [card] })}
                   aria-label={`Основание ${index + 1}`}
                 >
-                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} onDoubleClick={() => doubleClick(card)} /> : <><SuitPip suit={suit} /><small>A — K</small></>}
+                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} /> : <><SuitPip suit={suit} color="currentColor" /><small>A — K</small></>}
                 </button>
               );
             })}
@@ -306,57 +350,62 @@ export function SolitaireBoard({
           {state.tableau.map((column, columnIndex) => {
             const targetHint = hint?.targetType === "tableau" && hint.targetIndex === columnIndex;
             return (
-              <button
-                type="button"
+              <div
+                role="group"
                 key={columnIndex}
                 data-tableau-col={columnIndex}
                 className={`${styles.column} ${targetHint ? styles.hinted : ""}`}
                 onClick={() => selectTableau(columnIndex)}
                 aria-label={`Колонка ${columnIndex + 1}`}
+                style={{ marginBottom: stackOffset(column.slice(0, -1)) }}
               >
-                {!column.length && <span className={styles.kingSlot}>K<small>пустая колонка</small></span>}
+                {!column.length && <button className={styles.kingSlot} aria-label={`Пустая колонка ${columnIndex + 1}: положить короля`}>K<small>Король</small></button>}
                 {column.map((card, cardIndex) => {
-                  const top = column.slice(0, cardIndex).reduce((sum, current) => sum + (current.isFaceUp ? 30 : 15), 0);
+                  const top = stackOffset(column.slice(0, cardIndex));
                   const chosen = selected?.source === "tableau" && selected.columnIndex === columnIndex && selected.cardIndex !== undefined && cardIndex >= selected.cardIndex;
                   const sourceHint = hint?.sourceType === "tableau" && hint.sourceIndex === columnIndex && (hint.cardId ? hint.cardId === card.id : cardIndex === column.length - 1);
                   return (
-                    <span
+                    <button
                       key={card.id}
+                      disabled={!card.isFaceUp}
+                      aria-label={card.isFaceUp ? `${getRankNameRu(card.rank)}, ${getSuitNameRu(card.suit)}` : "Закрытая карта"}
                       className={styles.cardPosition}
                       style={{ top, zIndex: cardIndex + 1 }}
                       onClick={(event) => { event.stopPropagation(); selectTableau(columnIndex, cardIndex); }}
+                      onDoubleClick={() => doubleClick(card)}
                       onPointerDown={(event) => card.isFaceUp && startDrag(event, { source: "tableau", columnIndex, cardIndex, card, cards: column.slice(cardIndex) })}
                     >
-                      <SolitaireCard card={card} isSelected={chosen} isHinted={sourceHint} onDoubleClick={() => doubleClick(card)} />
-                    </span>
+                      <SolitaireCard card={card} isSelected={chosen} isHinted={sourceHint} />
+                    </button>
                   );
                 })}
-              </button>
+              </div>
             );
           })}
         </section>
       </main>
+      <p className={styles.instructions}>Чередуй цвета, раскладывай по убыванию. Двойной клик — карта в основание.</p>
 
       <AnimatePresence>
-        {message && <motion.div className={styles.toast} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>{message}</motion.div>}
+        {message && <motion.div role="status" className={styles.toast} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>{message}</motion.div>}
       </AnimatePresence>
 
-      {dragging && (
-        <div className={styles.dragOverlay} style={{ left: dragging.currentX - 46, top: dragging.currentY - 56 }}>
-          {dragging.info.cards.map((card, index) => <span key={card.id} style={{ marginTop: index ? -100 : 0 }}><SolitaireCard card={card} isDragging /></span>)}
-        </div>
+      {dragging && createPortal(
+        <div aria-hidden="true" data-testid="solitaire-drag" className={styles.dragOverlay} style={{ left: dragging.currentX - dragging.offsetX, top: dragging.currentY - dragging.offsetY, width: dragging.width }}>
+          {dragging.info.cards.map((card, index) => <span key={card.id} style={{ top: index * Math.max(22, Math.min(36, dragging.width * .3)) }}><SolitaireCard card={card} isDragging /></span>)}
+        </div>, document.body
       )}
 
       <footer className={styles.toolbar}>
         <div>
-          <button onClick={onNewGame} data-ym-goal="solitaire_new_game"><ToolbarIcon name="new" /><span>Новая</span></button>
-          <button onClick={onUndo} disabled={!canUndo} data-ym-goal="solitaire_undo"><ToolbarIcon name="undo" /><span>Отменить</span></button>
-          <button onClick={requestHint} data-ym-goal="solitaire_hint"><ToolbarIcon name="hint" /><span>Подсказка</span></button>
+          <button aria-label="Новая игра" className={styles.primaryButton} onClick={onNewGame} data-ym-goal="solitaire_new_game"><ToolbarIcon name="new" /><span>Новая игра</span></button>
+          <button aria-label="Отменить" onClick={() => { clearSelection(); setIsAutoFinishing(false); onUndo(); }} disabled={!canUndo} data-ym-goal="solitaire_undo"><ToolbarIcon name="undo" /><span>Отменить</span></button>
+          <button aria-label="Подсказка" onClick={requestHint} data-ym-goal="solitaire_hint"><ToolbarIcon name="hint" /><span>Подсказка</span></button>
         </div>
         <div>
-          {eligibleForAutoFinish && <button className={styles.finishButton} onClick={() => setIsAutoFinishing(true)} disabled={isAutoFinishing} data-ym-goal="solitaire_auto_finish"><ToolbarIcon name="finish" /><span>{isAutoFinishing ? "Завершаем" : "Собрать"}</span></button>}
-          <button onClick={onOpenDeckGallery} data-ym-goal="solitaire_deck_gallery"><ToolbarIcon name="gallery" /><span>Коллекция</span></button>
-          {onOpenLeaderboard && <button onClick={onOpenLeaderboard} data-ym-goal="solitaire_leaderboard_open"><ToolbarIcon name="trophy" /><span>Рекорды</span></button>}
+          {eligibleForAutoFinish && <button aria-label="Собрать" className={styles.finishButton} onClick={() => setIsAutoFinishing(true)} disabled={isAutoFinishing} data-ym-goal="solitaire_auto_finish"><ToolbarIcon name="finish" /><span>{isAutoFinishing ? "Завершаем" : "Собрать"}</span></button>}
+          <button aria-label="Коллекция" onClick={onOpenDeckGallery} data-ym-goal="solitaire_deck_gallery"><ToolbarIcon name="gallery" /><span>Карты</span></button>
+          {onOpenLeaderboard && <button aria-label="Рекорды" onClick={onOpenLeaderboard} data-ym-goal="solitaire_leaderboard_open"><ToolbarIcon name="trophy" /><span>Рекорды</span></button>}
         </div>
       </footer>
     </div>
