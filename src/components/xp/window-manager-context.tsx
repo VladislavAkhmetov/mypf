@@ -385,6 +385,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     if (typeof window !== "undefined" && (id === "portfolio" || id.startsWith("project-"))) {
       const url = new URL(window.location.href);
       url.searchParams.delete("project");
+      url.searchParams.delete("tool");
       url.searchParams.delete("view");
       url.searchParams.delete("focus");
       window.history.replaceState({}, "", url.toString());
@@ -455,6 +456,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
       if (options?.pushHistory !== false && typeof window !== "undefined") {
         const url = new URL(window.location.href);
+        url.searchParams.delete("tool");
         if (options?.projectSlug) {
           url.searchParams.set("project", options.projectSlug);
           if (options.focus) {
@@ -500,6 +502,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       if (options?.pushHistory !== false && typeof window !== "undefined") {
         const url = new URL(window.location.href);
         url.searchParams.delete("project");
+        url.searchParams.delete("tool");
         url.searchParams.delete("focus");
         const hasOther = Array.from(url.searchParams.keys()).some(
           (k) => k !== "view" && k !== "project" && k !== "focus"

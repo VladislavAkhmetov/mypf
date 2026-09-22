@@ -98,6 +98,15 @@ describe("parseNavigationParams", () => {
 });
 
 describe("buildNavigationQuery", () => {
+  it("round-trips tool deep links with focus and unrelated parameters", () => {
+    const query = buildNavigationQuery("portfolio", { toolSlug: "auto-bezier-kern", focus: "engineering", otherParams: { source: "test" } });
+    expect(parseNavigationParams(query)).toEqual({ target: "portfolio", toolSlug: "auto-bezier-kern", focus: "engineering", otherParams: { source: "test" } });
+  });
+
+  it("routes unknown tools to the catalog and prioritizes a project", () => {
+    expect(parseNavigationParams("?tool=missing").projectNotFound).toBe(true);
+    expect(parseNavigationParams("?tool=auto-bezier-kern&project=kora").projectSlug).toBe("kora");
+  });
   it("builds query for profile with no extra params", () => {
     expect(buildNavigationQuery("profile")).toBe("");
   });
@@ -138,12 +147,12 @@ describe("buildNavigationQuery", () => {
 });
 
 describe("Direction slugs coverage", () => {
-  it("contains all 12 projects partitioned into communication and engineering", () => {
+  it("covers all projects, allowing a project in both directions", () => {
     const allPartitioned = [
       ...PORTFOLIO_DIRECTIONS.communication.slugs,
       ...PORTFOLIO_DIRECTIONS.engineering.slugs,
     ];
-    expect(allPartitioned.length).toBe(ALL_PROJECT_SLUGS.length);
+    expect(new Set(allPartitioned).size).toBe(ALL_PROJECT_SLUGS.length);
     ALL_PROJECT_SLUGS.forEach((slug) => {
       expect(allPartitioned).toContain(slug);
     });

@@ -1,3 +1,5 @@
+import { toolsList } from "@/data/tools";
+
 export type FocusDirection = "communication" | "engineering";
 
 export const PORTFOLIO_DIRECTIONS: Record<FocusDirection, { title: string; slugs: string[] }> = {
@@ -43,6 +45,7 @@ export const ALL_PROJECT_SLUGS: string[] = [
 export interface ParsedNavigation {
   target: "profile" | "portfolio";
   projectSlug?: string;
+  toolSlug?: string;
   projectNotFound?: boolean;
   focus?: FocusDirection;
   otherParams: Record<string, string>;
@@ -66,7 +69,7 @@ export function parseNavigationParams(
 
   const otherParams: Record<string, string> = {};
   params.forEach((val, key) => {
-    if (key !== "project" && key !== "view" && key !== "focus") {
+    if (key !== "project" && key !== "tool" && key !== "view" && key !== "focus") {
       otherParams[key] = val;
     }
   });
@@ -99,7 +102,14 @@ export function parseNavigationParams(
     };
   }
 
-  // Case 2: no project, check view
+  const rawTool = params.get("tool");
+  if (rawTool) {
+    return toolsList.some(tool => tool.slug === rawTool)
+      ? { target: "portfolio", toolSlug: rawTool, focus, otherParams }
+      : { target: "portfolio", projectNotFound: true, focus, otherParams };
+  }
+
+  // Case 2: no project or tool, check view
   if (rawView === "portfolio") {
     return {
       target: "portfolio",
@@ -123,6 +133,7 @@ export function buildNavigationQuery(
   target: "profile" | "portfolio",
   options?: {
     projectSlug?: string | null;
+    toolSlug?: string | null;
     focus?: FocusDirection | null;
     otherParams?: Record<string, string>;
   }
@@ -141,6 +152,9 @@ export function buildNavigationQuery(
       if (options.focus) {
         params.set("focus", options.focus);
       }
+    } else if (options?.toolSlug) {
+      params.set("tool", options.toolSlug);
+      if (options.focus) params.set("focus", options.focus);
     } else {
       params.set("view", "portfolio");
       if (options?.focus) {
