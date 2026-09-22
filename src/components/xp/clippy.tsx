@@ -7,7 +7,7 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { site } from "@/data/site";
 
 export function Clippy() {
-  const { openWindow, openProject } = useWindowManager();
+  const { openWindow, openProject, activeWindowId } = useWindowManager();
   const [isOpen, setIsOpen] = useState(false); // Calm closed state by default (A01, A10, A11)
   const [currentPose, setCurrentPose] = useState<"rest" | "eyebrow" | "look-left" | "wave">("rest");
 
@@ -92,6 +92,9 @@ export function Clippy() {
       : currentPose === "look-left"
       ? "/clippy/look-left.png"
       : "/clippy/rest.png";
+
+  // Keep the gallery and its mobile contact actions unobstructed.
+  if (activeWindowId === "portfolio") return null;
 
   return (
     <div
@@ -200,4 +203,3 @@ export function Clippy() {
     </div>
   );
 }
-

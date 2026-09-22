@@ -174,7 +174,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 94px;
+  width: 98px;
   padding: 6px 4px;
   cursor: inherit;
   border-radius: 2px;
@@ -201,14 +201,17 @@
 }
 
 .xp-desktop-icon-label {
-  margin-top: 5px;
-  font-size: 13px;
+  margin-top: 4px;
+  font-family: var(--font-tahoma, "Tahoma", "Segoe UI", sans-serif);
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.25;
   color: #ffffff;
   text-align: center;
-  word-break: break-word;
-  max-width: 90px;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  max-width: 94px;
   text-shadow: 1px 1px 2px #000, 0 0 4px #000, 1px 0 1px #000, 0 1px 1px #000;
   padding: 2px 4px;
   border-radius: 2px;
@@ -1031,57 +1034,143 @@ button.xp-btn-ctrl:focus-visible {
   }
 }
 
-/* Solitaire Tabletop and Cards */
-.xp-solitaire-board {
-  background: radial-gradient(ellipse at 50% 30%, #15803d 0%, #166534 60%, #14532d 100%);
-  position: relative;
-  overflow: hidden;
+/* Windows XP Desktop Hero & Authentic Stickers */
+.xp-desktop-hero {
   user-select: none;
   -webkit-user-select: none;
 }
 
-.xp-solitaire-slot {
-  border: 1.5px dashed rgba(255, 255, 255, 0.35);
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.12);
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+.xp-hero-text {
+  font-family: var(--xp-font), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 16px 48px rgba(0, 0, 0, 0.35);
+  line-height: 0.9;
 }
 
-.xp-solitaire-slot.is-valid-target {
-  border-color: #38bdf8;
-  border-style: solid;
-  background-color: rgba(56, 189, 248, 0.2);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+/* Authentic Windows XP Luna Glossy Pill Sticker */
+.xp-sticker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 3px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+  touch-action: manipulation;
+  transform-origin: center center;
 }
 
-.xp-solitaire-card {
-  border-radius: 5px;
-  background: #ffffff;
-  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.45), 0 1px 1px rgba(0, 0, 0, 0.2);
-  border: 1px solid #94a3b8;
-  touch-action: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+.xp-sticker-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  padding: 6px 14px 6px 8px;
+  overflow: hidden;
 }
 
-.xp-solitaire-card.is-selected {
-  outline: 2.5px solid #38bdf8;
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.9), 0 6px 14px rgba(0, 0, 0, 0.45);
-  transform: translateY(-4px);
-  z-index: 50 !important;
+/* Glass Specular Top Reflection */
+.xp-sticker-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-top-left-radius: 9999px;
+  border-top-right-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.15) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
-.xp-solitaire-card.is-hinted {
-  animation: xp-card-hint-pulse 0.9s infinite alternate;
+.xp-sticker-icon-badge {
+  position: relative;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-@keyframes xp-card-hint-pulse {
-  from {
-    outline: 2px solid #facc15;
-    box-shadow: 0 0 6px rgba(250, 204, 21, 0.6);
+@media (min-width: 640px) {
+  .xp-sticker-icon-badge {
+    width: 32px;
+    height: 32px;
   }
-  to {
-    outline: 3px solid #f59e0b;
-    box-shadow: 0 0 16px rgba(245, 158, 11, 0.95);
-  }
 }
 
+.xp-sticker-label {
+  position: relative;
+  z-index: 3;
+  font-family: var(--xp-font), Tahoma, "Segoe UI", sans-serif;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* Windows XP Luna Blue Style */
+.xp-sticker-luna-blue {
+  border: 1.5px solid #002288;
+  background: linear-gradient(180deg, #388bfd 0%, #1f64db 46%, #0d4ab5 52%, #0a3a96 100%);
+  box-shadow:
+    0 10px 24px rgba(0, 24, 100, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.xp-sticker-luna-blue .xp-sticker-label {
+  text-shadow: 0 1px 2px rgba(0, 18, 80, 0.9);
+}
+
+/* Windows XP Paint / Sunset Orange Style */
+.xp-sticker-luna-orange {
+  border: 1.5px solid #9a3412;
+  background: linear-gradient(180deg, #fb923c 0%, #ea580c 46%, #c2410c 52%, #9a3412 100%);
+  box-shadow:
+    0 10px 24px rgba(154, 52, 18, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.xp-sticker-luna-orange .xp-sticker-label {
+  text-shadow: 0 1px 2px rgba(80, 20, 5, 0.9);
+}
+
+/* Windows XP Media / Royale Purple Style */
+.xp-sticker-luna-purple {
+  border: 1.5px solid #4c1d95;
+  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 46%, #6d28d9 52%, #4c1d95 100%);
+  box-shadow:
+    0 10px 24px rgba(76, 29, 149, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+.xp-sticker-luna-purple .xp-sticker-label {
+  text-shadow: 0 1px 2px rgba(46, 16, 101, 0.9);
+}
+
+/* Scotch tape pinning the sticker */
+.xp-sticker-tape {
+  position: absolute;
+  width: 38px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border-left: 1px dashed rgba(255, 255, 255, 0.5);
+  border-right: 1px dashed rgba(255, 255, 255, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.65);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 30;
+}

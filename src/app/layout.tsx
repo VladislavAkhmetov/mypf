@@ -1,12 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Onest } from "next/font/google";
+import { Onest, Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { YandexMetrika } from "@/components/analytics/yandex-metrika";
 import { site } from "@/data/site";
 import "./globals.css";
 import "@/styles/xp.css";
 
 const onest = Onest({
   variable: "--font-onest",
+  subsets: ["latin", "cyrillic"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin", "cyrillic"],
 });
 
@@ -31,10 +37,13 @@ export default function RootLayout({
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${onest.variable} h-full antialiased`}
+      className={`${onest.variable} ${manrope.variable} h-full antialiased`}
     >
       <body className="h-full w-full overflow-hidden bg-[#004e98]">
-        <Providers>{children}</Providers>
+        <Providers>
+          <YandexMetrika />
+          {children}
+        </Providers>
       </body>
     </html>
   );

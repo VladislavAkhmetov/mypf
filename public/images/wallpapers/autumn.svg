@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4a7c9f"/>
+      <stop offset="45%" stop-color="#8bb7d6"/>
+      <stop offset="75%" stop-color="#f8dfaa"/>
+      <stop offset="100%" stop-color="#ffd599"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="72%" cy="42%" r="28%">
+      <stop offset="0%" stop-color="#fff8eb" stop-opacity="0.95"/>
+      <stop offset="30%" stop-color="#fed7aa" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#fdba74" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#fb923c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hillFar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b48c77"/>
+      <stop offset="100%" stop-color="#8e6757"/>
+    </linearGradient>
+    <linearGradient id="hillMid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c2782e"/>
+      <stop offset="40%" stop-color="#a4551d"/>
+      <stop offset="100%" stop-color="#69300c"/>
+    </linearGradient>
+    <linearGradient id="hillFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="35%" stop-color="#b45309"/>
+      <stop offset="80%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+    <linearGradient id="leafAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="leafRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky & Atmospheric Glow -->
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <circle cx="1380" cy="450" r="450" fill="url(#sun)"/>
+
+  <!-- Distant Mountain Ridges -->
+  <path d="M0,660 Q340,590 680,630 T1380,610 T1920,640 L1920,1080 L0,1080 Z" fill="url(#hillFar)" opacity="0.6"/>
+
+  <!-- Midground Rolling Golden Hills -->
+  <path d="M0,720 Q480,640 960,700 T1920,680 L1920,1080 L0,1080 Z" fill="url(#hillMid)"/>
+
+  <!-- Foreground Main Hill -->
+  <path d="M0,790 Q560,730 1140,810 T1920,770 L1920,1080 L0,1080 Z" fill="url(#hillFront)"/>
+
+  <!-- Golden Autumn Tree Grove (Right) -->
+  <g transform="translate(1420, 520)">
+    <!-- Tree 1 -->
+    <path d="M120,260 Q115,190 100,120 Q125,125 140,110 Q118,170 128,260 Z" fill="#3e200c"/>
+    <ellipse cx="110" cy="90" rx="90" ry="75" fill="url(#leafAmber)"/>
+    <ellipse cx="140" cy="115" rx="75" ry="60" fill="url(#leafRed)"/>
+    <ellipse cx="80" cy="110" rx="60" ry="50" fill="#f59e0b"/>
+  </g>
+
+  <!-- Golden Autumn Tree Grove (Left Foreground) -->
+  <g transform="translate(180, 590)">
+    <!-- Tree Trunk -->
+    <path d="M90,260 Q85,180 70,110 Q95,115 110,95 Q88,160 98,260 Z" fill="#381b0a"/>
+    <!-- Canopy Clusters -->
+    <ellipse cx="60" cy="90" rx="95" ry="80" fill="url(#leafRed)"/>
+    <ellipse cx="110" cy="80" rx="85" ry="70" fill="url(#leafAmber)"/>
+    <ellipse cx="75" cy="50" rx="70" ry="55" fill="#fef08a" opacity="0.85"/>
+  </g>
+
+  <!-- Distant Tree Silhouettes on Hill Crest -->
+  <g fill="#713f12" opacity="0.65">
+    <ellipse cx="620" cy="670" rx="28" ry="24"/>
+    <ellipse cx="650" cy="675" rx="22" ry="18"/>
+    <ellipse cx="680" cy="672" rx="30" ry="25"/>
+    <ellipse cx="715" cy="678" rx="18" ry="16"/>
+  </g>
+</svg>

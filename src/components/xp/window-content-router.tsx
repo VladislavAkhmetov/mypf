@@ -13,15 +13,48 @@ import { DisplayPropertiesDialog } from "./apps/display-properties-dialog";
 import { RecycleBinWindow } from "./apps/recycle-bin-window";
 import { PropertiesDialog } from "./apps/properties-dialog";
 import { ResumeWindow } from "./apps/resume-window";
+import dynamic from "next/dynamic";
 import { StarterWindow } from "./apps/starter-window";
-import { SolitaireWindow } from "./apps/solitaire-window";
 import { ToolsWindow } from "./apps/tools-window";
 import { WordWindow } from "./apps/word-window";
-import { MinesweeperWindow } from "./apps/minesweeper-window";
 import { PaintWindow } from "./apps/paint-window";
+import { PortfolioBrowserWindow } from "./apps/portfolio-browser-window";
+import { FocusDirection } from "@/lib/xp/navigation";
+
+const SolitaireWindow = dynamic(
+  () => import("./apps/solitaire-window").then((mod) => mod.SolitaireWindow),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-[#16070c] text-[#f2d999] text-xs font-serif">
+        Открываем карточный салон...
+      </div>
+    ),
+  }
+);
+
+const MinesweeperWindow = dynamic(
+  () => import("./apps/minesweeper-window").then((mod) => mod.MinesweeperWindow),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-[#0B1127] text-[#57E4FF] text-xs font-mono">
+        Заряжаем игровое поле...
+      </div>
+    ),
+  }
+);
 
 export function WindowContentRouter({ window: win }: { window: WindowItem }) {
   switch (win.type) {
+    case "portfolio":
+      return (
+        <PortfolioBrowserWindow
+          initialProjectSlug={win.props?.projectSlug as string | undefined}
+          initialFocus={win.props?.focus as FocusDirection | undefined}
+          notFound={win.props?.notFound as boolean | undefined}
+        />
+      );
     case "starter":
       return <StarterWindow />;
     case "solitaire":
@@ -29,7 +62,16 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
     case "tools":
       return <ToolsWindow />;
     case "word":
-      return <WordWindow initialDocSlug={(win.props?.initialSlug as string) || (win.props?.slug as string)} />;
+      return (
+        <WordWindow
+          initialDocSlug={
+            (win.props?.docSlug as string) ||
+            (win.props?.initialSlug as string) ||
+            (win.props?.slug as string)
+          }
+          docSlug={win.props?.docSlug as string | undefined}
+        />
+      );
     case "minesweeper":
       return <MinesweeperWindow />;
     case "paint":

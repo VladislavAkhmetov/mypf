@@ -90,7 +90,7 @@ export function StarterWindow() {
     openWindow({
       id: "solitaire",
       type: "solitaire",
-      title: "Косынка — Авторская колода",
+      title: "Косынка — Maison Solitaire",
       iconType: "solitaire",
       x: 75,
       y: 35,

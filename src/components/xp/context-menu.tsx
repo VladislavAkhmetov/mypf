@@ -84,6 +84,8 @@ export function ContextMenu({
   return (
     <div
       className="xp-context-menu"
+      data-ym-goal="context_menu_open"
+      data-ym-params={JSON.stringify({ targetType: menu.targetType, targetId: menu.targetId })}
       style={{
         left: `${menuLeft}px`,
         top: `${menuTop}px`,

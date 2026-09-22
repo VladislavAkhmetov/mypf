@@ -15,6 +15,22 @@ export interface DocumentItem {
 
 export const documentsList: DocumentItem[] = [
   {
+    id: "doc-profile",
+    slug: "profile",
+    title: "Влад Ахметов",
+    subtitle: "Коммуникационный дизайн и интерактивные прототипы",
+    date: "14 сентября 2026",
+    author: "Влад Ахметов",
+    wordCount: 28,
+    sections: [
+      {
+        paragraphs: [
+          "Я занимаюсь коммуникационным дизайном и создаю работающие интерактивные прототипы с помощью AI-инструментов. Мне интересны задачи на стыке визуальной коммуникации, интерфейсов и их поведения.",
+        ],
+      },
+    ],
+  },
+  {
     id: "doc-about",
     slug: "about-vlad",
     title: "Обо мне: путь между кодом и визуальной формой",

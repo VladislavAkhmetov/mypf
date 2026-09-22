@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="azSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="40%" stop-color="#38bdf8"/>
+      <stop offset="75%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="azSeaDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0369a1"/>
+      <stop offset="60%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="azSeaShallow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="45%" stop-color="#14b8a6"/>
+      <stop offset="85%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#99f6e4"/>
+    </linearGradient>
+    <linearGradient id="azSand" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="35%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <radialGradient id="azSun" cx="80%" cy="25%" r="20%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="30%" stop-color="#fef08a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1920" height="1080" fill="url(#azSky)"/>
+  <circle cx="1536" cy="270" r="300" fill="url(#azSun)"/>
+
+  <!-- Horizon & Deep Sea -->
+  <path d="M0,580 L1920,580 L1920,800 L0,800 Z" fill="url(#azSeaDeep)"/>
+
+  <!-- Shallow Turquoise Water Reefs -->
+  <path d="M0,640 Q480,620 960,650 T1920,630 L1920,850 L0,850 Z" fill="url(#azSeaShallow)"/>
+
+  <!-- Gentle Shore Waves -->
+  <path d="M0,740 Q380,710 820,750 T1640,730 T1920,745 L1920,870 L0,870 Z" fill="#ccfbf1" opacity="0.7"/>
+
+  <!-- Golden Sandy Beach & Coastal Dune -->
+  <path d="M0,790 Q540,740 1080,820 T1920,780 L1920,1080 L0,1080 Z" fill="url(#azSand)"/>
+
+  <!-- Tropical Island Silhouette & Palms on Horizon -->
+  <path d="M1200,580 Q1350,555 1500,580 Z" fill="#047857" opacity="0.8"/>
+  <path d="M1320,580 Q1420,560 1580,580 Z" fill="#065f46" opacity="0.9"/>
+
+  <!-- Left Coastal Palm Silhouettes -->
+  <g transform="translate(120, 560)">
+    <!-- Palm 1 trunk -->
+    <path d="M80,320 Q120,200 160,80" stroke="#78350f" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <!-- Fronds -->
+    <path d="M160,80 Q240,40 300,90" stroke="#15803d" stroke-width="6" fill="none"/>
+    <path d="M160,80 Q210,10 240,0" stroke="#16a34a" stroke-width="6" fill="none"/>
+    <path d="M160,80 Q160,10 130,5" stroke="#15803d" stroke-width="6" fill="none"/>
+    <path d="M160,80 Q90,30 60,70" stroke="#166534" stroke-width="6" fill="none"/>
+    <path d="M160,80 Q130,120 150,150" stroke="#15803d" stroke-width="6" fill="none"/>
+  </g>
+</svg>

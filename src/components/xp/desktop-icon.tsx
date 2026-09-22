@@ -141,6 +141,8 @@ export function DesktopIcon({
         role="button"
         tabIndex={0}
         aria-label={title}
+        data-ym-goal="desktop_icon_click"
+        data-ym-params={JSON.stringify({ iconId: id, title })}
         className={`xp-desktop-icon absolute ${isSelected ? "is-selected" : ""}`}
         style={{
           transform: `translate3d(${x}px, ${y}px, 0)`,
@@ -151,6 +153,7 @@ export function DesktopIcon({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onDoubleClick={() => onOpen(id)}
         onContextMenu={handleContextMenu}
       >
         <div className="xp-desktop-icon-img flex items-center justify-center pointer-events-none">

@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PrintForge Figma Screencast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0d0e12;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #f1f5f9;
+  }
+
+  /* Camera rig for smooth pan and zoom */
+  #camera-rig {
+    width: 1920px;
+    height: 1080px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+  }
+
+  /* Figma Shell */
+  .figma-shell {
+    width: 1920px;
+    height: 1080px;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+  }
+
+  /* Top Navigation Bar */
+  .figma-topbar {
+    height: 48px;
+    background: #2c2c2c;
+    border-bottom: 1px solid #383838;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .figma-logo {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .project-title-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #e2e8f0;
+  }
+  .project-name { font-weight: 600; }
+  .project-badge {
+    background: rgba(13, 153, 255, 0.18);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .topbar-tools {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #1e1e1e;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid #383838;
+  }
+  .tool-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tool-btn.active {
+    background: #334155;
+    color: #f8fafc;
+  }
+  .tool-btn.plugin-active {
+    background: linear-gradient(135deg, rgba(13, 153, 255, 0.25), rgba(225, 29, 72, 0.25));
+    border: 1px solid #0d99ff;
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .share-btn {
+    background: #0d99ff;
+    color: #fff;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  /* Workspace Body */
+  .workspace {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Left Layers Panel */
+  .layers-panel {
+    width: 250px;
+    background: #252525;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    z-index: 20;
+  }
+  .panel-header {
+    height: 36px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #333;
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .layer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    color: #cbd5e1;
+  }
+  .layer-item.active {
+    background: #0d99ff22;
+    color: #38bdf8;
+    border-left: 2px solid #0d99ff;
+  }
+  .layer-tag-bleed {
+    font-size: 10px;
+    background: #ef444422;
+    color: #f87171;
+    border: 1px solid #ef444444;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .layer-tag-cut {
+    font-size: 10px;
+    background: #e11d4822;
+    color: #fb7185;
+    border: 1px solid #e11d4844;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Center Canvas */
+  .canvas-viewport {
+    flex: 1;
+    background: #181818 radial-gradient(circle, #292929 1px, transparent 1px);
+    background-size: 24px 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Artboard / Poster on canvas */
+  .artboard-container {
+    position: relative;
+    width: 580px;
+    height: 820px;
+  }
+
+  /* Red Bleed Guide Container */
+  .bleed-guide-box {
+    position: absolute;
+    top: -18px;
+    left: -18px;
+    right: -18px;
+    bottom: -18px;
+    border: 2px dashed #ef4444;
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .bleed-guide-box.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .bleed-label-tag {
+    position: absolute;
+    top: -24px;
+    left: 0;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px 3px 0 0;
+    letter-spacing: 0.05em;
+  }
+
+  /* Spot Dieline Cut Contour */
+  .cut-dieline-box {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 2.5px solid #e11d48;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 0 15px rgba(225, 29, 72, 0.4);
+    transition: opacity 0.4s ease;
+    z-index: 10;
+  }
+  .cut-dieline-box.visible {
+    opacity: 1;
+  }
+  .cut-label-tag {
+    position: absolute;
+    bottom: -24px;
+    right: 0;
+    background: #e11d48;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* Scanner Laser */
+  .scan-beam {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #00f0ff, #fff, #00f0ff, transparent);
+    box-shadow: 0 0 24px 6px #00f0ff;
+    top: 0;
+    opacity: 0;
+    z-index: 15;
+    pointer-events: none;
+  }
+
+  /* The actual poster artwork */
+  .poster-artwork {
+    width: 100%;
+    height: 100%;
+    background: #fdfbf7;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1);
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .poster-grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 3px solid #111;
+    padding-bottom: 16px;
+  }
+  .poster-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+  .poster-edition {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+  .poster-title {
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-top: 24px;
+    text-transform: uppercase;
+  }
+  .poster-visual-block {
+    margin-top: 30px;
+    height: 280px;
+    background: #0f172a;
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .poster-visual-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 30% 40%, rgba(13, 153, 255, 0.8), transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(225, 29, 72, 0.8), transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.8), transparent 50%);
+    filter: blur(30px);
+  }
+  .poster-visual-badge {
+    position: relative;
+    z-index: 2;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #fff;
+    text-align: center;
+  }
+  .badge-res {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: #38bdf8;
+  }
+  .badge-format { font-size: 11px; opacity: 0.8; }
+
+  .poster-cmyk-bars {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .cmyk-swatch {
+    flex: 1;
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .swatch-c { background: #009ee3; }
+  .swatch-m { background: #e5007d; }
+  .swatch-y { background: #fff100; color: #111; }
+  .swatch-k { background: #1a1a1a; }
+
+  /* Crop Marks at Corners */
+  .crop-mark {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+  .crop-tl { top: -14px; left: -14px; border-right: 1.5px solid #666; border-bottom: 1.5px solid #666; }
+  .crop-tr { top: -14px; right: -14px; border-left: 1.5px solid #666; border-bottom: 1.5px solid #666; }
+  .crop-bl { bottom: -14px; left: -14px; border-right: 1.5px solid #666; border-top: 1.5px solid #666; }
+  .crop-br { bottom: -14px; right: -14px; border-left: 1.5px solid #666; border-top: 1.5px solid #666; }
+
+  /* RIGHT PANEL: PRINTFORGE PLUGIN */
+  .plugin-panel {
+    width: 440px;
+    background: #0f172a;
+    border-left: 1px solid #1e293b;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  /* Plugin Header */
+  .plugin-header {
+    padding: 16px 20px;
+    background: #131d32;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .plugin-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #0d99ff, #e11d48);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(13, 153, 255, 0.4);
+  }
+  .brand-name {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .brand-tag {
+    font-size: 10px;
+    color: #38bdf8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trial-pill {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Navigation Tabs */
+  .plugin-tabs {
+    display: flex;
+    background: #111a2e;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 4px 8px;
+    gap: 4px;
+  }
+  .tab-item {
+    flex: 1;
+    padding: 9px 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .tab-item.active {
+    background: #1e293b;
+    color: #f8fafc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .tab-item.active.tab-cmyk {
+    color: #38bdf8;
+    border-bottom: 2px solid #0d99ff;
+  }
+
+  /* Tab View Container */
+  .tab-view-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Card Component */
+  .section-card {
+    background: #162036;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Switches and controls */
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+  .switch-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+  .switch-sub {
+    font-size: 11px;
+    color: #64748b;
+  }
+  .spring-switch {
+    width: 44px;
+    height: 24px;
+    background: #334155;
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.3s ease;
+  }
+  .spring-switch.on {
+    background: #0d99ff;
+  }
+  .switch-thumb {
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .spring-switch.on .switch-thumb {
+    transform: translateX(20px);
+  }
+
+  /* Bleed size buttons */
+  .pill-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .pill-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    background: #0b1222;
+    border: 1px solid #1e293b;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .pill-btn.active {
+    background: rgba(13, 153, 255, 0.15);
+    border-color: #0d99ff;
+    color: #38bdf8;
+  }
+
+  /* Select dropdown */
+  .custom-select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #0b1222;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    color: #f1f5f9;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .custom-select.highlight {
+    border-color: #0d99ff;
+    box-shadow: 0 0 12px rgba(13, 153, 255, 0.3);
+  }
+
+  /* TAC ink bar */
+  .tac-meter-box {
+    margin-top: 12px;
+  }
+  .tac-track {
+    height: 8px;
+    background: #0b1222;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+  }
+  .tac-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #22c55e);
+    width: 73%;
+    transition: width 0.5s ease;
+  }
+
+  /* DPI Scan Result Cards */
+  .dpi-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #0b1222;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #1e293b;
+  }
+  .dpi-file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .dpi-filename { font-size: 12px; font-weight: 600; color: #f8fafc; }
+  .dpi-dim { font-size: 10px; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+  .dpi-pill {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .dpi-ok { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+  .dpi-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+  /* Bottom Export Area */
+  .plugin-bottom-bar {
+    padding: 18px 20px;
+    background: #131d32;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .export-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #0d99ff 0%, #0070f3 100%);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 8px 20px -4px rgba(13, 153, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  /* Progress Overlay Modal */
+  .progress-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .progress-modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-spinner {
+    width: 52px;
+    height: 52px;
+    border: 3px solid rgba(56, 189, 248, 0.2);
+    border-top-color: #38bdf8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 20px;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  .modal-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .modal-status { font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace; text-align: center; }
+
+  /* Success Card */
+  .success-badge-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+  .success-icon {
+    width: 52px;
+    height: 52px;
+    background: #22c55e;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+  }
+  .download-ready-btn {
+    background: #22c55e;
+    color: white;
+    font-weight: 700;
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    border: none;
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+  }
+
+  /* CURSOR OVERLAY */
+  #cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+  }
+  .cursor-svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Click Ripple */
+  #ripple {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    margin-left: -22px;
+    margin-top: -22px;
+    border-radius: 50%;
+    border: 2px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.25);
+    pointer-events: none;
+    z-index: 9998;
+    transform: scale(0);
+    opacity: 0;
+  }
+  .ripple-animate {
+    animation: ripple-pulse 0.45s ease-out forwards;
+  }
+  @keyframes ripple-pulse {
+    0% { transform: scale(0.2); opacity: 1; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="camera-rig">
+  <div class="figma-shell">
+    <!-- Top Navigation Bar -->
+    <header class="figma-topbar">
+      <div class="topbar-left">
+        <div class="figma-logo">
+          <svg width="20" height="20" viewBox="0 0 38 57" fill="none">
+            <path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="#1ABCFE"/>
+            <path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="#0ACF83"/>
+            <path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="#FF7262"/>
+            <path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="#F24E1E"/>
+            <path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="#A259FF"/>
+          </svg>
+        </div>
+        <div class="project-title-box">
+          <span class="project-name">Swiss_Poster_Basel2026.fig</span>
+          <span class="project-badge">A4 • 300 DPI • CMYK</span>
+        </div>
+      </div>
+
+      <div class="topbar-tools">
+        <div class="tool-btn">Select</div>
+        <div class="tool-btn active">Frame</div>
+        <div class="tool-btn">Pen</div>
+        <div class="tool-btn">Text</div>
+        <div class="tool-btn plugin-active">✨ PrintForge Plugin</div>
+      </div>
+
+      <div class="topbar-right">
+        <span>100%</span>
+        <button class="share-btn">Share</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <!-- Left Layers Panel -->
+      <aside class="layers-panel">
+        <div class="panel-header">Layers</div>
+        <div class="layer-item active">
+          <span>📄</span>
+          <span>Swiss Poster A4</span>
+          <span class="layer-tag-bleed" id="layer-bleed-tag" style="display:none;">BLEED 3mm</span>
+        </div>
+        <div class="layer-item" style="padding-left: 28px;">
+          <span>📐</span>
+          <span>Bleed Boundary</span>
+          <span class="layer-tag-bleed" id="layer-bleed-sub" style="display:none;">TRIMBOX</span>
+        </div>
+        <div class="layer-item" style="padding-left: 28px;">
+          <span>🖼</span>
+          <span>Hero_Key_Visual.tiff</span>
+        </div>
+        <div class="layer-item" style="padding-left: 28px;">
+          <span>🔤</span>
+          <span>Typography Outlines</span>
+        </div>
+        <div class="layer-item" style="padding-left: 28px;" id="layer-cut-item">
+          <span>✂</span>
+          <span>Packaging Cut Contour</span>
+          <span class="layer-tag-cut" id="layer-cut-tag" style="display:none;">SPOT CUT</span>
+        </div>
+      </aside>
+
+      <!-- Center Canvas -->
+      <main class="canvas-viewport">
+        <div class="artboard-container" id="artboard-box">
+          <!-- Crop marks -->
+          <div class="crop-mark crop-tl"></div>
+          <div class="crop-mark crop-tr"></div>
+          <div class="crop-mark crop-bl"></div>
+          <div class="crop-mark crop-br"></div>
+
+          <!-- Red Bleed Guide -->
+          <div class="bleed-guide-box" id="bleed-box">
+            <span class="bleed-label-tag">BLEED BOX: +3.0mm (216 × 303 mm)</span>
+          </div>
+
+          <!-- Spot Dieline Cut -->
+          <div class="cut-dieline-box" id="cut-box">
+            <span class="cut-label-tag">SPOT CUT DIE LINE (100% MAGENTA)</span>
+          </div>
+
+          <!-- Laser Scan Beam -->
+          <div class="scan-beam" id="scan-beam"></div>
+
+          <!-- The poster artwork -->
+          <div class="poster-artwork">
+            <div class="poster-grid-header">
+              <span class="poster-year">BASEL 2026 // N° 04</span>
+              <span class="poster-edition">PREPRESS READY • CMYK 300 DPI</span>
+            </div>
+
+            <div class="poster-title">
+              INTERNATIONALE<br>
+              TYPOGRAPHIE<br>
+              SCHWEIZ
+            </div>
+
+            <div class="poster-visual-block">
+              <div class="poster-visual-bg"></div>
+              <div class="poster-visual-badge">
+                <div class="badge-res">320 DPI</div>
+                <div class="badge-format">TIFF • FOGRA39 COATED</div>
+              </div>
+            </div>
+
+            <div class="poster-cmyk-bars">
+              <div class="cmyk-swatch swatch-c">C 100%</div>
+              <div class="cmyk-swatch swatch-m">M 85%</div>
+              <div class="cmyk-swatch swatch-y">Y 10%</div>
+              <div class="cmyk-swatch swatch-k">K 25%</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Panel: PrintForge Plugin -->
+      <aside class="plugin-panel">
+        <div class="plugin-header">
+          <div class="plugin-brand">
+            <div class="brand-logo">P</div>
+            <div>
+              <div class="brand-name">PrintForge</div>
+              <div class="brand-tag">CMYK Prepress Engine</div>
+            </div>
+          </div>
+          <div class="header-actions">
+            <div class="trial-pill">PRO ACTIVE</div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="plugin-tabs">
+          <div class="tab-item active tab-cmyk" id="tab-btn-layouts">Layouts</div>
+          <div class="tab-item" id="tab-btn-colors">Colors</div>
+          <div class="tab-item" id="tab-btn-dpi">DPI</div>
+          <div class="tab-item" id="tab-btn-health">Health</div>
+          <div class="tab-item" id="tab-btn-packaging">Packaging</div>
+        </nav>
+
+        <!-- Dynamic Tab Contents -->
+        <div class="tab-view-content" id="tab-content-area">
+          <!-- LAYOUTS TAB (Initial) -->
+          <div id="view-layouts" class="tab-view">
+            <div class="section-card">
+              <div class="card-title">Document Format</div>
+              <div style="font-size: 15px; font-weight: 700; color: #fff;">ISO A4 (Portrait)</div>
+              <div style="font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace; margin-top: 4px;">210 × 297 mm</div>
+            </div>
+
+            <div class="section-card" id="bleed-card">
+              <div class="card-title">
+                <span>Bleed & TrimBox</span>
+                <span style="color:#ef4444; font-size:10px; font-weight:700;">PRINT SAFETY</span>
+              </div>
+              <div class="switch-row">
+                <div>
+                  <div class="switch-label">Add Bleed Margins</div>
+                  <div class="switch-sub">Generate 4 red guidelines for trimming</div>
+                </div>
+                <div class="spring-switch" id="bleed-switch">
+                  <div class="switch-thumb"></div>
+                </div>
+              </div>
+              <div class="pill-group">
+                <div class="pill-btn" id="bleed-2mm">2 mm</div>
+                <div class="pill-btn" id="bleed-3mm">3 mm ⭐</div>
+                <div class="pill-btn" id="bleed-5mm">5 mm</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLORS TAB (Hidden Initially) -->
+          <div id="view-colors" class="tab-view" style="display:none;">
+            <div class="section-card" id="icc-card">
+              <div class="card-title">ICC Color Profile</div>
+              <div class="custom-select" id="icc-select-box">
+                <span id="icc-label">Coated FOGRA39 (ISO 12647-2)</span>
+                <span style="color:#0d99ff;">▼</span>
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="card-title">Total Area Coverage (TAC)</div>
+              <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700;">
+                <span style="color:#38bdf8;">Current Max: 294%</span>
+                <span style="color:#22c55e;">Safe (≤ 300%)</span>
+              </div>
+              <div class="tac-meter-box">
+                <div class="tac-track">
+                  <div class="tac-fill" id="tac-fill-bar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DPI TAB (Hidden Initially) -->
+          <div id="view-dpi" class="tab-view" style="display:none;">
+            <div class="section-card" id="dpi-card">
+              <div class="card-title">Image Resolution Auditor</div>
+              <div style="display:flex; gap:6px; margin-bottom:12px;">
+                <div class="pill-btn" style="flex:1;">150 Draft</div>
+                <div class="pill-btn active" style="flex:1;">300 Print ⭐</div>
+                <div class="pill-btn" style="flex:1;">600 Ultra</div>
+              </div>
+              <button class="pill-btn active" id="btn-scan-dpi" style="width:100%; padding:10px; font-size:12px; font-weight:700;">
+                🔍 Check Selected Frame
+              </button>
+            </div>
+
+            <div id="dpi-results-box" style="display:none;">
+              <div class="dpi-result-item">
+                <div class="dpi-file-info">
+                  <span class="dpi-filename">Hero_Key_Visual.tiff</span>
+                  <span class="dpi-dim">2480 × 3508 px</span>
+                </div>
+                <span class="dpi-pill dpi-ok">320 DPI ✓</span>
+              </div>
+              <div class="dpi-result-item">
+                <div class="dpi-file-info">
+                  <span class="dpi-filename">Texture_Grain.png</span>
+                  <span class="dpi-dim">3800 × 5200 px</span>
+                </div>
+                <span class="dpi-pill dpi-ok">450 DPI ✓</span>
+              </div>
+              <div class="dpi-result-item">
+                <div class="dpi-file-info">
+                  <span class="dpi-filename">Partner_Logo.png</span>
+                  <span class="dpi-dim">420 × 280 px</span>
+                </div>
+                <span class="dpi-pill dpi-warn">142 DPI ⚠️</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PACKAGING TAB (Hidden Initially) -->
+          <div id="view-packaging" class="tab-view" style="display:none;">
+            <div class="section-card" id="pkg-card">
+              <div class="card-title">Pre-press Marking (Dielines)</div>
+              <div style="font-size:12px; color:#94a3b8; margin-bottom:12px;">
+                Assign dedicated spot color channels for die-cutting and folding machines:
+              </div>
+              <button class="pill-btn active" id="btn-tag-cut" style="width:100%; padding:10px; font-size:12px; font-weight:700; margin-bottom:8px; border-color:#e11d48; color:#fb7185;">
+                ✂ Tag Selected as Cut Contour (Резка)
+              </button>
+              <button class="pill-btn" style="width:100%; padding:8px; font-size:11px; margin-bottom:8px;">
+                📏 Tag Selected as Crease Line (Биговка)
+              </button>
+              <button class="pill-btn" style="width:100%; padding:8px; font-size:11px;">
+                ✨ Spot Varnish Layer (УФ-Лак)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Export Area -->
+        <div class="plugin-bottom-bar">
+          <button class="export-btn" id="btn-export">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Export Print-Ready PDF</span>
+          </button>
+        </div>
+
+        <!-- Progress & Success Modal -->
+        <div class="progress-modal" id="progress-modal">
+          <div class="modal-spinner" id="modal-spinner"></div>
+          <div class="modal-title" id="modal-title">Generating Prepress File...</div>
+          <div class="modal-status" id="modal-status">Cloud Serverless: Converting CMYK (FOGRA39)...</div>
+
+          <div class="success-badge-box" id="success-box" style="display:none;">
+            <div class="success-icon">✓</div>
+            <div style="font-size: 16px; font-weight: 800; color: #fff;">Prepress PDF Ready!</div>
+            <div style="font-size: 12px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">
+              swiss_poster_fogra39_cmyk.pdf • 14.8 MB
+            </div>
+            <button class="download-ready-btn" id="download-btn">
+              <span>Download Press Package</span>
+              <span>↗</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- CURSOR AND CLICK RIPPLE -->
+<div id="ripple"></div>
+<div id="cursor">
+  <svg class="cursor-svg" viewBox="0 0 24 24" fill="none">
+    <path d="M5.5 2.5L18.5 13.5L12 14.5L15.5 21.5L12.5 23L9 16L4 20.5L5.5 2.5Z" fill="#000000" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<script>
+  const rig = document.getElementById('camera-rig');
+  const cursor = document.getElementById('cursor');
+  const ripple = document.getElementById('ripple');
+
+  const tabBtnLayouts = document.getElementById('tab-btn-layouts');
+  const tabBtnColors = document.getElementById('tab-btn-colors');
+  const tabBtnDPI = document.getElementById('tab-btn-dpi');
+  const tabBtnPackaging = document.getElementById('tab-btn-packaging');
+
+  const viewLayouts = document.getElementById('view-layouts');
+  const viewColors = document.getElementById('view-colors');
+  const viewDPI = document.getElementById('view-dpi');
+  const viewPackaging = document.getElementById('view-packaging');
+
+  const bleedSwitch = document.getElementById('bleed-switch');
+  const bleed3mm = document.getElementById('bleed-3mm');
+  const bleedBox = document.getElementById('bleed-box');
+  const layerBleedTag = document.getElementById('layer-bleed-tag');
+  const layerBleedSub = document.getElementById('layer-bleed-sub');
+
+  const iccSelectBox = document.getElementById('icc-select-box');
+  const tacFillBar = document.getElementById('tac-fill-bar');
+
+  const btnScanDPI = document.getElementById('btn-scan-dpi');
+  const dpiResultsBox = document.getElementById('dpi-results-box');
+  const scanBeam = document.getElementById('scan-beam');
+
+  const btnTagCut = document.getElementById('btn-tag-cut');
+  const cutBox = document.getElementById('cut-box');
+  const layerCutTag = document.getElementById('layer-cut-tag');
+
+  const btnExport = document.getElementById('btn-export');
+  const progressModal = document.getElementById('progress-modal');
+  const modalSpinner = document.getElementById('modal-spinner');
+  const modalTitle = document.getElementById('modal-title');
+  const modalStatus = document.getElementById('modal-status');
+  const successBox = document.getElementById('success-box');
+
+  function triggerRipple(x, y) {
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.classList.remove('ripple-animate');
+    void ripple.offsetWidth;
+    ripple.classList.add('ripple-animate');
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  // Camera framing coordinates:
+  // We keep the plugin fully visible on right, shifting slightly left to reveal bleed/crop/cuts on canvas
+  const keyframes = [
+    // 0.0s: Wide view of Figma canvas + plugin
+    { time: 0.0,  cx: 700,  cy: 400,  zoom: 1.0,  tx: 0,    ty: 0 },
+    // 1.2s: Cursor glides towards Bleed switch
+    { time: 1.2,  cx: 1550, cy: 320,  zoom: 1.15, tx: -60,  ty: -20 },
+    // 2.2s: Zoom 1.48x focused on Bleed controls + canvas crop
+    { time: 2.2,  cx: 1845, cy: 335,  zoom: 1.45, tx: -340, ty: -80 },
+    { time: 2.5,  cx: 1845, cy: 335,  zoom: 1.45, tx: -340, ty: -80, action: 'bleed-click' },
+    // 2.9s: Click 3mm preset
+    { time: 2.9,  cx: 1700, cy: 385,  zoom: 1.45, tx: -340, ty: -80, action: 'bleed-3mm-click' },
+    // 3.6s: Cursor glides to Colors tab
+    { time: 3.6,  cx: 1580, cy: 140,  zoom: 1.45, tx: -340, ty: -40 },
+    { time: 3.9,  cx: 1580, cy: 140,  zoom: 1.45, tx: -340, ty: -40, action: 'tab-colors-click' },
+    // 4.6s: Zoom tightens to 1.55x on ICC Profile selector
+    { time: 4.6,  cx: 1680, cy: 260,  zoom: 1.55, tx: -420, ty: -100 },
+    { time: 5.2,  cx: 1680, cy: 260,  zoom: 1.55, tx: -420, ty: -100, action: 'icc-click' },
+    // 6.0s: Cursor moves to DPI tab
+    { time: 6.0,  cx: 1660, cy: 140,  zoom: 1.45, tx: -340, ty: -40 },
+    { time: 6.3,  cx: 1660, cy: 140,  zoom: 1.45, tx: -340, ty: -40, action: 'tab-dpi-click' },
+    // 7.0s: Cursor hovers "Check Selected Frame"
+    { time: 7.0,  cx: 1680, cy: 305,  zoom: 1.40, tx: -300, ty: -70 },
+    { time: 7.3,  cx: 1680, cy: 305,  zoom: 1.40, tx: -300, ty: -70, action: 'dpi-scan-click' },
+    // 8.0s: Scanner sweeps down poster, camera shifts to show canvas + results
+    { time: 8.0,  cx: 1200, cy: 500,  zoom: 1.20, tx: -140, ty: -40, action: 'dpi-show-results' },
+    // 9.0s: Cursor glides to Packaging tab
+    { time: 9.0,  cx: 1820, cy: 140,  zoom: 1.45, tx: -360, ty: -40 },
+    { time: 9.3,  cx: 1820, cy: 140,  zoom: 1.45, tx: -360, ty: -40, action: 'tab-packaging-click' },
+    // 10.0s: Click "Tag Cut Contour"
+    { time: 10.0, cx: 1680, cy: 280,  zoom: 1.45, tx: -340, ty: -90 },
+    { time: 10.3, cx: 1680, cy: 280,  zoom: 1.45, tx: -340, ty: -90, action: 'tag-cut-click' },
+    // 11.2s: Camera pans back out to full overview
+    { time: 11.2, cx: 1680, cy: 650,  zoom: 1.10, tx: -60,  ty: -20 },
+    // 12.0s: Hover & click Export button
+    { time: 12.0, cx: 1680, cy: 1020, zoom: 1.05, tx: -30,  ty: -10 },
+    { time: 12.3, cx: 1680, cy: 1020, zoom: 1.05, tx: -30,  ty: -10, action: 'export-click' },
+    // 13.5s: Export finishes -> Success dialog
+    { time: 13.5, cx: 1680, cy: 750,  zoom: 1.15, tx: -100, ty: -60, action: 'export-success' },
+    // 14.5s: Settle on download button
+    { time: 14.5, cx: 1680, cy: 650,  zoom: 1.15, tx: -100, ty: -60 },
+    { time: 15.0, cx: 1680, cy: 650,  zoom: 1.15, tx: -100, ty: -60 }
+  ];
+
+  let executedActions = new Set();
+
+  function switchTab(name) {
+    [viewLayouts, viewColors, viewDPI, viewPackaging].forEach(v => v.style.display = 'none');
+    [tabBtnLayouts, tabBtnColors, tabBtnDPI, tabBtnPackaging].forEach(b => {
+      b.classList.remove('active', 'tab-cmyk');
+    });
+
+    if (name === 'layouts') {
+      viewLayouts.style.display = 'block';
+      tabBtnLayouts.classList.add('active', 'tab-cmyk');
+    } else if (name === 'colors') {
+      viewColors.style.display = 'block';
+      tabBtnColors.classList.add('active', 'tab-cmyk');
+    } else if (name === 'dpi') {
+      viewDPI.style.display = 'block';
+      tabBtnDPI.classList.add('active', 'tab-cmyk');
+    } else if (name === 'packaging') {
+      viewPackaging.style.display = 'block';
+      tabBtnPackaging.classList.add('active', 'tab-cmyk');
+    }
+  }
+
+  function handleAction(act, screenX, screenY) {
+    if (act === 'bleed-click') {
+      triggerRipple(screenX, screenY);
+      bleedSwitch.classList.add('on');
+      bleedBox.classList.add('visible');
+      layerBleedTag.style.display = 'inline-block';
+      layerBleedSub.style.display = 'inline-block';
+    } else if (act === 'bleed-3mm-click') {
+      triggerRipple(screenX, screenY);
+      bleed3mm.classList.add('active');
+    } else if (act === 'tab-colors-click') {
+      triggerRipple(screenX, screenY);
+      switchTab('colors');
+    } else if (act === 'icc-click') {
+      triggerRipple(screenX, screenY);
+      iccSelectBox.classList.add('highlight');
+      tacFillBar.style.width = '73%';
+    } else if (act === 'tab-dpi-click') {
+      triggerRipple(screenX, screenY);
+      switchTab('dpi');
+    } else if (act === 'dpi-scan-click') {
+      triggerRipple(screenX, screenY);
+      scanBeam.style.opacity = '1';
+      scanBeam.animate([
+        { top: '0px', opacity: 1 },
+        { top: '820px', opacity: 1 },
+        { top: '820px', opacity: 0 }
+      ], { duration: 900, fill: 'forwards' });
+    } else if (act === 'dpi-show-results') {
+      dpiResultsBox.style.display = 'block';
+    } else if (act === 'tab-packaging-click') {
+      triggerRipple(screenX, screenY);
+      switchTab('packaging');
+    } else if (act === 'tag-cut-click') {
+      triggerRipple(screenX, screenY);
+      cutBox.classList.add('visible');
+      layerCutTag.style.display = 'inline-block';
+    } else if (act === 'export-click') {
+      triggerRipple(screenX, screenY);
+      progressModal.classList.add('visible');
+    } else if (act === 'export-success') {
+      modalSpinner.style.display = 'none';
+      modalTitle.style.display = 'none';
+      modalStatus.style.display = 'none';
+      successBox.style.display = 'flex';
+    }
+  }
+
+  window.seek = function(t) {
+    if (t < 0) t = 0;
+    if (t > 15.0) t = 15.0;
+
+    let k0 = keyframes[0];
+    let k1 = keyframes[keyframes.length - 1];
+
+    for (let i = 0; i < keyframes.length - 1; i++) {
+      if (t >= keyframes[i].time && t <= keyframes[i+1].time) {
+        k0 = keyframes[i];
+        k1 = keyframes[i+1];
+        break;
+      }
+    }
+
+    const duration = k1.time - k0.time;
+    const progress = duration > 0 ? (t - k0.time) / duration : 0;
+    const factor = easeInOutCubic(progress);
+
+    const cx = lerp(k0.cx, k1.cx, factor);
+    const cy = lerp(k0.cy, k1.cy, factor);
+    const zoom = lerp(k0.zoom, k1.zoom, factor);
+    const tx = lerp(k0.tx, k1.tx, factor);
+    const ty = lerp(k0.ty, k1.ty, factor);
+
+    rig.style.transform = `scale(${zoom}) translate(${tx}px, ${ty}px)`;
+
+    // Screen coordinate of cursor: (cx + tx) * zoom
+    const screenX = (cx + tx) * zoom;
+    const screenY = (cy + ty) * zoom;
+    cursor.style.transform = `translate(${screenX}px, ${screenY}px)`;
+
+    for (const kf of keyframes) {
+      if (kf.action && t >= kf.time && !executedActions.has(kf.action)) {
+        executedActions.add(kf.action);
+        const aScreenX = (kf.cx + kf.tx) * kf.zoom;
+        const aScreenY = (kf.cy + kf.ty) * kf.zoom;
+        handleAction(kf.action, aScreenX, aScreenY);
+      }
+    }
+  };
+
+  let startTime = null;
+  function step(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const t = (timestamp - startTime) / 1000;
+    window.seek(t);
+    if (t < 15.0) {
+      requestAnimationFrame(step);
+    }
+  }
+  if (window.location.search.includes('play=1')) {
+    requestAnimationFrame(step);
+  } else {
+    window.seek(0);
+  }
+</script>
+</body>
+</html>

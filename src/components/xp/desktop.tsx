@@ -12,6 +12,9 @@ import { TurnOffDialog } from "./turn-off-dialog";
 import { Clippy } from "./clippy";
 import { xpCursors } from "@/lib/xp/cursors";
 import { xpSound, tryPlayStartupOnFirstGesture } from "@/lib/xp/sound";
+import { getMinesweeperWindowBounds } from "@/lib/xp/minesweeper-game";
+import { minesweeperStore } from "@/lib/xp/games/game-session-store";
+import { getWordWindowBounds } from "@/lib/xp/navigation";
 import {
   MyComputerIcon,
   MyDocumentsIcon,
@@ -24,12 +27,29 @@ import {
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
+  PdfIcon,
+  InternetExplorerIcon,
 } from "./xp-icons";
 
 interface IconDef {
   id: string;
   title: string;
   icon: React.ReactNode;
+}
+
+function getWallpaperCss(wp: string): React.CSSProperties {
+  const image = wp.startsWith("/") || wp.startsWith("data:") ? `url("${wp}")` : wp;
+  if (wp.startsWith("/")) {
+    return {
+      backgroundImage: `${image}, radial-gradient(ellipse at 50% 20%, #76b5ff 0%, #2f82e8 45%, #155bb5 80%), linear-gradient(to top, #3a9718 0%, #58b628 25%, transparent 60%)`,
+      backgroundSize: "cover",
+      backgroundPosition: "center bottom",
+      backgroundRepeat: "no-repeat",
+    };
+  }
+  return {
+    background: `#0b1c24 ${image} center / cover no-repeat`,
+  };
 }
 
 export function Desktop() {
@@ -39,9 +59,57 @@ export function Desktop() {
     theme,
     openWindow,
     openProject,
+    openPortfolio,
+    openProfile,
     balloon,
     closeBalloon,
   } = useWindowManager();
+
+  // Wallpaper crossfade transition state
+  const [displayedWallpaper, setDisplayedWallpaper] = useState(wallpaper);
+  const [transitionWallpaper, setTransitionWallpaper] = useState<string | null>(null);
+  const [transitionOpacity, setTransitionOpacity] = useState(0);
+
+  useEffect(() => {
+    if (wallpaper === displayedWallpaper) return;
+
+    let isMounted = true;
+
+    const triggerTransition = () => {
+      if (!isMounted) return;
+      setTransitionWallpaper(wallpaper);
+      setTransitionOpacity(0);
+
+      requestAnimationFrame(() => {
+        if (!isMounted) return;
+        requestAnimationFrame(() => {
+          if (!isMounted) return;
+          setTransitionOpacity(1);
+        });
+      });
+    };
+
+    if (wallpaper.startsWith("/")) {
+      const img = new Image();
+      img.src = wallpaper;
+      img.onload = () => triggerTransition();
+      img.onerror = () => triggerTransition();
+    } else {
+      triggerTransition();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [wallpaper, displayedWallpaper]);
+
+  const handleTransitionEnd = useCallback(() => {
+    if (transitionWallpaper) {
+      setDisplayedWallpaper(transitionWallpaper);
+      setTransitionWallpaper(null);
+      setTransitionOpacity(0);
+    }
+  }, [transitionWallpaper]);
 
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isTurnOffOpen, setIsTurnOffOpen] = useState(false);
@@ -70,23 +138,19 @@ export function Desktop() {
   const builtInIcons: IconDef[] = useMemo(
     () => [
       {
+        id: "profile",
+        title: "Обо мне",
+        icon: <WordDocIcon className="w-12 h-12" />,
+      },
+      {
+        id: "portfolio",
+        title: "Портфолио",
+        icon: <InternetExplorerIcon className="w-12 h-12" />,
+      },
+      {
         id: "resume",
         title: "Резюме.pdf",
-        icon: (
-          <div className="w-12 h-12 rounded bg-gradient-to-b from-red-600 to-red-800 border-2 border-white text-white font-black text-xs grid place-items-center shadow-lg">
-            <span className="tracking-tighter">PDF</span>
-          </div>
-        ),
-      },
-      {
-        id: "my-documents",
-        title: "Мои работы",
-        icon: <MyDocumentsIcon className="w-12 h-12" />,
-      },
-      {
-        id: "notepad",
-        title: "Обо мне",
-        icon: <NotepadIcon className="w-12 h-12" />,
+        icon: <PdfIcon className="w-12 h-12" />,
       },
       {
         id: "my-computer",
@@ -124,13 +188,8 @@ export function Desktop() {
         icon: <ToolsIcon className="w-12 h-12" />,
       },
       {
-        id: "word",
-        title: "Документы Word",
-        icon: <WordDocIcon className="w-12 h-12" />,
-      },
-      {
         id: "paint",
-        title: "Paint Studio",
+        title: "Paint",
         icon: <PaintIcon className="w-12 h-12" />,
       },
     ],
@@ -202,13 +261,15 @@ export function Desktop() {
         sorted.sort((a, b) => a.title.localeCompare(b.title, "ru"));
       } else if (by === "type") {
         const order = (id: string) => {
-          if (id === "resume") return 0;
-          if (id.startsWith("folder-")) return 1;
-          if (id.startsWith("doc-")) return 2;
-          if (id === "my-computer" || id === "my-documents" || id === "media-player") return 3;
-          if (id.startsWith("project-")) return 4;
+          if (id === "profile") return 0;
+          if (id === "portfolio") return 1;
+          if (id === "resume") return 2;
+          if (id.startsWith("folder-")) return 3;
+          if (id.startsWith("doc-")) return 4;
+          if (id === "my-computer" || id === "media-player") return 5;
+          if (id.startsWith("project-")) return 6;
           if (id === "recycle-bin") return 99;
-          return 5;
+          return 7;
         };
         sorted.sort((a, b) => order(a.id) - order(b.id));
       }
@@ -370,6 +431,14 @@ export function Desktop() {
       }
 
       switch (id) {
+        case "profile":
+          openProfile();
+          break;
+
+        case "portfolio":
+          openPortfolio();
+          break;
+
         case "resume":
           openWindow({
             id: "resume",
@@ -465,12 +534,12 @@ export function Desktop() {
           openWindow({
             id: "solitaire",
             type: "solitaire",
-            title: "Косынка — Авторская колода",
+            title: "Косынка — Maison Solitaire",
             iconType: "solitaire",
-            x: 75,
-            y: 35,
-            width: 840,
-            height: 620,
+            x: 60,
+            y: 15,
+            width: typeof window !== "undefined" ? Math.min(960, window.innerWidth - 40) : 960,
+            height: typeof window !== "undefined" ? Math.min(700, window.innerHeight - 75) : 700,
           });
           break;
 
@@ -487,37 +556,36 @@ export function Desktop() {
           });
           break;
 
-        case "word":
+        case "word": {
+          const bounds = getWordWindowBounds();
           openWindow({
             id: "word",
             type: "word",
             title: "Документы — Влад Ахметов",
             iconType: "word",
-            x: 85,
-            y: 45,
-            width: 740,
-            height: 540,
+            ...bounds,
           });
           break;
+        }
 
-        case "minesweeper":
+        case "minesweeper": {
+          const currentDiff = minesweeperStore.getSnapshot().difficulty;
+          const bounds = getMinesweeperWindowBounds(currentDiff);
           openWindow({
             id: "minesweeper",
             type: "minesweeper",
-            title: "Сапёр",
+            title: "Сапёр — Pulsefield",
             iconType: "minesweeper",
-            x: 120,
-            y: 75,
-            width: 340,
-            height: 450,
+            ...bounds,
           });
           break;
+        }
 
         case "paint":
           openWindow({
             id: "paint",
             type: "paint",
-            title: "Paint Studio — Постеры и эскизы",
+            title: "Paint",
             iconType: "paint",
             x: 90,
             y: 45,
@@ -530,7 +598,7 @@ export function Desktop() {
           break;
       }
     },
-    [openProject, openWindow, customIcons],
+    [openProject, openPortfolio, openProfile, openWindow, customIcons],
   );
 
   const handleIconContextMenu = useCallback(
@@ -564,12 +632,8 @@ export function Desktop() {
     <div
       ref={desktopRef}
       data-xp-theme={theme}
-      className={`xp-desktop xp-system ${isRefreshing ? "xp-refreshing" : ""}`}
+      className={`xp-desktop xp-system relative ${isRefreshing ? "xp-refreshing" : ""}`}
       style={{
-        backgroundImage: wallpaper.startsWith("/")
-          ? `url(${wallpaper}), radial-gradient(ellipse at 50% 20%, #76b5ff 0%, #2f82e8 45%, #155bb5 80%), linear-gradient(to top, #3a9718 0%, #58b628 25%, transparent 60%)`
-          : undefined,
-        background: !wallpaper.startsWith("/") ? wallpaper : undefined,
         cursor: xpCursors.default,
       }}
       onPointerDown={handleDesktopPointerDown}
@@ -577,6 +641,25 @@ export function Desktop() {
       onPointerUp={handleDesktopPointerUp}
       onContextMenu={handleDesktopContextMenu}
     >
+      {/* Base Wallpaper Layer */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={getWallpaperCss(displayedWallpaper)}
+        aria-hidden="true"
+      />
+
+      {/* Crossfade Transition Layer */}
+      {transitionWallpaper && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-700 ease-in-out"
+          style={{
+            ...getWallpaperCss(transitionWallpaper),
+            opacity: transitionOpacity,
+          }}
+          onTransitionEnd={handleTransitionEnd}
+          aria-hidden="true"
+        />
+      )}
       {/* Marquee Selection Rect */}
       {marqueeRect && (
         <div

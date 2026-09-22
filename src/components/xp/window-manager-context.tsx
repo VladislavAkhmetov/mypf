@@ -2,9 +2,17 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from "react";
 import { xpSound } from "@/lib/xp/sound";
-import { projects } from "@/data/projects";
+import {
+  parseNavigationParams,
+  getPrimaryWindowBounds,
+  getWordWindowBounds,
+  getTaskbarHeight,
+  FocusDirection,
+} from "@/lib/xp/navigation";
+import { DEFAULT_WALLPAPER_SRC } from "@/lib/xp/wallpapers";
 
 export type WindowType =
+  | "portfolio"
   | "starter"
   | "solitaire"
   | "media-player"
@@ -50,18 +58,36 @@ interface WindowManagerContextType {
   windows: WindowItem[];
   activeWindowId: string | null;
   wallpaper: string;
-  setWallpaper: (wp: string) => void;
+  setWallpaper: (wp: string, source?: "user" | "geo") => void;
+  wallpaperSource: "user" | "geo" | "default";
+  geoInfo: { country: string; countryCode: string | null; city: string | null } | null;
+  resetWallpaperToGeo: () => Promise<string | null>;
   theme: XpTheme;
   setTheme: (theme: XpTheme) => void;
-  openWindow: (win: Omit<WindowItem, "zIndex" | "isMinimized" | "isMaximized"> & { isMinimized?: boolean; isMaximized?: boolean }) => void;
+  openWindow: (
+    win: Omit<WindowItem, "zIndex" | "isMinimized" | "isMaximized"> & {
+      isMinimized?: boolean;
+      isMaximized?: boolean;
+    }
+  ) => void;
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
   maximizeWindow: (id: string) => void;
   restoreWindow: (id: string) => void;
   focusWindow: (id: string) => void;
-  updateWindowBounds: (id: string, bounds: { x?: number; y?: number; width?: number; height?: number }) => void;
+  updateWindowBounds: (
+    id: string,
+    bounds: { x?: number; y?: number; width?: number; height?: number }
+  ) => void;
   minimizeAll: () => void;
   openProject: (slug: string) => void;
+  openPortfolio: (options?: {
+    projectSlug?: string;
+    focus?: FocusDirection;
+    notFound?: boolean;
+    pushHistory?: boolean;
+  }) => void;
+  openProfile: (options?: { pushHistory?: boolean }) => void;
   balloon: BalloonInfo | null;
   showBalloon: (title: string, message: string) => void;
   closeBalloon: () => void;
@@ -72,41 +98,84 @@ const WindowManagerContext = createContext<WindowManagerContextType | null>(null
 let topZ = 100;
 
 function getDefaultWindows(): WindowItem[] {
-  const isClient = typeof window !== "undefined";
-  const screenW = isClient ? window.innerWidth : 1024;
-  const isMobile = screenW < 768;
+  if (typeof window === "undefined") {
+    return [];
+  }
 
-  const width = isMobile ? screenW : 720;
-  const height = isMobile ? (isClient ? window.innerHeight - 46 : 520) : 480;
-  const x = isMobile ? 0 : Math.max(20, Math.round((screenW - width) / 2));
-  const y = isMobile ? 0 : 36;
+  const nav = parseNavigationParams(window.location.search);
+  const bounds = getPrimaryWindowBounds();
 
+  if (nav.target === "portfolio") {
+    return [
+      {
+        id: "portfolio",
+        type: "portfolio",
+        title: "Портфолио — Internet Explorer",
+        iconType: "ie",
+        ...bounds,
+        isMinimized: false,
+        isMaximized: false,
+        zIndex: 100,
+        props: {
+          projectSlug: nav.projectSlug,
+          focus: nav.focus,
+          notFound: nav.projectNotFound,
+        },
+      },
+    ];
+  }
+
+  // Clean entry without special params opens only Word with profile
+  const wordBounds = getWordWindowBounds();
   return [
     {
-      id: "starter",
-      type: "starter",
-      title: "Влад Ахметов — Портфолио",
-      iconType: "starter",
-      x,
-      y,
-      width,
-      height,
+      id: "word",
+      type: "word",
+      title: "Документы — Влад Ахметов",
+      iconType: "word",
+      ...wordBounds,
       isMinimized: false,
       isMaximized: false,
       zIndex: 100,
+      props: {
+        docSlug: "profile",
+      },
     },
   ];
 }
 
 export function WindowManagerProvider({ children }: { children: React.ReactNode }) {
   const [windows, setWindows] = useState<WindowItem[]>(getDefaultWindows);
-  const [activeWindowId, setActiveWindowId] = useState<string | null>("starter");
+  const [activeWindowId, setActiveWindowId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const nav = parseNavigationParams(window.location.search);
+      return nav.target === "portfolio" ? "portfolio" : "word";
+    }
+    return null;
+  });
+
   const [wallpaper, setWallpaperState] = useState<string>(() => {
     if (typeof window !== "undefined") {
-      return window.localStorage.getItem("amazi-xp-wallpaper") || "/images/bliss.jpg";
+      return window.localStorage.getItem("amazi-xp-wallpaper") || DEFAULT_WALLPAPER_SRC;
     }
-    return "/images/bliss.jpg";
+    return DEFAULT_WALLPAPER_SRC;
   });
+
+  const [wallpaperSource, setWallpaperSource] = useState<"user" | "geo" | "default">(() => {
+    if (typeof window !== "undefined") {
+      const src = window.localStorage.getItem("amazi-xp-wallpaper-source") as "user" | "geo" | null;
+      if (src === "user" || src === "geo") return src;
+      if (window.localStorage.getItem("amazi-xp-wallpaper")) return "user";
+    }
+    return "default";
+  });
+
+  const [geoInfo, setGeoInfo] = useState<{
+    country: string;
+    countryCode: string | null;
+    city: string | null;
+  } | null>(null);
+
   const [theme, setThemeState] = useState<XpTheme>(() => {
     if (typeof window !== "undefined") {
       const saved = window.localStorage.getItem("amazi-xp-theme") as XpTheme;
@@ -116,6 +185,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     }
     return "luna-blue";
   });
+
   const [balloon, setBalloon] = useState<BalloonInfo | null>(null);
 
   // Synchronize theme token attribute on root html tag
@@ -134,9 +204,105 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     setBalloon(null);
   }, []);
 
-  const setWallpaper = useCallback((wp: string) => {
+  const setWallpaper = useCallback((wp: string, source: "user" | "geo" = "user") => {
     setWallpaperState(wp);
-    window.localStorage.setItem("amazi-xp-wallpaper", wp);
+    setWallpaperSource(source);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("amazi-xp-wallpaper", wp);
+      window.localStorage.setItem("amazi-xp-wallpaper-source", source);
+    }
+  }, []);
+
+  const resetWallpaperToGeo = useCallback(async (): Promise<string | null> => {
+    if (typeof window === "undefined") return null;
+
+    window.localStorage.removeItem("amazi-xp-wallpaper-source");
+    window.localStorage.removeItem("amazi-xp-wallpaper");
+    setWallpaperSource("default");
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch("/api/geo", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data?.wallpaper) {
+        setGeoInfo({
+          country: data.country,
+          countryCode: data.countryCode,
+          city: data.city,
+        });
+        const newWp = data.wallpaper.src;
+        setWallpaperState(newWp);
+        setWallpaperSource("geo");
+        window.localStorage.setItem("amazi-xp-wallpaper", newWp);
+        window.localStorage.setItem("amazi-xp-wallpaper-source", "geo");
+        return newWp;
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    if (typeof window === "undefined") return;
+
+    const currentSource = window.localStorage.getItem("amazi-xp-wallpaper-source");
+    const hasUserPref =
+      currentSource === "user" ||
+      (currentSource === null && window.localStorage.getItem("amazi-xp-wallpaper") !== null);
+
+    if (hasUserPref) return;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    fetch("/api/geo", { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (ignore || !data?.wallpaper) return;
+
+        setGeoInfo({
+          country: data.country,
+          countryCode: data.countryCode,
+          city: data.city,
+        });
+
+        const latestSource = window.localStorage.getItem("amazi-xp-wallpaper-source");
+        const latestUserPref =
+          latestSource === "user" ||
+          (latestSource === null && window.localStorage.getItem("amazi-xp-wallpaper") !== null);
+        if (latestUserPref) return;
+
+        const newWp = data.wallpaper.src;
+        setWallpaperState(newWp);
+        setWallpaperSource("geo");
+        window.localStorage.setItem("amazi-xp-wallpaper", newWp);
+        window.localStorage.setItem("amazi-xp-wallpaper-source", "geo");
+
+        if (!data.isFallback && data.wallpaper.name) {
+          xpSound.balloon();
+          setBalloon({
+            title: "Персонализация",
+            message: `Определен регион: ${data.country || data.countryCode}. Установлены обои «${data.wallpaper.name}».`,
+            id: Date.now(),
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback gracefully on timeout or network error
+      })
+      .finally(() => {
+        clearTimeout(timeoutId);
+      });
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
   }, []);
 
   const setTheme = useCallback((newTheme: XpTheme) => {
@@ -156,14 +322,19 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
           return { ...w, zIndex: topZ, isMinimized: false };
         }
         return w;
-      }),
+      })
     );
     setActiveWindowId(id);
   }, []);
 
   // Open or focus window
   const openWindow = useCallback(
-    (win: Omit<WindowItem, "zIndex" | "isMinimized" | "isMaximized"> & { isMinimized?: boolean; isMaximized?: boolean }) => {
+    (
+      win: Omit<WindowItem, "zIndex" | "isMinimized" | "isMaximized"> & {
+        isMinimized?: boolean;
+        isMaximized?: boolean;
+      }
+    ) => {
       setWindows((prev) => {
         const existing = prev.find((w) => w.id === win.id);
         topZ += 1;
@@ -171,8 +342,13 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
           xpSound.open();
           return prev.map((w) =>
             w.id === win.id
-              ? { ...w, isMinimized: false, zIndex: topZ, ...(win.props ? { props: win.props } : {}) }
-              : w,
+              ? {
+                  ...w,
+                  isMinimized: false,
+                  zIndex: topZ,
+                  ...(win.props ? { props: { ...w.props, ...win.props } } : {}),
+                }
+              : w
           );
         }
         xpSound.open();
@@ -188,7 +364,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       });
       setActiveWindowId(win.id);
     },
-    [],
+    []
   );
 
   const closeWindow = useCallback((id: string) => {
@@ -205,20 +381,23 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       return remaining;
     });
 
-    // Clear project param if closing project window
-    if (typeof window !== "undefined" && id.startsWith("project-")) {
+    // Closing portfolio window clears its URL params via replaceState without opening Word immediately
+    if (typeof window !== "undefined" && (id === "portfolio" || id.startsWith("project-"))) {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("project")) {
-        url.searchParams.delete("project");
-        window.history.replaceState({}, "", url.toString());
-      }
+      url.searchParams.delete("project");
+      url.searchParams.delete("view");
+      url.searchParams.delete("focus");
+      window.history.replaceState({}, "", url.toString());
+      window.sessionStorage.removeItem("amazi-portfolio-slug");
+      window.sessionStorage.removeItem("amazi-portfolio-focus");
+      window.sessionStorage.removeItem("amazi-portfolio-scroll");
     }
   }, []);
 
   const minimizeWindow = useCallback((id: string) => {
     xpSound.minimize();
     setWindows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, isMinimized: true } : w)),
+      prev.map((w) => (w.id === id ? { ...w, isMinimized: true } : w))
     );
     setActiveWindowId((cur) => (cur === id ? null : cur));
   }, []);
@@ -226,24 +405,24 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const maximizeWindow = useCallback((id: string) => {
     xpSound.click();
     setWindows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, isMaximized: true } : w)),
+      prev.map((w) => (w.id === id ? { ...w, isMaximized: true } : w))
     );
   }, []);
 
   const restoreWindow = useCallback((id: string) => {
     xpSound.restore();
     setWindows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, isMaximized: false, isMinimized: false } : w)),
+      prev.map((w) => (w.id === id ? { ...w, isMaximized: false, isMinimized: false } : w))
     );
   }, []);
 
   const updateWindowBounds = useCallback(
     (id: string, bounds: { x?: number; y?: number; width?: number; height?: number }) => {
       setWindows((prev) =>
-        prev.map((w) => (w.id === id ? { ...w, ...bounds } : w)),
+        prev.map((w) => (w.id === id ? { ...w, ...bounds } : w))
       );
     },
-    [],
+    []
   );
 
   const minimizeAll = useCallback(() => {
@@ -252,66 +431,150 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     setActiveWindowId(null);
   }, []);
 
-  const openProject = useCallback(
-    (slug: string) => {
-      const proj = projects.find((p) => p.slug === slug);
-      if (!proj) return;
-      const screenW = typeof window !== "undefined" ? window.innerWidth : 1024;
-      const screenH = typeof window !== "undefined" ? window.innerHeight : 768;
-
-      const isMobile = screenW < 768;
-      const width = isMobile ? screenW : Math.min(840, screenW - 120);
-      const height = isMobile ? screenH - 46 : Math.min(580, screenH - 100);
-      const x = isMobile ? 0 : Math.max(30, Math.round((screenW - width) / 2));
-      const y = isMobile ? 0 : Math.max(20, Math.round((screenH - height) / 2) - 30);
-
+  // Unified Portfolio Browser launcher
+  const openPortfolio = useCallback(
+    (options?: {
+      projectSlug?: string;
+      focus?: FocusDirection;
+      notFound?: boolean;
+      pushHistory?: boolean;
+    }) => {
+      const bounds = getPrimaryWindowBounds();
       openWindow({
-        id: `project-${slug}`,
-        type: "project",
-        title: `${proj.title} - C:\\Projects\\${proj.slug}`,
-        iconType: proj.motif,
-        x,
-        y,
-        width,
-        height,
-        props: { slug },
+        id: "portfolio",
+        type: "portfolio",
+        title: "Портфолио — Internet Explorer",
+        iconType: "ie",
+        ...bounds,
+        props: {
+          projectSlug: options?.projectSlug,
+          focus: options?.focus,
+          notFound: options?.notFound,
+        },
       });
 
-      // Update URL with history entry
-      if (typeof window !== "undefined") {
+      if (options?.pushHistory !== false && typeof window !== "undefined") {
         const url = new URL(window.location.href);
-        if (url.searchParams.get("project") !== slug) {
-          url.searchParams.set("project", slug);
-          window.history.pushState({ project: slug }, "", url.toString());
+        if (options?.projectSlug) {
+          url.searchParams.set("project", options.projectSlug);
+          if (options.focus) {
+            url.searchParams.set("focus", options.focus);
+          } else {
+            url.searchParams.delete("focus");
+          }
+          url.searchParams.delete("view");
+        } else {
+          url.searchParams.delete("project");
+          url.searchParams.set("view", "portfolio");
+          if (options?.focus) {
+            url.searchParams.set("focus", options.focus);
+          } else {
+            url.searchParams.delete("focus");
+          }
         }
+        window.history.pushState(
+          { target: "portfolio", project: options?.projectSlug, focus: options?.focus },
+          "",
+          url.toString()
+        );
       }
     },
-    [openWindow],
+    [openWindow]
   );
 
-  // Check query params on boot (without distracting unneeded welcome balloon A12)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const targetProject = params.get("project");
-    if (targetProject) {
-      setTimeout(() => {
-        openProject(targetProject);
-      }, 150);
-    }
+  // Unified Profile launcher
+  const openProfile = useCallback(
+    (options?: { pushHistory?: boolean }) => {
+      const bounds = getWordWindowBounds();
+      openWindow({
+        id: "word",
+        type: "word",
+        title: "Документы — Влад Ахметов",
+        iconType: "word",
+        ...bounds,
+        props: {
+          docSlug: "profile",
+        },
+      });
 
+      if (options?.pushHistory !== false && typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("project");
+        url.searchParams.delete("focus");
+        const hasOther = Array.from(url.searchParams.keys()).some(
+          (k) => k !== "view" && k !== "project" && k !== "focus"
+        );
+        if (hasOther) {
+          url.searchParams.set("view", "profile");
+        } else {
+          url.searchParams.delete("view");
+        }
+        window.history.pushState({ target: "profile" }, "", url.toString());
+      }
+    },
+    [openWindow]
+  );
+
+  // Maintain backwards-compatible openProject router leading directly into the portfolio browser
+  const openProject = useCallback(
+    (slug: string) => {
+      openPortfolio({ projectSlug: slug, pushHistory: true });
+    },
+    [openPortfolio]
+  );
+
+  // Handle browser Back/Forward (popstate)
+  useEffect(() => {
     const handlePopState = () => {
-      const currentParams = new URLSearchParams(window.location.search);
-      const projSlug = currentParams.get("project");
-      if (projSlug) {
-        openProject(projSlug);
+      const nav = parseNavigationParams(window.location.search);
+      if (nav.target === "portfolio") {
+        openPortfolio({
+          projectSlug: nav.projectSlug,
+          focus: nav.focus,
+          notFound: nav.projectNotFound,
+          pushHistory: false, // Popstate must not push a new history entry
+        });
       } else {
-        setWindows((prev) => prev.filter((w) => !w.id.startsWith("project-")));
+        openProfile({
+          pushHistory: false, // Popstate must not push a new history entry
+        });
       }
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [openProject]);
+  }, [openPortfolio, openProfile]);
+
+  // Keep window controls visible and accessible when viewport resizes
+  useEffect(() => {
+    const handleResize = () => {
+      const screenW = window.innerWidth;
+      const screenH = window.innerHeight;
+      const taskbarH = getTaskbarHeight();
+      const availH = Math.max(100, screenH - taskbarH);
+
+      setWindows((prev) =>
+        prev.map((w) => {
+          const isPrimary = w.id === "word" || w.id === "portfolio";
+          const newW = screenW < 1024 && isPrimary ? screenW : Math.min(w.width, screenW);
+          const newH = screenW < 1024 && isPrimary ? availH : Math.min(w.height, availH);
+          const newX = screenW < 1024 && isPrimary ? 0 : Math.max(0, Math.min(w.x, screenW - 80));
+          const newY = screenW < 1024 && isPrimary ? 0 : Math.max(0, Math.min(w.y, availH - 30));
+
+          return {
+            ...w,
+            x: newX,
+            y: newY,
+            width: newW,
+            height: newH,
+          };
+        })
+      );
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -319,6 +582,9 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       activeWindowId,
       wallpaper,
       setWallpaper,
+      wallpaperSource,
+      geoInfo,
+      resetWallpaperToGeo,
       theme,
       setTheme,
       openWindow,
@@ -330,6 +596,8 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       updateWindowBounds,
       minimizeAll,
       openProject,
+      openPortfolio,
+      openProfile,
       balloon,
       showBalloon,
       closeBalloon,
@@ -339,6 +607,9 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       activeWindowId,
       wallpaper,
       setWallpaper,
+      wallpaperSource,
+      geoInfo,
+      resetWallpaperToGeo,
       theme,
       setTheme,
       openWindow,
@@ -350,10 +621,12 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       updateWindowBounds,
       minimizeAll,
       openProject,
+      openPortfolio,
+      openProfile,
       balloon,
       showBalloon,
       closeBalloon,
-    ],
+    ]
   );
 
   return <WindowManagerContext.Provider value={value}>{children}</WindowManagerContext.Provider>;

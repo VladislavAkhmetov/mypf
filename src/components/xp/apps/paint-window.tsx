@@ -1,552 +1,392 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useWindowManager } from "../window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
-import { PaintIcon } from "../xp-icons";
+type Particle = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  tone: 0 | 1 | 2;
+  orbit: number;
+  phase: number;
+  spin: number;
+};
 
-type ToolType = "brush" | "eraser" | "line" | "rect" | "circle" | "stamp-va" | "stamp-grid" | "stamp-cross";
+type Palette = {
+  bg: string;
+  tones: [string, string, string];
+};
 
-const CLASSIC_PALETTE = [
-  "#000000", "#787878", "#790300", "#757401", "#007702", "#007777", "#030079", "#790077",
-  "#ffffff", "#b8b8b8", "#ff0018", "#ffff00", "#00ff17", "#00ffff", "#0000ff", "#ff00ff",
-  "#c0c0c0", "#808080", "#800000", "#808000", "#008000", "#008080", "#000080", "#800080",
-  "#fffbf0", "#e2e8f0", "#ea580c", "#f59e0b", "#10b981", "#06b6d4", "#6366f1", "#d946ef",
+const PALETTES: Palette[] = [
+  { bg: "#00354d", tones: ["#d3ff6a", "#9fe7f2", "#ffffff"] },
+  { bg: "#0b1220", tones: ["#ff8ed8", "#244bff", "#f4f7ff"] },
+  { bg: "#1a140c", tones: ["#ffb703", "#fb8500", "#fff6e5"] },
+  { bg: "#ece9d8", tones: ["#245edc", "#c43e1c", "#13211f"] },
+  { bg: "#081c14", tones: ["#7dffb3", "#eaff6a", "#f7fff8"] },
 ];
 
+const FOLDS = [4, 6, 8] as const;
+
+type FieldState = {
+  particles: Particle[];
+  pointer: { x: number; y: number; inside: boolean; down: boolean };
+  folds: number;
+  paletteIndex: number;
+  width: number;
+  height: number;
+  time: number;
+};
+
+function spawn(state: FieldState, count: number, origin?: { x: number; y: number }) {
+  const cx = origin?.x ?? state.width * 0.5;
+  const cy = origin?.y ?? state.height * 0.5;
+  const reach = Math.min(state.width, state.height);
+  for (let i = 0; i < count; i += 1) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = origin ? Math.random() * 26 : 12 + Math.random() * reach * 0.22;
+    const speed = origin ? 1.8 + Math.random() * 2.8 : 0.2 + Math.random() * 0.7;
+    state.particles.push({
+      x: cx + Math.cos(angle) * radius,
+      y: cy + Math.sin(angle) * radius,
+      vx: Math.cos(angle + 0.7) * speed,
+      vy: Math.sin(angle + 0.7) * speed,
+      size: origin ? 2.2 + Math.random() * 5.5 : 2.6 + Math.random() * 7,
+      tone: ((Math.random() * 3) | 0) as 0 | 1 | 2,
+      orbit: origin ? 18 + Math.random() * 90 : 28 + Math.random() * reach * 0.28,
+      phase: Math.random() * Math.PI * 2,
+      spin: 0.35 + Math.random() * 1.1,
+    });
+  }
+  if (state.particles.length > 160) {
+    state.particles.splice(0, state.particles.length - 160);
+  }
+}
+
+function snapshotCanvas(source: HTMLCanvasElement, mime: string, quality: number, maxWidth: number) {
+  const scale = Math.min(1, maxWidth / source.width);
+  const out = document.createElement("canvas");
+  out.width = Math.max(1, Math.round(source.width * scale));
+  out.height = Math.max(1, Math.round(source.height * scale));
+  const ctx = out.getContext("2d");
+  if (!ctx) return source.toDataURL(mime, quality);
+  ctx.drawImage(source, 0, 0, out.width, out.height);
+  return out.toDataURL(mime, quality);
+}
+
 export function PaintWindow() {
-  const { setWallpaper } = useWindowManager();
+  const { setWallpaper, showBalloon } = useWindowManager();
+  const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [currentTool, setCurrentTool] = useState<ToolType>("brush");
-  const [primaryColor, setPrimaryColor] = useState<string>("#000000");
-  const [brushSize, setBrushSize] = useState<number>(3);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
-  const [history, setHistory] = useState<ImageData[]>([]);
-  const canvasDimensions = { width: 640, height: 440 };
+  const stateRef = useRef<FieldState>({
+    particles: [],
+    pointer: { x: 0, y: 0, inside: false, down: false },
+    folds: 6,
+    paletteIndex: 0,
+    width: 1,
+    height: 1,
+    time: 0,
+  });
 
-  // Initialize Canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
+  const [folds, setFolds] = useState(6);
+  const [paletteIndex, setPaletteIndex] = useState(0);
 
-    // Fill with clean warm paper white
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Save initial state to history
-    const initialImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setHistory([initialImg]);
+  const applyPalette = useCallback((index: number) => {
+    stateRef.current.paletteIndex = index;
+    setPaletteIndex(index);
   }, []);
 
-  const saveHistoryState = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setHistory((prev) => [...prev.slice(-15), imgData]);
+  const applyFolds = useCallback((value: number) => {
+    stateRef.current.folds = value;
+    setFolds(value);
   }, []);
 
-  const handleUndo = useCallback(() => {
-    if (history.length <= 1) return;
+  const reshuffle = useCallback(() => {
     xpSound.click();
+    const state = stateRef.current;
+    const nextPalette = (state.paletteIndex + 1 + Math.floor(Math.random() * (PALETTES.length - 1))) % PALETTES.length;
+    const nextFolds = FOLDS[Math.floor(Math.random() * FOLDS.length)];
+    state.particles = [];
+      spawn(state, 88);
+    applyPalette(nextPalette);
+    applyFolds(nextFolds);
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const ctx = canvas?.getContext("2d");
+    if (canvas && ctx) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = PALETTES[nextPalette].bg;
+      ctx.fillRect(0, 0, state.width, state.height);
+    }
+  }, [applyFolds, applyPalette]);
+
+  const captureFrame = useCallback((kind: "wallpaper" | "download") => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    if (kind === "wallpaper") return snapshotCanvas(canvas, "image/jpeg", 0.82, 1280);
+    return snapshotCanvas(canvas, "image/png", 1, 1920);
+  }, []);
+
+  const handleWallpaper = useCallback(() => {
+    const url = captureFrame("wallpaper");
+    if (!url) return;
+    try {
+      setWallpaper(url, "user");
+      showBalloon("Обои установлены", "Это поле теперь на рабочем столе.");
+    } catch {
+      showBalloon("Не удалось сохранить", "Снимок не поместился в браузер. Попробуй ещё раз.");
+    }
+  }, [captureFrame, setWallpaper, showBalloon]);
+
+  const handleDownload = useCallback(() => {
+    xpSound.click();
+    const url = captureFrame("download");
+    if (!url) return;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `amazi-field-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [captureFrame]);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const newHistory = [...history];
-    newHistory.pop(); // Remove current
-    const previous = newHistory[newHistory.length - 1];
-    ctx.putImageData(previous, 0, 0);
-    setHistory(newHistory);
-  }, [history]);
+    const state = stateRef.current;
+    let frame = 0;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Mouse / Touch handlers for Canvas
-  const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    if ("touches" in e) {
-      const touch = e.touches[0];
-      return {
-        x: Math.round((touch.clientX - rect.left) * scaleX),
-        y: Math.round((touch.clientY - rect.top) * scaleY),
-      };
-    }
-
-    return {
-      x: Math.round((e.clientX - rect.left) * scaleX),
-      y: Math.round((e.clientY - rect.top) * scaleY),
+    const fit = () => {
+      const rect = wrap.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(1, Math.floor(rect.width));
+      const height = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const resized = Math.abs(state.width - width) > 48 || Math.abs(state.height - height) > 48;
+      state.width = width;
+      state.height = height;
+      if (state.particles.length === 0 || resized) {
+        state.particles = [];
+        spawn(state, 88);
+      }
+      ctx.fillStyle = PALETTES[state.paletteIndex].bg;
+      ctx.fillRect(0, 0, width, height);
     };
-  };
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    const coords = getCanvasCoords(e);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
+    const pointerToLocal = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      };
+    };
 
-    setIsDrawing(true);
-    setStartPos(coords);
+    const onPointerMove = (event: PointerEvent) => {
+      const point = pointerToLocal(event);
+      state.pointer.x = point.x;
+      state.pointer.y = point.y;
+      state.pointer.inside = true;
+    };
 
-    // Stamping logic
-    if (currentTool.startsWith("stamp-")) {
-      xpSound.click();
-      drawStamp(ctx, coords.x, coords.y, currentTool);
-      saveHistoryState();
-      setIsDrawing(false);
-      return;
-    }
+    const onPointerDown = (event: PointerEvent) => {
+      canvas.setPointerCapture(event.pointerId);
+      const point = pointerToLocal(event);
+      state.pointer.x = point.x;
+      state.pointer.y = point.y;
+      state.pointer.inside = true;
+      state.pointer.down = true;
+      spawn(state, 18, point);
+    };
 
-    ctx.beginPath();
-    ctx.moveTo(coords.x, coords.y);
-    ctx.strokeStyle = currentTool === "eraser" ? "#ffffff" : primaryColor;
-    ctx.fillStyle = currentTool === "eraser" ? "#ffffff" : primaryColor;
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    const onPointerUp = () => {
+      state.pointer.down = false;
+    };
 
-    if (currentTool === "brush" || currentTool === "eraser") {
-      ctx.lineTo(coords.x, coords.y);
-      ctx.stroke();
-    }
-  };
+    const onPointerLeave = () => {
+      state.pointer.inside = false;
+      state.pointer.down = false;
+    };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !startPos) return;
-    const coords = getCanvasCoords(e);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
+    const tick = () => {
+      frame = requestAnimationFrame(tick);
+      state.time += reduceMotion ? 0.008 : 0.016;
+      const { width: w, height: h } = state;
+      const palette = PALETTES[state.paletteIndex];
+      const idleX = w * 0.5 + Math.cos(state.time * 0.55) * Math.min(w, h) * 0.08;
+      const idleY = h * 0.5 + Math.sin(state.time * 0.42) * Math.min(w, h) * 0.06;
+      const targetX = state.pointer.inside ? state.pointer.x : idleX;
+      const targetY = state.pointer.inside ? state.pointer.y : idleY;
+      const cx = w * 0.5;
+      const cy = h * 0.5;
 
-    if (currentTool === "brush" || currentTool === "eraser") {
-      ctx.lineTo(coords.x, coords.y);
-      ctx.stroke();
-    } else if (currentTool === "line" || currentTool === "rect" || currentTool === "circle") {
-      // Restore previous state while dragging shape
-      const latestSaved = history[history.length - 1];
-      if (latestSaved) {
-        ctx.putImageData(latestSaved, 0, 0);
+      if (state.pointer.down && !reduceMotion) spawn(state, 3, state.pointer);
+
+      for (const particle of state.particles) {
+        const seatX = targetX + Math.cos(state.time * particle.spin + particle.phase) * particle.orbit;
+        const seatY = targetY + Math.sin(state.time * particle.spin + particle.phase) * particle.orbit * 0.82;
+        particle.vx += (seatX - particle.x) * (state.pointer.down ? 0.045 : 0.02);
+        particle.vy += (seatY - particle.y) * (state.pointer.down ? 0.045 : 0.02);
+        particle.vx += -(particle.y - cy) * 0.00018;
+        particle.vy += (particle.x - cx) * 0.00018;
+        particle.vx *= 0.9;
+        particle.vy *= 0.9;
+        particle.x += particle.vx;
+        particle.y += particle.vy;
       }
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = brushSize;
-      ctx.beginPath();
 
-      if (currentTool === "line") {
-        ctx.moveTo(startPos.x, startPos.y);
-        ctx.lineTo(coords.x, coords.y);
-        ctx.stroke();
-      } else if (currentTool === "rect") {
-        const w = coords.x - startPos.x;
-        const h = coords.y - startPos.y;
-        ctx.strokeRect(startPos.x, startPos.y, w, h);
-      } else if (currentTool === "circle") {
-        const rx = Math.abs(coords.x - startPos.x) / 2;
-        const ry = Math.abs(coords.y - startPos.y) / 2;
-        const cx = Math.min(startPos.x, coords.x) + rx;
-        const cy = Math.min(startPos.y, coords.y) + ry;
-        ctx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-    }
-  };
+      ctx.globalAlpha = reduceMotion ? 0.2 : 0.055;
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1;
 
-  const stopDrawing = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    setStartPos(null);
-    saveHistoryState();
-  };
-
-  const drawStamp = (ctx: CanvasRenderingContext2D, x: number, y: number, stampType: ToolType) => {
-    ctx.save();
-    if (stampType === "stamp-va") {
-      // Author monogram stamp
-      ctx.fillStyle = primaryColor;
-      ctx.font = "bold 28px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("VA", x, y);
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x - 24, y - 20, 48, 40);
-    } else if (stampType === "stamp-cross") {
-      // Technical Crosshair stamp
-      ctx.strokeStyle = primaryColor;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x, y, 16, 0, 2 * Math.PI);
-      ctx.moveTo(x - 22, y);
-      ctx.lineTo(x + 22, y);
-      ctx.moveTo(x, y - 22);
-      ctx.lineTo(x, y + 22);
-      ctx.stroke();
-    } else if (stampType === "stamp-grid") {
-      // Swiss dot grid stamp
-      ctx.fillStyle = primaryColor;
-      for (let dx = -20; dx <= 20; dx += 10) {
-        for (let dy = -20; dy <= 20; dy += 10) {
-          ctx.fillRect(x + dx - 1, y + dy - 1, 2, 2);
+      const foldsCount = state.folds;
+      ctx.lineCap = "round";
+      for (const particle of state.particles) {
+        const color = palette.tones[particle.tone];
+        for (let i = 0; i < foldsCount; i += 1) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate((Math.PI * 2 * i) / foldsCount);
+          if (i % 2 === 1) ctx.scale(1, -1);
+          ctx.translate(-cx, -cy);
+          ctx.fillStyle = color;
+          ctx.globalAlpha = 0.22;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size * 2.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 0.95;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = color;
+          ctx.globalAlpha = 0.7;
+          ctx.lineWidth = Math.max(1.4, particle.size * 0.55);
+          ctx.beginPath();
+          ctx.moveTo(particle.x, particle.y);
+          ctx.lineTo(particle.x - particle.vx * 8, particle.y - particle.vy * 8);
+          ctx.stroke();
+          ctx.restore();
         }
       }
-    }
-    ctx.restore();
-  };
+      ctx.globalAlpha = 1;
+    };
 
-  // Templates
-  const loadPreset = (preset: "blank" | "swiss" | "blueprint") => {
-    xpSound.click();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(wrap);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("pointerleave", onPointerLeave);
+    frame = requestAnimationFrame(tick);
 
-    if (preset === "blank") {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    } else if (preset === "swiss") {
-      // Swiss Poster template
-      ctx.fillStyle = "#f8fafc";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Red accent bar
-      ctx.fillStyle = "#ef4444";
-      ctx.fillRect(40, 40, canvas.width - 80, 12);
-      // Typography
-      ctx.fillStyle = "#0f172a";
-      ctx.font = "900 36px sans-serif";
-      ctx.fillText("SWISS POSTER 2026", 40, 100);
-      ctx.font = "500 14px monospace";
-      ctx.fillStyle = "#64748b";
-      ctx.fillText("SYSTEMIC DESIGN & PROTOTYPES // VLAD AKHMETOV", 40, 126);
-    } else if (preset === "blueprint") {
-      // Blueprint grid template
-      ctx.fillStyle = "#0284c7";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < canvas.height; y += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
-    }
-    saveHistoryState();
-  };
-
-  // Export actions
-  const handleDownload = () => {
-    xpSound.click();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `vlad-paint-${Date.now()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const handleSetWallpaper = () => {
-    xpSound.click();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const url = canvas.toDataURL("image/png");
-    setWallpaper(url);
-    alert("Рисунок успешно установлен в качестве обоев рабочего стола!");
-  };
-
-  const handleResetWallpaper = () => {
-    xpSound.click();
-    setWallpaper("/images/bliss.jpg");
-  };
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
+      canvas.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col h-full bg-[#ece9d8] select-none font-sans text-xs text-slate-800">
-      {/* Top Menu / Preset bar */}
-      <div className="bg-[#f0f0f0] border-b border-[#7b7b7b] p-1.5 flex flex-wrap items-center justify-between gap-2 shadow-2xs flex-shrink-0">
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1.5 font-bold mr-2 text-slate-900">
-            <PaintIcon className="w-4 h-4" />
-            <span>Paint Studio</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => loadPreset("blank")}
-            className="px-2 py-0.5 rounded bg-white border border-slate-300 hover:bg-slate-50 text-[11px]"
-            style={{ cursor: xpCursors.pointer }}
-          >
-            Чистый лист
-          </button>
-          <button
-            type="button"
-            onClick={() => loadPreset("swiss")}
-            className="px-2 py-0.5 rounded bg-white border border-slate-300 hover:bg-slate-50 text-[11px]"
-            style={{ cursor: xpCursors.pointer }}
-          >
-            Шаблон: Постер
-          </button>
-          <button
-            type="button"
-            onClick={() => loadPreset("blueprint")}
-            className="px-2 py-0.5 rounded bg-white border border-slate-300 hover:bg-slate-50 text-[11px]"
-            style={{ cursor: xpCursors.pointer }}
-          >
-            Шаблон: Чертёж
-          </button>
-
-          <button
-            type="button"
-            onClick={handleUndo}
-            disabled={history.length <= 1}
-            className="px-2 py-0.5 rounded bg-white border border-slate-300 hover:bg-slate-50 text-[11px] disabled:opacity-40"
-            style={{ cursor: xpCursors.pointer }}
-            title="Отменить (Ctrl+Z)"
-          >
-            ↩ Отмена
-          </button>
-        </div>
-
-        {/* Primary Export Actions */}
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded text-xs font-semibold flex items-center gap-1"
-            style={{ cursor: xpCursors.pointer }}
-            title="Сохранить PNG на компьютер"
-          >
-            <span>💾</span>
-            <span>Скачать PNG</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSetWallpaper}
-            className="px-2.5 py-1 bg-[#0055ea] hover:bg-[#0044bb] text-white rounded text-xs font-bold flex items-center gap-1 shadow-2xs"
-            style={{ cursor: xpCursors.pointer }}
-            title="Установить текущий рисунок фоном рабочего стола"
-          >
-            <span>🖼️</span>
-            <span>Сделать обоями</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleResetWallpaper}
-            className="px-1.5 py-1 text-slate-500 hover:text-slate-800 text-[10px] underline"
-            style={{ cursor: xpCursors.pointer }}
-            title="Вернуть стандартный Bliss"
-          >
-            Сброс
-          </button>
-        </div>
-      </div>
-
-      {/* Workspace Area: Left Toolbox + Center Canvas + Bottom Color Palette */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Toolbox */}
-        <div className="w-14 sm:w-16 bg-[#ece9d8] border-r border-[#7b7b7b] p-1.5 flex flex-col gap-1.5 items-center flex-shrink-0">
-          {/* Tool buttons */}
-          <div className="grid grid-cols-2 gap-1 w-full">
+    <div className="flex h-full flex-col bg-[#ece9d8] text-xs text-slate-800 select-none">
+      <div className="xp-toolbar flex-shrink-0">
+          {FOLDS.map((value) => (
             <button
+              key={value}
               type="button"
-              onClick={() => setCurrentTool("brush")}
-              className={`p-1.5 rounded border text-sm flex items-center justify-center ${
-                currentTool === "brush" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Кисть"
-            >
-              ✏️
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("eraser")}
-              className={`p-1.5 rounded border text-sm flex items-center justify-center ${
-                currentTool === "eraser" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Ластик"
-            >
-              🧹
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("line")}
-              className={`p-1.5 rounded border text-xs font-bold flex items-center justify-center ${
-                currentTool === "line" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Линия"
-            >
-              ╱
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("rect")}
-              className={`p-1.5 rounded border text-xs font-bold flex items-center justify-center ${
-                currentTool === "rect" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Прямоугольник"
-            >
-              ▭
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("circle")}
-              className={`p-1.5 rounded border text-xs font-bold flex items-center justify-center ${
-                currentTool === "circle" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Эллипс"
-            >
-              ○
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("stamp-va")}
-              className={`p-1.5 rounded border text-[10px] font-black flex items-center justify-center ${
-                currentTool === "stamp-va" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Штамп монограммы VA"
-            >
-              VA
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("stamp-cross")}
-              className={`p-1.5 rounded border text-xs font-bold flex items-center justify-center ${
-                currentTool === "stamp-cross" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Штамп перекрестья"
-            >
-              ⊕
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentTool("stamp-grid")}
-              className={`p-1.5 rounded border text-xs font-bold flex items-center justify-center ${
-                currentTool === "stamp-grid" ? "bg-[#316ac5] text-white border-blue-900" : "bg-white border-slate-300"
-              }`}
-              style={{ cursor: xpCursors.pointer }}
-              title="Штамп сетки точек"
-            >
-              ⸬
-            </button>
-          </div>
-
-          <div className="w-full h-px bg-slate-300 my-1" />
-
-          {/* Line width selector */}
-          <div className="flex flex-col items-center gap-1.5 w-full">
-            <div className="text-[10px] text-slate-500 font-mono">Толщина</div>
-            {[1, 3, 6, 12].map((size) => (
-              <button
-                key={size}
-                type="button"
-                onClick={() => setBrushSize(size)}
-                className={`w-full py-1 flex items-center justify-center rounded border ${
-                  brushSize === size ? "bg-white border-blue-600 shadow-2xs" : "border-transparent"
-                }`}
-                style={{ cursor: xpCursors.pointer }}
-              >
-                <div
-                  className="rounded-full bg-slate-900"
-                  style={{ width: `${Math.min(18, size * 2.5)}px`, height: `${Math.min(18, size * 2.5)}px` }}
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Current color indicator */}
-          <div className="mt-auto flex flex-col items-center gap-1 pb-1">
-            <div className="text-[10px] text-slate-500">Цвет</div>
-            <div
-              className="w-8 h-8 rounded border-2 border-white shadow-md"
-              style={{ backgroundColor: primaryColor }}
-            />
-          </div>
-        </div>
-
-        {/* Center Canvas Area */}
-        <div className="flex-1 bg-[#808080] p-4 overflow-auto flex items-center justify-center">
-          <div className="bg-white shadow-2xl border-2 border-black inline-block leading-none">
-            <canvas
-              ref={canvasRef}
-              width={canvasDimensions.width}
-              height={canvasDimensions.height}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={startDrawing}
-              onTouchMove={draw}
-              onTouchEnd={stopDrawing}
-              className="cursor-crosshair block touch-none"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Color Palette Bar */}
-      <div className="bg-[#ece9d8] border-t border-[#7b7b7b] p-2 flex flex-wrap items-center gap-2 flex-shrink-0">
-        <div className="text-[11px] font-semibold text-slate-700 mr-1">Палитра:</div>
-        <div className="flex flex-wrap items-center gap-1 flex-1">
-          {CLASSIC_PALETTE.map((color, idx) => (
-            <button
-              key={idx}
-              type="button"
+              className="xp-toolbar-btn min-w-7 justify-center font-mono text-[11px]"
+              aria-pressed={folds === value}
               onClick={() => {
                 xpSound.click();
-                setPrimaryColor(color);
+                applyFolds(value);
               }}
-              className={`w-5 h-5 rounded-xs border transition-transform ${
-                primaryColor === color
-                  ? "border-black scale-110 shadow-sm ring-2 ring-blue-500"
-                  : "border-slate-400 hover:scale-105"
-              }`}
-              style={{ backgroundColor: color, cursor: xpCursors.pointer }}
-              title={color}
+              style={{
+                cursor: xpCursors.pointer,
+                background: folds === value ? "#fff" : undefined,
+                borderColor: folds === value ? "#7a9eb5" : undefined,
+              }}
+              title={`${value} осей`}
+            >
+              {value}
+            </button>
+          ))}
+
+          <div className="xp-toolbar-sep" />
+
+          {PALETTES.map((palette, index) => (
+            <button
+              key={palette.bg}
+              type="button"
+              aria-label={`Палитра ${index + 1}`}
+              aria-pressed={paletteIndex === index}
+              onClick={() => {
+                xpSound.click();
+                applyPalette(index);
+              }}
+              className="h-5 w-5 rounded-sm border"
+              style={{
+                cursor: xpCursors.pointer,
+                background: palette.bg,
+                boxShadow: `inset 0 0 0 2px ${palette.tones[0]}`,
+                outline: paletteIndex === index ? "2px solid #316ac5" : "none",
+                outlineOffset: 1,
+              }}
             />
           ))}
-        </div>
 
-        {/* Custom hex color input */}
-        <div className="flex items-center gap-1 text-[11px]">
-          <span className="font-mono text-slate-600">HEX:</span>
-          <input
-            type="color"
-            value={primaryColor}
-            onChange={(e) => setPrimaryColor(e.target.value)}
-            className="w-6 h-6 p-0 border border-slate-400 rounded cursor-pointer"
-          />
-        </div>
+          <div className="xp-toolbar-sep" />
+
+          <button
+            type="button"
+            className="xp-toolbar-btn"
+            onClick={reshuffle}
+            style={{ cursor: xpCursors.pointer }}
+          >
+            Ещё
+          </button>
+          <button
+            type="button"
+            className="xp-toolbar-btn"
+            onClick={handleDownload}
+            style={{ cursor: xpCursors.pointer }}
+            title="Скачать кадр"
+          >
+            PNG
+          </button>
+          <button
+            type="button"
+            onClick={handleWallpaper}
+            className="ml-auto rounded-sm border border-[#003c9f] bg-[#245edc] px-2.5 py-0.5 font-semibold text-white hover:bg-[#1f4fc0]"
+            style={{ cursor: xpCursors.pointer }}
+            data-ym-goal="paint_set_wallpaper"
+          >
+            На стол
+          </button>
+      </div>
+
+      <div ref={wrapRef} className="relative min-h-0 flex-1 overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          className="block h-full w-full touch-none"
+          style={{ cursor: "crosshair" }}
+        />
       </div>
     </div>
   );

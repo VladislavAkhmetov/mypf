@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 * {
@@ -27,4 +28,17 @@ button {
   color: inherit;
   background: none;
   border: 0;
+}
+
+@keyframes word-caret {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-word-caret {
+  animation: word-caret 1s infinite;
 }

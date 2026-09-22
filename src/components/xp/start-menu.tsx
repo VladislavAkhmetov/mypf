@@ -8,6 +8,9 @@ import { useLocale } from "@/lib/i18n";
 import { useWindowManager } from "./window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
+import { getMinesweeperWindowBounds } from "@/lib/xp/minesweeper-game";
+import { minesweeperStore } from "@/lib/xp/games/game-session-store";
+import { getWordWindowBounds } from "@/lib/xp/navigation";
 import {
   WindowsMediaPlayerIcon,
   InternetExplorerIcon,
@@ -23,6 +26,7 @@ import {
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
+  PdfIcon,
 } from "./xp-icons";
 
 interface StartMenuProps {
@@ -33,7 +37,7 @@ interface StartMenuProps {
 
 export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
   const { t } = useLocale();
-  const { openWindow, openProject } = useWindowManager();
+  const { openWindow, openProject, openPortfolio, openProfile } = useWindowManager();
   const [showAllPrograms, setShowAllPrograms] = useState(false);
 
   if (!isOpen) return null;
@@ -64,29 +68,22 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
       <div className="xp-start-body relative">
         {/* Left Column (White) */}
         <div className="xp-start-left">
-          {/* My Documents / Portfolio */}
+          {/* Portfolio */}
           <div
             onClick={() => {
               xpSound.click();
               onClose();
-              openWindow({
-                id: "my-documents",
-                type: "my-documents",
-                title: "Мои работы — Проекты",
-                iconType: "folder",
-                x: 60,
-                y: 50,
-                width: 620,
-                height: 420,
-              });
+              openPortfolio();
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"portfolio"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
             <InternetExplorerIcon className="w-8 h-8 flex-shrink-0" />
             <div>
-              <div className="xp-start-item-title">Портфолио проектов</div>
-              <div className="xp-start-subtext">Кейсы и прототипы</div>
+              <div className="xp-start-item-title">Портфолио</div>
+              <div className="xp-start-subtext">Кейсы и интерактивные прототипы</div>
             </div>
           </div>
 
@@ -97,6 +94,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               xpSound.click();
               onClose();
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"email"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -127,6 +126,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 440,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"media-player"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -142,7 +143,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "notepad",
                 type: "notepad",
-                title: "About_Vlad.txt - Блокнот",
+                title: "Блокнот — Безымянный",
                 iconType: "notepad",
                 x: 70,
                 y: 60,
@@ -150,11 +151,13 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 380,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"notepad"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
             <NotepadIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Блокнот (Обо мне)</span>
+            <span className="font-semibold text-xs">Блокнот</span>
           </div>
 
           {/* Command Prompt */}
@@ -173,6 +176,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 360,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"cmd"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -196,6 +201,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 520,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"tools"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -203,27 +210,20 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             <span className="font-semibold text-xs">Инструменты и скрипты</span>
           </div>
 
-          {/* Word Documents */}
+          {/* About / Word */}
           <div
             onClick={() => {
               xpSound.click();
               onClose();
-              openWindow({
-                id: "word",
-                type: "word",
-                title: "Документы — Влад Ахметов",
-                iconType: "word",
-                x: 85,
-                y: 45,
-                width: 740,
-                height: 540,
-              });
+              openProfile();
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"word"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
             <WordDocIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Документы Word</span>
+            <span className="font-semibold text-xs">Обо мне (Word)</span>
           </div>
 
           {/* Paint Studio */}
@@ -234,7 +234,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "paint",
                 type: "paint",
-                title: "Paint Studio — Постеры и эскизы",
+                title: "Paint",
                 iconType: "paint",
                 x: 90,
                 y: 45,
@@ -242,11 +242,13 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 540,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"paint"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
             <PaintIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Paint Studio</span>
+            <span className="font-semibold text-xs">Paint</span>
           </div>
 
           {/* Stories */}
@@ -265,6 +267,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 430,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"stories"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -288,10 +292,12 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 520,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"resume"}'
             className="xp-start-item border border-blue-300 bg-blue-50 hover:bg-[#316ac5]"
             style={{ cursor: xpCursors.pointer }}
           >
-            <span className="text-lg">⭐</span>
+            <PdfIcon className="w-7 h-7 flex-shrink-0" />
             <div>
               <div className="xp-start-item-title text-blue-950 font-bold">Для работодателей / HR</div>
               <div className="xp-start-subtext text-blue-800">Резюме, специализация, стек</div>
@@ -304,6 +310,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               type="button"
               onMouseEnter={() => setShowAllPrograms(true)}
               onClick={() => setShowAllPrograms(!showAllPrograms)}
+              data-ym-goal="start_menu_all_programs_toggle"
               className="w-full flex items-center justify-between p-2 rounded hover:bg-[#316ac5] hover:text-white font-bold text-xs text-slate-900"
               style={{ cursor: xpCursors.pointer }}
             >
@@ -330,6 +337,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                   onClose();
                   openProject(p.slug);
                 }}
+                data-ym-goal="start_menu_project"
+                data-ym-params={JSON.stringify({ slug: p.slug })}
                 className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
                 style={{ cursor: xpCursors.pointer }}
               >
@@ -348,41 +357,44 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 openWindow({
                   id: "solitaire",
                   type: "solitaire",
-                  title: "Косынка — Авторская колода",
+                  title: "Косынка — Maison Solitaire",
                   iconType: "solitaire",
-                  x: 75,
-                  y: 35,
-                  width: 840,
-                  height: 620,
+                  x: 60,
+                  y: 15,
+                  width: typeof window !== "undefined" ? Math.min(960, window.innerWidth - 40) : 960,
+                  height: typeof window !== "undefined" ? Math.min(700, window.innerHeight - 75) : 700,
                 });
               }}
+              data-ym-goal="start_menu_item"
+              data-ym-params='{"app":"solitaire"}'
               className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
               style={{ cursor: xpCursors.pointer }}
             >
               <SolitaireIcon className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Косынка (Solitaire)</span>
+              <span className="truncate">Косынка Atelier</span>
             </div>
 
             <div
               onClick={() => {
                 xpSound.click();
                 onClose();
+                const currentDiff = minesweeperStore.getSnapshot().difficulty;
+                const bounds = getMinesweeperWindowBounds(currentDiff);
                 openWindow({
                   id: "minesweeper",
                   type: "minesweeper",
-                  title: "Сапёр",
+                  title: "Сапёр — Pulsefield",
                   iconType: "minesweeper",
-                  x: 120,
-                  y: 75,
-                  width: 340,
-                  height: 450,
+                  ...bounds,
                 });
               }}
+              data-ym-goal="start_menu_item"
+              data-ym-params='{"app":"minesweeper"}'
               className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
               style={{ cursor: xpCursors.pointer }}
             >
               <MinesweeperIcon className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Сапёр (Minesweeper)</span>
+              <span className="truncate">Сапёр Pulse</span>
             </div>
           </div>
         )}
@@ -404,6 +416,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 420,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"my-documents"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -426,6 +440,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 420,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"my-computer"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -448,6 +464,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 520,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"tools"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -459,17 +477,17 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             onClick={() => {
               xpSound.click();
               onClose();
+              const bounds = getWordWindowBounds();
               openWindow({
                 id: "word",
                 type: "word",
                 title: "Документы — Влад Ахметов",
                 iconType: "word",
-                x: 85,
-                y: 45,
-                width: 740,
-                height: 540,
+                ...bounds,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"word"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -494,6 +512,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 490,
               });
             }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"display-properties"}'
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -505,6 +525,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             href={site.telegram}
             target="_blank"
             rel="noreferrer"
+            data-ym-goal="start_menu_telegram"
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -529,6 +550,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 height: 350,
               });
             }}
+            data-ym-goal="start_menu_run"
             className="xp-start-item"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -547,6 +569,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             onClose();
             onTurnOffClick();
           }}
+          data-ym-goal="start_menu_logoff"
           className="xp-start-footer-btn"
           style={{ cursor: xpCursors.pointer }}
         >
@@ -563,6 +586,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             onClose();
             onTurnOffClick();
           }}
+          data-ym-goal="start_menu_turnoff"
           className="xp-start-footer-btn font-bold"
           style={{ cursor: xpCursors.pointer }}
         >

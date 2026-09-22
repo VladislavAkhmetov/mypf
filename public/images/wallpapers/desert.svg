@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="desSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#090514"/>
+      <stop offset="35%" stop-color="#1e0c2b"/>
+      <stop offset="70%" stop-color="#4a1228"/>
+      <stop offset="100%" stop-color="#7c1d29"/>
+    </linearGradient>
+    <radialGradient id="desMoon" cx="45%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#fff1f2"/>
+      <stop offset="30%" stop-color="#fda4af"/>
+      <stop offset="75%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </radialGradient>
+    <radialGradient id="desMoonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#e11d48" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#7c1d29" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="duneFar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9a2c20"/>
+      <stop offset="100%" stop-color="#541212"/>
+    </linearGradient>
+    <linearGradient id="duneMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c2410c"/>
+      <stop offset="50%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
+    </linearGradient>
+    <linearGradient id="duneFore" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="40%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#431407"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Night Sky -->
+  <rect width="1920" height="1080" fill="url(#desSky)"/>
+
+  <!-- Stars -->
+  <g fill="#ffffff" opacity="0.75">
+    <circle cx="200" cy="120" r="1.5"/>
+    <circle cx="350" cy="80" r="1"/>
+    <circle cx="580" cy="190" r="1.5"/>
+    <circle cx="820" cy="110" r="2"/>
+    <circle cx="1100" cy="90" r="1.5"/>
+    <circle cx="1400" cy="160" r="1"/>
+    <circle cx="1650" cy="110" r="2"/>
+    <circle cx="1800" cy="70" r="1.5"/>
+    <circle cx="950" cy="240" r="1"/>
+    <circle cx="300" cy="290" r="1.5"/>
+  </g>
+
+  <!-- Big Glowing Red Moon -->
+  <circle cx="1320" cy="380" r="240" fill="url(#desMoonGlow)"/>
+  <circle cx="1320" cy="380" r="120" fill="url(#desMoon)"/>
+  <!-- Moon crater shading -->
+  <circle cx="1290" cy="350" r="24" fill="#9f1239" opacity="0.35"/>
+  <circle cx="1350" cy="410" r="32" fill="#881337" opacity="0.3"/>
+  <circle cx="1310" cy="420" r="18" fill="#881337" opacity="0.35"/>
+
+  <!-- Distant Ridge Dune -->
+  <path d="M0,660 Q480,590 1020,670 T1920,620 L1920,1080 L0,1080 Z" fill="url(#duneFar)"/>
+
+  <!-- Sweeping Crest Middle Dune -->
+  <path d="M0,740 Q620,640 1280,760 T1920,710 L1920,1080 L0,1080 Z" fill="url(#duneMid)"/>
+
+  <!-- Foreground Sweeping Razor-Edge Dune -->
+  <path d="M0,820 Q480,720 1100,840 T1920,790 L1920,1080 L0,1080 Z" fill="url(#duneFore)"/>
+  <!-- Dune ridge shadow side -->
+  <path d="M480,720 Q790,780 1100,840 L1100,1080 L480,1080 Z" fill="#431407" opacity="0.45"/>
+</svg>

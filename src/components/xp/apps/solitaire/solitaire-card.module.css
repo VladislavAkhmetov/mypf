@@ -1,0 +1,50 @@
+.card {
+  position: relative;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: clamp(6px, .8vw, 9px);
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border: 1px solid rgba(116, 82, 42, .1);
+  border-radius: calc(clamp(6px, .8vw, 9px) - 2px);
+}
+
+.face {
+  border: 1px solid #d5c59e;
+  background:
+    radial-gradient(circle at 34% 20%, rgba(255,255,255,.75), transparent 30%),
+    linear-gradient(145deg, #fffaf0, #f7e8c8);
+  box-shadow: 0 3px 5px rgba(13, 3, 7, .42), 0 12px 20px rgba(13,3,7,.13);
+}
+
+.face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .14;
+  background-image: repeating-linear-gradient(108deg, rgba(100,70,35,.18) 0 1px, transparent 1px 4px);
+  mix-blend-mode: multiply;
+}
+
+.back { border: 1px solid #e0c47e; background: #1c080f; box-shadow: 0 3px 5px rgba(13, 3, 7, .5), 0 12px 20px rgba(13,3,7,.16); }
+.selected { z-index: 40; outline: 2px solid #f4d892; outline-offset: 2px; box-shadow: 0 0 0 5px rgba(244,216,146,.16), 0 15px 28px rgba(12,3,6,.45) !important; }
+.hinted { z-index: 30; animation: hint 1s ease-in-out 2; }
+
+@keyframes hint {
+  50% { outline: 2px solid #fff0bb; outline-offset: 3px; box-shadow: 0 0 24px rgba(255,224,149,.62); }
+}
+
+@media (prefers-reduced-motion: reduce) { .hinted { animation: none; outline: 2px solid #fff0bb; } }

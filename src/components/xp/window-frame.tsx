@@ -273,6 +273,8 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
           <button
             type="button"
             className="xp-btn-ctrl xp-btn-minimize"
+            data-ym-goal="window_minimize"
+            data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
             title="Свернуть"
             onClick={() => minimizeWindow(win.id)}
             style={{ cursor: xpCursors.pointer }}
@@ -284,6 +286,8 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
           <button
             type="button"
             className="xp-btn-ctrl xp-btn-maximize"
+            data-ym-goal={win.isMaximized ? "window_restore" : "window_maximize"}
+            data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
             title={win.isMaximized ? "Восстановить" : "Развернуть"}
             onClick={() => (win.isMaximized ? restoreWindow(win.id) : maximizeWindow(win.id))}
             style={{ cursor: xpCursors.pointer }}
@@ -302,6 +306,8 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
           <button
             type="button"
             className="xp-btn-ctrl xp-btn-close"
+            data-ym-goal="window_close"
+            data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
             title="Закрыть"
             onClick={() => closeWindow(win.id)}
             style={{ cursor: xpCursors.pointer }}

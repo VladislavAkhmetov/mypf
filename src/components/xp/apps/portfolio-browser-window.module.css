@@ -1,0 +1,102 @@
+/* Portfolio Internet Explorer Container & Toolbar */
+
+.browserContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #f8fafc;
+  color: #0f172a;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: text;
+}
+
+/* 44px Browser Navigation Toolbar */
+.toolbar {
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  background-color: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 10px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Back Button */
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  background-color: #ffffff;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.backBtn:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  border-color: #64748b;
+  color: #0f172a;
+}
+
+.backBtn:active:not(:disabled) {
+  background-color: #cbd5e1;
+  transform: translateY(1px);
+}
+
+.backBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #94a3b8;
+  box-shadow: none;
+}
+
+/* Address Bar */
+.addressBar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  background-color: #ffffff;
+  border: 1px solid #94a3b8;
+  border-radius: 3px;
+  padding: 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: #334155;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.addressText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: all;
+}
+
+/* Main Content Viewport: replacement point for future landing */
+.contentViewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  /* Allows independent fonts without being overridden by .xp-system */
+  font-family: inherit;
+}

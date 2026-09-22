@@ -10,7 +10,8 @@ export type Motif =
   | "lock"
   | "atlas"
   | "pulp"
-  | "spark";
+  | "spark"
+  | "honeycomb";
 
 export type Localized = { ru: string; en: string };
 
@@ -19,6 +20,7 @@ export type Project = {
   year: number;
   span: string;
   cover: string;
+  video?: string;
   glow: [string, string];
   motif: Motif;
   title: string;
@@ -34,6 +36,54 @@ function cover(slug: string) {
 }
 
 export const projects: Project[] = [
+  {
+    slug: "printforge",
+    year: 2026,
+    span: "col-span-6 row-span-2 md:col-span-4",
+    cover: cover("printforge"),
+    video: "/placeholders/covers/printforge.webm",
+    glow: ["#0d99ff", "#e11d48"],
+    motif: "fold",
+    title: "PrintForge",
+    kicker: {
+      ru: "Prepress-плагин и облачный пайплайн для полиграфии в Figma",
+      en: "Figma prepress plugin & cloud CMYK pipeline",
+    },
+    body: {
+      ru: "Комплексная предпечатная подготовка макетов: автоматический расчёт припусков под обрез (BleedBox, TrimBox), калиброванная CMYK-конвертация по профилям ISO 12647 (FOGRA39, SWOP, GRACoL), аудит эффективного DPI растра и генерация плашечных каналов для ножей вырубки и биговки.",
+      en: "Full-cycle print prepress inside Figma: automated bleed margin setup (BleedBox, TrimBox), ISO 12647 CMYK color conversion (FOGRA39, SWOP, GRACoL), effective DPI asset auditing, and spot color channels for cutting and creasing dielines.",
+    },
+    tags: {
+      ru: ["figma-плагин", "prepress", "cmyk", "упаковка", "software"],
+      en: ["figma plugin", "prepress", "cmyk", "packaging", "software"],
+    },
+    href: "http://localhost:3005",
+    linkLabel: { ru: "Локальный запуск", en: "Local Preview" },
+  },
+  {
+    slug: "altyn-solok",
+    year: 2026,
+    span: "col-span-6 row-span-2 md:col-span-4",
+    cover: cover("altyn-solok"),
+    video: "/placeholders/covers/altyn-solok.webm",
+    glow: ["#f59e0b", "#1c382b"],
+    motif: "honeycomb",
+    title: "Алтын Солок",
+    kicker: {
+      ru: "Витрина апифитопродукции Башкортостана",
+      en: "Bashkir apiphytotherapy digital showcase",
+    },
+    body: {
+      ru: "Бортевой мёд, прополис и дикорастущие травы. Интерактивная витрина с тонкой микрофизикой и живым ритмом природы.",
+      en: "Wild-hive honey, propolis, and medicinal herbs. An interactive showcase blending organic rhythm with modern craft.",
+    },
+    tags: {
+      ru: ["веб-витрина", "айдентика", "e-commerce"],
+      en: ["web showcase", "identity", "e-commerce"],
+    },
+    href: "https://altyn-solok-demo.website.yandexcloud.net/",
+    linkLabel: { ru: "Смотреть сайт", en: "Live Site" },
+  },
   {
     slug: "kora",
     year: 2026,

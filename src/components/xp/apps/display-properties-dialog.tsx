@@ -54,33 +54,50 @@ const themeOptions: ThemeOption[] = [
   },
 ];
 
-const wallpapers = [
-  { id: "bliss", name: "Bliss (Безмятежность)", src: "/images/bliss.jpg", desc: "Холмы Сономы, Калифорния (Чарльз О'Риэр, 1996)" },
-  { id: "swiss", name: "Swiss Modernist Grid", src: "radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%)", desc: "Типографическая сетка и монохромная подложка", isGradient: true },
-  { id: "royale", name: "Energy Blue (Royale)", src: "linear-gradient(135deg, #0b4f8c 0%, #1783cf 50%, #032b57 100%)", desc: "Абстрактный векторный градиент Media Center", isGradient: true },
-  { id: "classic", name: "Classic Teal (2000)", src: "#008080", desc: "Эталонный бирюзовый монохром рабочей станции", isColor: true },
-  { id: "dark", name: "Midnight Onyx", src: "#090d16", desc: "Бескомпромиссный глубокий темный фон", isColor: true },
-];
+import { WALLPAPERS } from "@/lib/xp/wallpapers";
 
 export function DisplayPropertiesDialog() {
-  const { wallpaper, setWallpaper, theme, setTheme, closeWindow } = useWindowManager();
+  const {
+    wallpaper,
+    setWallpaper,
+    wallpaperSource,
+    geoInfo,
+    resetWallpaperToGeo,
+    theme,
+    setTheme,
+    closeWindow,
+  } = useWindowManager();
   const [activeTab, setActiveTab] = useState<"themes" | "wallpapers">("themes");
   const [selectedTheme, setSelectedTheme] = useState<XpTheme>(theme);
   const [selectedWp, setSelectedWp] = useState<string>(wallpaper);
+  const [isDetecting, setIsDetecting] = useState(false);
 
   const currentThemeObj = themeOptions.find((t) => t.id === selectedTheme) || themeOptions[0];
 
   const handleApply = () => {
     xpSound.click();
     setTheme(selectedTheme);
-    setWallpaper(selectedWp);
+    setWallpaper(selectedWp, "user");
   };
 
   const handleOk = () => {
     xpSound.click();
     setTheme(selectedTheme);
-    setWallpaper(selectedWp);
+    setWallpaper(selectedWp, "user");
     closeWindow("display-properties");
+  };
+
+  const handleAutoGeo = async () => {
+    xpSound.click();
+    setIsDetecting(true);
+    try {
+      const newWp = await resetWallpaperToGeo();
+      if (newWp) {
+        setSelectedWp(newWp);
+      }
+    } finally {
+      setIsDetecting(false);
+    }
   };
 
   return (
@@ -226,41 +243,79 @@ export function DisplayPropertiesDialog() {
             </div>
           </div>
         ) : (
-          <div className="space-y-1">
-            <span className="font-bold text-slate-800 text-[11px] block mb-1.5">
+          <div className="space-y-2">
+            {/* Geo status & auto-detection banner */}
+            <div className="bg-[#f0f4f9] border border-[#b2c8e6] rounded p-2 flex items-center justify-between text-[11px]">
+              <div>
+                <div className="font-semibold text-slate-800">
+                  Режим:{" "}
+                  <span className="font-normal text-blue-900">
+                    {wallpaperSource === "user"
+                      ? "Ручной выбор (сохранен)"
+                      : wallpaperSource === "geo"
+                      ? "Автоматически по IP"
+                      : "По умолчанию"}
+                  </span>
+                </div>
+                {geoInfo && (
+                  <div className="text-[10px] text-slate-500">
+                    Определенная локация: {geoInfo.city ? `${geoInfo.city}, ` : ""}{geoInfo.country}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleAutoGeo}
+                disabled={isDetecting}
+                className="px-2.5 py-1 bg-white hover:bg-slate-50 active:bg-slate-200 border border-[#7a9eb5] rounded text-[11px] font-medium text-slate-800 shadow-xs flex items-center gap-1 disabled:opacity-50"
+                style={{ cursor: xpCursors.pointer }}
+              >
+                <span>🌍</span>
+                <span>{isDetecting ? "Определение..." : "Определить по IP"}</span>
+              </button>
+            </div>
+
+            <span className="font-bold text-slate-800 text-[11px] block mb-1">
               Выберите рисунок рабочего стола:
             </span>
-            {wallpapers.map((wp) => {
-              const isSelected = selectedWp === wp.src;
-              return (
-                <div
-                  key={wp.id}
-                  onClick={() => {
-                    xpSound.click();
-                    setSelectedWp(wp.src);
-                  }}
-                  className={`px-3 py-2 rounded transition cursor-pointer flex items-center justify-between ${
-                    isSelected
-                      ? "bg-[#316ac5] text-white font-bold"
-                      : "hover:bg-slate-100 text-slate-800"
-                  }`}
-                  style={{ cursor: xpCursors.pointer }}
-                >
-                  <div>
-                    <div className="text-xs">{wp.name}</div>
-                    <div className={`text-[10px] ${isSelected ? "text-blue-100" : "text-slate-500"}`}>
-                      {wp.desc}
-                    </div>
-                  </div>
+            <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
+              {WALLPAPERS.map((wp) => {
+                const isSelected = selectedWp === wp.src;
+                return (
                   <div
-                    className="w-8 h-5 rounded border border-black/30 shadow-xs flex-shrink-0"
-                    style={{
-                      background: wp.src.startsWith("/") ? `url(${wp.src}) center/cover` : wp.src,
+                    key={wp.id}
+                    onClick={() => {
+                      xpSound.click();
+                      setSelectedWp(wp.src);
                     }}
-                  />
-                </div>
-              );
-            })}
+                    className={`px-2.5 py-1.5 rounded transition cursor-pointer flex items-center justify-between gap-2 ${
+                      isSelected
+                        ? "bg-[#316ac5] text-white font-bold"
+                        : "hover:bg-slate-100 text-slate-800"
+                    }`}
+                    style={{ cursor: xpCursors.pointer }}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs truncate">{wp.name}</div>
+                      <div className={`text-[10px] truncate ${isSelected ? "text-blue-100" : "text-slate-500"}`}>
+                        {wp.desc}
+                      </div>
+                      {wp.region && (
+                        <div className={`text-[9px] ${isSelected ? "text-blue-200" : "text-blue-700 font-medium"}`}>
+                          Регион: {wp.region}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      className="w-9 h-6 rounded border border-black/30 shadow-xs flex-shrink-0"
+                      style={{
+                        background: wp.src.startsWith("/") ? `url(${wp.src}) center/cover` : wp.src,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

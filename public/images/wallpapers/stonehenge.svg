@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b536f"/>
+      <stop offset="35%" stop-color="#6b8aa8"/>
+      <stop offset="70%" stop-color="#a4bcd4"/>
+      <stop offset="100%" stop-color="#dce7f0"/>
+    </linearGradient>
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="shGrassFar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4d7c43"/>
+      <stop offset="100%" stop-color="#33592c"/>
+    </linearGradient>
+    <linearGradient id="shGrassMain" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5fa152"/>
+      <stop offset="40%" stop-color="#427a36"/>
+      <stop offset="100%" stop-color="#24481d"/>
+    </linearGradient>
+    <linearGradient id="stoneLight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="60%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="stoneDark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="1920" height="1080" fill="url(#shSky)"/>
+
+  <!-- Dramatic Clouds -->
+  <path d="M100,280 Q300,180 550,230 T1100,210 T1600,240 T1920,220 L1920,500 L0,500 Z" fill="url(#cloudGrad)"/>
+  <path d="M0,360 Q400,300 800,330 T1500,310 T1920,340 L1920,560 L0,560 Z" fill="url(#cloudGrad)" opacity="0.7"/>
+
+  <!-- Distant Salisbury Plain Hills -->
+  <path d="M0,690 Q460,630 980,670 T1920,650 L1920,1080 L0,1080 Z" fill="url(#shGrassFar)"/>
+
+  <!-- Foreground Green Mound -->
+  <path d="M0,760 Q520,700 1020,730 T1920,720 L1920,1080 L0,1080 Z" fill="url(#shGrassMain)"/>
+
+  <!-- Stonehenge Monoliths Formation -->
+  <g id="monoliths" transform="translate(680, 530)">
+    <!-- Shadow under stones -->
+    <ellipse cx="280" cy="220" rx="340" ry="25" fill="#1e3a19" opacity="0.6"/>
+
+    <!-- Left Trilithon Pillar 1 -->
+    <polygon points="60,60 105,60 95,220 50,220" fill="url(#stoneDark)"/>
+    <!-- Left Trilithon Pillar 2 -->
+    <polygon points="120,60 165,60 155,220 110,220" fill="url(#stoneLight)"/>
+    <!-- Left Lintel Cap -->
+    <polygon points="45,35 180,35 175,65 50,65" fill="url(#stoneLight)"/>
+
+    <!-- Center Giant Trilithon Pillar 1 -->
+    <polygon points="210,30 260,30 250,220 200,220" fill="url(#stoneDark)"/>
+    <!-- Center Giant Trilithon Pillar 2 -->
+    <polygon points="280,30 330,30 320,220 270,220" fill="url(#stoneLight)"/>
+    <!-- Center Lintel Cap -->
+    <polygon points="195,0 345,0 340,35 200,35" fill="url(#stoneLight)"/>
+
+    <!-- Right Trilithon Pillar 1 -->
+    <polygon points="375,65 420,65 410,220 365,220" fill="url(#stoneDark)"/>
+    <!-- Right Trilithon Pillar 2 -->
+    <polygon points="435,65 480,65 470,220 425,220" fill="url(#stoneLight)"/>
+    <!-- Right Lintel Cap -->
+    <polygon points="360,40 495,40 490,70 365,70" fill="url(#stoneLight)"/>
+
+    <!-- Fallen / Angled Heel Stone -->
+    <polygon points="530,120 570,110 595,220 545,220" fill="url(#stoneDark)"/>
+    <polygon points="-20,130 20,125 15,220 -25,220" fill="url(#stoneDark)"/>
+  </g>
+</svg>

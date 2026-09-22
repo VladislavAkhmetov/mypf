@@ -7,6 +7,7 @@ import { useWindowManager } from "../window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 import { Motif } from "@/components/motifs";
+import { AltynSolokLanding } from "./altyn-solok-landing";
 
 /* Custom Bespoke Specimen Components per Domain to avoid generic AI templates */
 
@@ -398,9 +399,18 @@ export function ProjectExplorerWindow({ slug }: { slug: string }) {
           </div>
         </div>
 
-        {/* Right Main Editorial Dossier Content */}
-        <div className="flex-1 p-4 sm:p-7 overflow-y-auto bg-white space-y-6">
-          {/* Archival Classification Header */}
+        {/* Right Main Editorial Content */}
+        {project.slug === "altyn-solok" ? (
+          <div className="flex-1 overflow-y-auto bg-[#0b130e] flex flex-col">
+            <AltynSolokLanding
+              project={project}
+              adjacent={{ prev, next }}
+              onOpenProject={(s) => openProject(s)}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 p-4 sm:p-7 overflow-y-auto bg-white space-y-6">
+            {/* Archival Classification Header */}
           <div className="border-b-2 border-slate-900 pb-4 space-y-1">
             <div className="flex items-center justify-between text-[11px] font-mono text-slate-500">
               <span>DOSSIER // DE-{project.year}-{project.slug.toUpperCase()}</span>
@@ -419,9 +429,11 @@ export function ProjectExplorerWindow({ slug }: { slug: string }) {
             {project.slug === "kora" && <KoraSpecimen />}
             {project.slug === "signalatlas" && <SignalatlasSpecimen />}
             {project.slug === "noclip" && <NoclipSpecimen />}
-            {project.slug !== "kora" && project.slug !== "signalatlas" && project.slug !== "noclip" && (
-              <GenericTactileSpecimen project={project} />
-            )}
+            {project.slug !== "kora" &&
+              project.slug !== "signalatlas" &&
+              project.slug !== "noclip" && (
+                <GenericTactileSpecimen project={project} />
+              )}
           </div>
 
           {/* Design Engineering Anatomy: Problem & Constraints, System, Implementation */}
@@ -518,6 +530,7 @@ export function ProjectExplorerWindow({ slug }: { slug: string }) {
             </button>
           </div>
         </div>
+      )}
       </div>
 
       {/* Status Bar */}

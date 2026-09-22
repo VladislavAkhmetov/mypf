@@ -16,6 +16,13 @@ import {
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
+  PdfIcon,
+  NotepadIcon,
+  MyComputerIcon,
+  MyDocumentsIcon,
+  StoriesIcon,
+  CmdIcon,
+  RecycleBinIcon,
 } from "./xp-icons";
 
 interface TaskbarProps {
@@ -73,6 +80,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
       {/* Start Button */}
       <button
         type="button"
+        data-ym-goal="start_button_click"
         onClick={(e) => {
           e.stopPropagation();
           xpSound.click();
@@ -155,6 +163,8 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
             <button
               key={win.id}
               type="button"
+              data-ym-goal="taskbar_tab_click"
+              data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
               onClick={() => {
                 if (isFocused) {
                   minimizeWindow(win.id);
@@ -173,16 +183,17 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
                 {win.type === "word" && <WordDocIcon className="w-3.5 h-3.5" />}
                 {win.type === "minesweeper" && <MinesweeperIcon className="w-3.5 h-3.5" />}
                 {win.type === "paint" && <PaintIcon className="w-3.5 h-3.5" />}
-                {win.type === "resume" && <span>📄</span>}
+                {win.type === "resume" && <PdfIcon className="w-3.5 h-3.5" />}
                 {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
-                {win.type === "project" && <span>📁</span>}
-                {win.type === "notepad" && <span>📝</span>}
-                {win.type === "my-computer" && <span>💻</span>}
-                {win.type === "my-documents" && <span>📂</span>}
-                {win.type === "stories" && <span>🖼️</span>}
-                {win.type === "cmd" && <span>📟</span>}
+                {win.type === "project" && <MyDocumentsIcon className="w-3.5 h-3.5" />}
+                {win.type === "portfolio" && <InternetExplorerIcon className="w-3.5 h-3.5" />}
+                {win.type === "notepad" && <NotepadIcon className="w-3.5 h-3.5" />}
+                {win.type === "my-computer" && <MyComputerIcon className="w-3.5 h-3.5" />}
+                {win.type === "my-documents" && <MyDocumentsIcon className="w-3.5 h-3.5" />}
+                {win.type === "stories" && <StoriesIcon className="w-3.5 h-3.5" />}
+                {win.type === "cmd" && <CmdIcon className="w-3.5 h-3.5" />}
                 {win.type === "display-properties" && <span>⚙️</span>}
-                {win.type === "recycle-bin" && <span>🗑️</span>}
+                {win.type === "recycle-bin" && <RecycleBinIcon className="w-3.5 h-3.5" />}
               </div>
               <span className="xp-task-btn-title">{win.title}</span>
             </button>
@@ -195,6 +206,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
         {/* Language Switcher Button (RU / EN) */}
         <button
           type="button"
+          data-ym-goal="tray_toggle_language"
           onClick={toggleLanguage}
           className="xp-tray-btn xp-tray-lang"
           title={`Язык: ${locale.toUpperCase()} (нажмите для переключения)`}
@@ -206,6 +218,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
         {/* Volume Icon (Toggle Mute) */}
         <button
           type="button"
+          data-ym-goal="tray_toggle_volume"
           onClick={toggleMute}
           className="xp-tray-btn"
           title={muted ? "Звук выключен (нажмите для включения)" : "Громкость 100% (нажмите для выключения)"}
@@ -220,7 +233,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
         </div>
 
         {/* Clock */}
-        <div className="xp-tray-clock" title={dateStr}>
+        <div className="xp-tray-clock" data-ym-goal="tray_clock_click" title={dateStr}>
           {timeStr}
         </div>
       </div>

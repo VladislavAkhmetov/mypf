@@ -160,6 +160,20 @@ export function Motif({ type, className = "" }: { type: Motif; className?: strin
           opacity="0.14"
         />
       )}
+      {type === "honeycomb" && (
+        <g stroke="white" strokeWidth="0.8" fill="none" opacity="0.25">
+          <polygon points="100,76 117,86 117,106 100,116 83,106 83,86" />
+          <polygon points="100,36 117,46 117,66 100,76 83,66 83,46" />
+          <polygon points="100,116 117,126 117,146 100,156 83,146 83,126" />
+          <polygon points="66,56 83,66 83,86 66,96 49,86 49,66" />
+          <polygon points="134,56 151,66 151,86 134,96 117,86 117,66" />
+          <polygon points="66,96 83,106 83,126 66,136 49,126 49,106" />
+          <polygon points="134,96 151,106 151,126 134,136 117,126 117,106" />
+          <circle cx="100" cy="96" r="2.5" fill="white" opacity="0.5" />
+          <circle cx="134" cy="76" r="1.8" fill="white" opacity="0.4" />
+          <circle cx="66" cy="116" r="1.8" fill="white" opacity="0.4" />
+        </g>
+      )}
     </svg>
   );
 }
