@@ -6,7 +6,6 @@ export const PORTFOLIO_DIRECTIONS: Record<FocusDirection, { title: string; slugs
   communication: {
     title: "Коммуникационный дизайн",
     slugs: [
-      "printforge",
       "altyn-solok",
       "kora",
       "signalatlas",
@@ -21,7 +20,7 @@ export const PORTFOLIO_DIRECTIONS: Record<FocusDirection, { title: string; slugs
   },
   engineering: {
     title: "Интерфейсы и прототипы",
-    slugs: ["printforge", "altyn-solok", "noclip", "dockyard", "sieve"],
+    slugs: ["altyn-solok", "noclip", "dockyard", "sieve"],
   },
 };
 

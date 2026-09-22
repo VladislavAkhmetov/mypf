@@ -340,15 +340,19 @@ export const projects: Project[] = [
   },
 ];
 
+const catalogExcluded = new Set(["printforge"]);
+
+export const catalogProjects = projects.filter(project => !catalogExcluded.has(project.slug));
+
 export function getProject(slug: string) {
   return projects.find((p) => p.slug === slug);
 }
 
 export function getAdjacent(slug: string) {
-  const i = projects.findIndex((p) => p.slug === slug);
-  if (i < 0) return { prev: null, next: null };
+  const i = catalogProjects.findIndex((p) => p.slug === slug);
+  if (i < 0) return { prev: null, next: catalogProjects[0] ?? null };
   return {
-    prev: projects[(i - 1 + projects.length) % projects.length],
-    next: projects[(i + 1) % projects.length],
+    prev: catalogProjects[(i - 1 + catalogProjects.length) % catalogProjects.length],
+    next: catalogProjects[(i + 1) % catalogProjects.length],
   };
 }

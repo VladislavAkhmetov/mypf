@@ -147,14 +147,16 @@ describe("buildNavigationQuery", () => {
 });
 
 describe("Direction slugs coverage", () => {
-  it("covers all projects, allowing a project in both directions", () => {
+  it("covers catalog projects, allowing a project in both directions", () => {
     const allPartitioned = [
       ...PORTFOLIO_DIRECTIONS.communication.slugs,
       ...PORTFOLIO_DIRECTIONS.engineering.slugs,
     ];
-    expect(new Set(allPartitioned).size).toBe(ALL_PROJECT_SLUGS.length);
-    ALL_PROJECT_SLUGS.forEach((slug) => {
+    const catalogSlugs = ALL_PROJECT_SLUGS.filter(slug => slug !== "printforge");
+    expect(new Set(allPartitioned).size).toBe(catalogSlugs.length);
+    catalogSlugs.forEach((slug) => {
       expect(allPartitioned).toContain(slug);
     });
+    expect(allPartitioned).not.toContain("printforge");
   });
 });

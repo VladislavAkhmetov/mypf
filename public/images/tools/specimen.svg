@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <g stroke="#ff4b16" stroke-opacity=".45" stroke-width="1">
+    <path d="M20 40h160M20 70h160M20 100h160M20 130h160M20 160h160M40 20v160M70 20v160M100 20v160M130 20v160M160 20v160"/>
+  </g>
+  <text x="36" y="132" fill="#ff4b16" font-family="Georgia, serif" font-size="78">Ag</text>
+</svg>

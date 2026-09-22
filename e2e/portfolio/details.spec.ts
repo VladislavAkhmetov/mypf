@@ -7,7 +7,7 @@ test.describe("Unified portfolio detail pages", () => {
     await page.setViewportSize({ width: 1440, height: 1050 });
     await page.goto("/?view=portfolio");
     const win = page.locator("#window-portfolio");
-    await win.getByRole("button", { name: "Инструменты", exact: true }).click();
+    await win.locator("#portfolio-tools-title").scrollIntoViewIfNeeded();
     await win.getByRole("button", { name: "Подробнее о Auto-Bézier Kern" }).click();
     await expect(win.locator("h1")).toHaveText("Auto-Bézier Kern");
     await expect(page).toHaveURL(/tool=auto-bezier-kern/);

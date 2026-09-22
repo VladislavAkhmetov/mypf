@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useSyncExternalStore } from "react";
-import { projects, getProject, getAdjacent } from "@/data/projects";
+import { catalogProjects, getProject, getAdjacent } from "@/data/projects";
 import { toolsList } from "@/data/tools";
 import { buildNavigationQuery, parseNavigationParams, PORTFOLIO_DIRECTIONS, type FocusDirection } from "@/lib/xp/navigation";
 import { xpSound } from "@/lib/xp/sound";
@@ -68,8 +68,8 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
   const openTool = (slug: string) => navigate({ toolSlug: slug, focus });
   const back = () => navigate({ focus });
   const displayedProjects = useMemo(() => focus
-    ? projects.filter(project => PORTFOLIO_DIRECTIONS[focus].slugs.includes(project.slug))
-    : projects, [focus]);
+    ? catalogProjects.filter(project => PORTFOLIO_DIRECTIONS[focus].slugs.includes(project.slug))
+    : catalogProjects, [focus]);
   const adjacent = currentProject ? getAdjacent(currentProject.slug) : null;
   const toolIndex = currentTool ? toolsList.indexOf(currentTool) : -1;
   const nextTool = currentTool ? toolsList[(toolIndex + 1) % toolsList.length] : null;
@@ -90,7 +90,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
       </div>
       <div ref={contentRef} className={styles.contentViewport}>
         {currentProject ? (
-          <PortfolioDetail key={currentProject.slug} project={currentProject} nextProject={adjacent?.next ?? projects[0]} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
+          <PortfolioDetail key={currentProject.slug} project={currentProject} nextProject={adjacent?.next ?? catalogProjects[0]} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
         ) : currentTool ? (
           <PortfolioDetail key={currentTool.slug} tool={currentTool} nextTool={nextTool} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
         ) : (

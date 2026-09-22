@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import { site } from "@/data/site";
@@ -20,11 +20,11 @@ interface PortfolioLandingProps {
 }
 
 const intro = "Создаю визуальные системы и интерфейсы. Соединяю дизайн и код, чтобы идеи становились работающими вещами.";
-const toolPresentation: Record<string, { art: string; title: string; caption: string }> = {
-  "figma-auto-kern": { art: "Аа", title: "Auto-Bézier Kern", caption: "Кернинг без ручных правок" },
-  "ai-vector-slicer": { art: "✳", title: "Vector Slicer", caption: "Кривые точно по направляющим" },
-  "oklch-harmonizer": { art: "", title: "Oklch Palette", caption: "Цвет с правильным контрастом" },
-  "specimen-blueprint": { art: "Ag", title: "Type Specimen", caption: "Сетка для шрифтовых каталогов" },
+const toolPresentation: Record<string, { visual: string; title: string; caption: string }> = {
+  "figma-auto-kern": { visual: "/images/tools/auto-kern.svg", title: "Auto-Bézier Kern", caption: "Кернинг без ручных правок" },
+  "ai-vector-slicer": { visual: "/images/tools/vector-slicer.svg", title: "Vector Slicer", caption: "Кривые точно по направляющим" },
+  "oklch-harmonizer": { visual: "/images/tools/palette.svg", title: "Oklch Palette", caption: "Цвет с правильным контрастом" },
+  "specimen-blueprint": { visual: "/images/tools/specimen.svg", title: "Type Specimen", caption: "Сетка для шрифтовых каталогов" },
 };
 
 function scrollBehavior(): ScrollBehavior {
@@ -34,8 +34,6 @@ function scrollBehavior(): ScrollBehavior {
 export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChange, onOpenProject, onOpenTool, notFound }: PortfolioLandingProps) {
   const { t, locale } = useLocale();
   const introRef = useRef<HTMLDivElement>(null);
-  const worksRef = useRef<HTMLElement>(null);
-  const toolsRef = useRef<HTMLElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(Math.min(1, projects.length - 1));
   const activeIndexRef = useRef(activeIndex);
@@ -127,12 +125,6 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
     slider.scrollTo({ left: card.offsetLeft + card.offsetWidth / 2 - slider.clientWidth / 2, behavior: scrollBehavior() });
   };
 
-  const jumpTo = (target: HTMLElement | null) => {
-    const viewport = scrollContainer.current;
-    if (!target || !viewport) return;
-    viewport.scrollTo({ top: viewport.scrollTop + target.getBoundingClientRect().top - viewport.getBoundingClientRect().top, behavior: scrollBehavior() });
-  };
-
   const endDrag = () => {
     drag.current.active = false;
     if (sliderRef.current) sliderRef.current.dataset.dragging = "false";
@@ -140,26 +132,15 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
 
   return (
     <div className={styles.landing}>
-      <header className={styles.header}>
-        <a href={site.telegram} target="_blank" rel="noreferrer" className={styles.wordmark} aria-label="amazi — Telegram">amazi<span>✳</span></a>
-        <nav aria-label="Разделы портфолио">
-          <button type="button" onClick={() => jumpTo(worksRef.current)}>Проекты</button>
-          <button type="button" onClick={() => jumpTo(toolsRef.current)}>Инструменты</button>
-          <a href={site.telegram} target="_blank" rel="noreferrer">Связаться <span aria-hidden="true">↗</span></a>
-        </nav>
-      </header>
       <section className={styles.about} aria-label="Обо мне">
-        <div className={styles.sideNote}><span className={styles.spark} aria-hidden="true">✳</span><span>Независимый дизайнер<br />На стыке формы и кода</span></div>
         <div ref={introRef} className={styles.intro}>
           <h1>Влад Ахметов<span className={styles.nameDot}>.</span></h1>
           <p className={styles.introText}>{intro.split(" ").map((word, index) => (
             <span key={index}>{index === 5 && <span className={styles.orangeObject} aria-hidden="true" />}<span data-word>{word}</span>{" "}</span>
           ))}</p>
-          <span className={styles.introFootnote}>Дизайн, который не только выглядит, но и работает.</span>
         </div>
       </section>
-      <section ref={worksRef} className={styles.works} aria-label="Проекты">
-        <div className={styles.sectionLine}><h2>Избранные проекты <span>/{String(projects.length).padStart(2, "0")}</span></h2><span>Листайте и открывайте <span aria-hidden="true">↔</span></span></div>
+      <section className={styles.works} aria-label="Проекты">
         {focus && <div className={styles.focusNotice}>{PORTFOLIO_DIRECTIONS[focus].title}<button type="button" onClick={() => onFocusChange(null)}>Все проекты ↗</button></div>}
         {notFound && <p className={styles.notice} role="alert">Проект не найден. Здесь можно посмотреть другие работы.</p>}
         <div ref={sliderRef} className={styles.carousel} role="region" aria-roledescription="карусель" aria-label="Лента проектов" tabIndex={0}
@@ -203,7 +184,6 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
           ))}
         </div>
         <div className={styles.carouselBottom}>
-          <span className={styles.carouselHint}>Идеи, ставшие реальностью</span>
           <div className={styles.carouselControls}>
             <button type="button" aria-label="Предыдущие проекты" disabled={activeIndex <= 0} onClick={() => goToCard(activeIndex - 1)}>←</button>
             <button type="button" aria-label="Следующие проекты" disabled={activeIndex >= projects.length - 1} onClick={() => goToCard(activeIndex + 1)}>→</button>
@@ -211,26 +191,24 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
           <span className={styles.counter} aria-live="polite" aria-atomic="true">{String(activeIndex + 1).padStart(2, "0")} <span>/ {String(projects.length).padStart(2, "0")}</span></span>
         </div>
       </section>
-      <section ref={toolsRef} className={styles.tools} aria-labelledby="portfolio-tools-title">
-        <div className={styles.toolsEyebrow}><span aria-hidden="true">✳</span> Сделано для дизайнеров</div>
+      <section className={styles.tools} aria-labelledby="portfolio-tools-title">
         <h2 id="portfolio-tools-title">Меньше рутины.<br />Больше <span>дизайна.</span></h2>
-        <p className={styles.toolsIntro}>Инструменты, которых мне не хватало.<br />Теперь ими можете пользоваться и вы.</p>
         <div className={styles.toolsGrid}>
-          <button type="button" className={`${styles.toolCard} ${styles.featuredTool}`} onClick={() => onOpenProject("printforge")} aria-label="Подробнее о PrintForge">
-            <span className={styles.toolTag}>Figma · Плагин</span><span className={styles.printArt} aria-hidden="true"><i /><i /><i /><i /></span>
+          <button type="button" className={styles.toolCard} style={{ "--tool-visual": "url(/images/tools/printforge.svg)" } as CSSProperties} onClick={() => onOpenProject("printforge")} aria-label="Подробнее о PrintForge">
+            <span className={styles.toolVisual} aria-hidden="true" />
+            <span className={styles.toolTag}>Figma · Плагин</span>
             <span className={styles.toolTitle}>PrintForge</span><span className={styles.toolTagline}>Из Figma — в печать</span><span className={styles.toolArrow} aria-hidden="true">↗</span>
           </button>
           {toolsList.map(tool => (
-            <button type="button" key={tool.id} className={styles.toolCard} data-tool-art={tool.platform} aria-label={`Подробнее о ${tool.title}`} onClick={() => onOpenTool(tool.slug)}>
+            <button type="button" key={tool.id} className={styles.toolCard} style={{ "--tool-visual": `url(${toolPresentation[tool.id]?.visual ?? ""})` } as CSSProperties} aria-label={`Подробнее о ${tool.title}`} onClick={() => onOpenTool(tool.slug)}>
+              <span className={styles.toolVisual} aria-hidden="true" />
               <span className={styles.toolTag}>{tool.platformLabel}</span>
-              <span className={styles.toolArt} aria-hidden="true">{toolPresentation[tool.id]?.art}{tool.platform === "web" && <span className={styles.palette}><i /><i /><i /><i /><i /></span>}</span>
               <span className={styles.toolTitle}>{toolPresentation[tool.id]?.title ?? tool.title}</span>
               <span className={styles.toolTagline}>{toolPresentation[tool.id]?.caption ?? tool.tagline}</span>
               <span className={styles.toolArrow} aria-hidden="true">↗</span>
             </button>
           ))}
         </div>
-        <div className={styles.toolsBottom}><span>От маленькой задачи — к своему инструменту.</span><span>Figma / Illustrator / Web</span></div>
       </section>
       <footer className={styles.contact}>
         <div><span className={styles.contactLabel}>Есть интересная задача?</span><a className={styles.contactTitle} href={site.telegram} target="_blank" rel="noreferrer">Давайте обсудим <span aria-hidden="true">↗</span></a></div>
