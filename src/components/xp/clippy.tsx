@@ -94,8 +94,14 @@ export function Clippy() {
       ? "/clippy/look-left.png"
       : "/clippy/rest.png";
 
-  // Keep the gallery and its mobile contact actions unobstructed.
-  if (activeWindowId === "portfolio") return null;
+  // Keep portfolio and interactive game windows unobstructed
+  if (
+    activeWindowId === "portfolio" ||
+    activeWindowId === "solitaire" ||
+    activeWindowId === "minesweeper"
+  ) {
+    return null;
+  }
 
   return (
     <div

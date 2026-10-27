@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { createDeck, type SolitaireState } from "../../src/lib/xp/solitaire-deck";
+import { createDeck, type SolitaireState, type Card, type Rank } from "../../src/lib/xp/solitaire-deck";
 
 test.use({ hasTouch: true });
 
@@ -104,3 +104,120 @@ test("collection and records match the game and can be closed", async ({ page },
   await game.getByRole("button", { name: "Закрыть рекорды" }).click();
   await expect(game.getByRole("dialog")).toHaveCount(0);
 });
+
+test("collection and records modals trap focus and support Escape closing", async ({ page }) => {
+  const game = page.locator("#window-solitaire");
+
+  // Verify Clippy is concealed when Solitaire is open
+  await expect(page.locator("img[src*='/clippy/']")).toHaveCount(0);
+
+  // 1. Collection modal Escape
+  await game.getByRole("button", { name: "Коллекция", exact: true }).click();
+  const collectionModal = game.getByRole("dialog", { name: "Коллекция карт" });
+  await expect(collectionModal).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(collectionModal).toHaveCount(0);
+
+  // 2. Collection inspector Escape
+  await game.getByRole("button", { name: "Коллекция", exact: true }).click();
+  await expect(collectionModal).toBeVisible();
+  await game.getByTestId("gallery-card").first().click();
+  await expect(game.getByRole("button", { name: "Закрыть просмотр карты" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(game.getByRole("button", { name: "Закрыть просмотр карты" })).toHaveCount(0);
+  await expect(collectionModal).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(collectionModal).toHaveCount(0);
+
+  // 3. Records modal Escape
+  await game.getByRole("button", { name: "Рекорды", exact: true }).click();
+  const recordsModal = game.getByRole("dialog", { name: "Рекорды косынки" });
+  await expect(recordsModal).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(recordsModal).toHaveCount(0);
+});
+
+test("auto-finish brings victory, records score, displays modal and avoids duplicate entry", async ({ page }) => {
+  const suits = ["spades", "hearts", "clubs", "diamonds"] as const;
+  const foundations = suits.map(suit => {
+    const list = [];
+    for (let r = 1; r <= 12; r++) {
+      list.push({ id: `${suit[0]}-${r}`, suit, rank: r as Rank, isFaceUp: true });
+    }
+    return list;
+  });
+  const winningState: SolitaireState = {
+    stock: [],
+    waste: [],
+    foundations: foundations as [Card[], Card[], Card[], Card[]],
+    tableau: [
+      [{ id: "s-13", suit: "spades", rank: 13, isFaceUp: true }],
+      [{ id: "h-13", suit: "hearts", rank: 13, isFaceUp: true }],
+      [{ id: "c-13", suit: "clubs", rank: 13, isFaceUp: true }],
+      [{ id: "d-13", suit: "diamonds", rank: 13, isFaceUp: true }],
+      [],
+      [],
+      [],
+    ],
+    moveCount: 48,
+    score: 600,
+    isWon: false,
+  };
+
+  await page.evaluate(st => {
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    const targetKey = "amazi.games.solitaire.v1";
+    const payload = JSON.stringify({
+      schemaVersion: 1,
+      sessionId: "winning-session",
+      state: st,
+      history: [],
+      elapsedSeconds: 50,
+      hasStarted: true,
+    });
+    originalSetItem(targetKey, payload);
+    localStorage.setItem = (key, value) => {
+      if (key === targetKey) return;
+      originalSetItem(key, value);
+    };
+  }, winningState);
+
+  await page.reload();
+  await page.locator("#window-word .xp-btn-close").click();
+  await page.locator(".xp-desktop-icon:has-text('Косынка')").dblclick();
+
+  const game = page.locator("#window-solitaire");
+  const finishBtn = game.getByRole("button", { name: "Собрать", exact: true });
+  await expect(finishBtn).toBeVisible();
+  await finishBtn.click();
+
+  // Victory dialog appears after auto-finish completes
+  const victoryDialog = game.getByRole("dialog", { name: "Победа" });
+  await expect(victoryDialog).toBeVisible({ timeout: 10000 });
+  await expect(victoryDialog.locator("h2")).toHaveText("Красиво сыграно.");
+
+  // Save record with player name
+  const nameInput = victoryDialog.locator("#solitaire-player");
+  await expect(nameInput).toBeVisible();
+  await nameInput.fill("Алексей");
+  await victoryDialog.getByRole("button", { name: "Сохранить" }).click();
+
+  // Leaderboard modal opens with the record highlighted
+  const recordsModal = game.getByRole("dialog", { name: "Рекорды косынки" });
+  await expect(recordsModal).toBeVisible();
+  await expect(recordsModal.locator("table")).toContainText("Алексей · вы");
+
+  // Close leaderboard modal
+  await recordsModal.getByRole("button", { name: "Закрыть рекорды" }).click();
+  await expect(recordsModal).toHaveCount(0);
+
+  // Victory dialog is still open, but the save form is no longer shown (no duplicate save)
+  await expect(victoryDialog).toBeVisible();
+  await expect(victoryDialog.locator("#solitaire-player")).toHaveCount(0);
+
+  // Start new game
+  await victoryDialog.getByRole("button", { name: "Начать новую партию" }).click();
+  await expect(victoryDialog).toHaveCount(0);
+  await expect.poll(async () => (await stored(page)).stock.length).toBe(24);
+});
+

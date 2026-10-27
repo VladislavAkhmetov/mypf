@@ -177,7 +177,6 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
               title={win.title}
             >
               <div className="w-3.5 h-3.5 flex-shrink-0">
-                {win.type === "starter" && <span>🪟</span>}
                 {win.type === "solitaire" && <SolitaireIcon className="w-3.5 h-3.5" />}
                 {win.type === "tools" && <ToolsIcon className="w-3.5 h-3.5" />}
                 {win.type === "word" && <WordDocIcon className="w-3.5 h-3.5" />}
@@ -185,7 +184,6 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
                 {win.type === "paint" && <PaintIcon className="w-3.5 h-3.5" />}
                 {win.type === "resume" && <PdfIcon className="w-3.5 h-3.5" />}
                 {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
-                {win.type === "project" && <MyDocumentsIcon className="w-3.5 h-3.5" />}
                 {win.type === "portfolio" && <InternetExplorerIcon className="w-3.5 h-3.5" />}
                 {win.type === "notepad" && <NotepadIcon className="w-3.5 h-3.5" />}
                 {win.type === "my-computer" && <MyComputerIcon className="w-3.5 h-3.5" />}

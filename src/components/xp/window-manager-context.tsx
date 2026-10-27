@@ -15,10 +15,8 @@ import { useDesktopWallpaper, type WallpaperSource } from "@/lib/xp/use-desktop-
 export type WindowType =
   | "notes"
   | "portfolio"
-  | "starter"
   | "solitaire"
   | "media-player"
-  | "project"
   | "my-computer"
   | "my-documents"
   | "notepad"

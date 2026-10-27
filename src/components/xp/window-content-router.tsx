@@ -3,7 +3,6 @@
 import React from "react";
 import { WindowItem } from "./window-manager-context";
 import { MediaPlayerWindow } from "./apps/media-player-window";
-import { ProjectExplorerWindow } from "./apps/project-explorer-window";
 import { MyComputerWindow } from "./apps/my-computer-window";
 import { MyDocumentsWindow } from "./apps/my-documents-window";
 import { NotepadWindow } from "./apps/notepad-window";
@@ -14,7 +13,6 @@ import { RecycleBinWindow } from "./apps/recycle-bin-window";
 import { PropertiesDialog } from "./apps/properties-dialog";
 import { ResumeWindow } from "./apps/resume-window";
 import dynamic from "next/dynamic";
-import { StarterWindow } from "./apps/starter-window";
 import { ToolsWindow } from "./apps/tools-window";
 import { WordWindow } from "./apps/word-window";
 import { PaintWindow } from "./apps/paint-window";
@@ -27,8 +25,8 @@ const SolitaireWindow = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-[#16070c] text-[#f2d999] text-xs font-serif">
-        Открываем карточный салон...
+      <div className="w-full h-full flex items-center justify-center bg-[#1b4332] text-[#d8f3dc] text-xs font-sans">
+        Раскладываем пасьянс...
       </div>
     ),
   }
@@ -58,8 +56,6 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
           notFound={win.props?.notFound as boolean | undefined}
         />
       );
-    case "starter":
-      return <StarterWindow />;
     case "solitaire":
       return <SolitaireWindow />;
     case "tools":
@@ -81,8 +77,6 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
       return <PaintWindow />;
     case "media-player":
       return <MediaPlayerWindow />;
-    case "project":
-      return <ProjectExplorerWindow slug={(win.props?.slug as string) || "kora"} />;
     case "my-computer":
       return <MyComputerWindow />;
     case "my-documents":

@@ -31,6 +31,11 @@ export function MinesweeperBoard({
 }: MinesweeperBoardProps) {
   const [touchMode, setTouchMode] = useState<"reveal" | "flag">("reveal");
   const [zoomScale, setZoomScale] = useState(1);
+  const [prevDifficulty, setPrevDifficulty] = useState(state.difficulty);
+  if (state.difficulty !== prevDifficulty) {
+    setPrevDifficulty(state.difficulty);
+    setZoomScale(1);
+  }
   const [shakeKey, setShakeKey] = useState(0);
   const [systemReducedMotion, setSystemReducedMotion] = useState(false);
   const canvasRef = useRef<EffectsCanvasHandle>(null);
@@ -69,10 +74,7 @@ export function MinesweeperBoard({
     return () => observer.disconnect();
   }, []);
 
-  // Reset zoom scale whenever difficulty changes
-  useEffect(() => {
-    setZoomScale(1);
-  }, [state.difficulty]);
+
 
   const baseCellSize = useMemo(() => {
     if (!viewportSize || viewportSize.width <= 0 || viewportSize.height <= 0) {

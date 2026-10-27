@@ -120,6 +120,7 @@ export function SolitaireBoard({
   };
 
   const selectWaste = () => {
+    if (isAutoFinishing) return;
     const card = state.waste.at(-1);
     if (!card) return;
     setSelected(selected?.source === "waste" ? null : { source: "waste", card, cards: [card] });
@@ -127,6 +128,7 @@ export function SolitaireBoard({
   };
 
   const selectFoundation = (foundationIndex: number) => {
+    if (isAutoFinishing) return;
     if (selected?.cards.length === 1) {
       const next = selected.source === "waste"
         ? moveWasteToFoundation(state, foundationIndex)
@@ -147,6 +149,7 @@ export function SolitaireBoard({
   };
 
   const selectTableau = (columnIndex: number, cardIndex?: number) => {
+    if (isAutoFinishing) return;
     if (selected) {
       const next = selected.source === "waste"
         ? moveWasteToTableau(state, columnIndex)
@@ -273,7 +276,18 @@ export function SolitaireBoard({
     return () => clearTimeout(timer);
   }, [isAutoFinishing, onApplyState, state]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+        setIsAutoFinishing(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const handleStock = () => {
+    if (isAutoFinishing) return;
     const next = drawCard(state);
     if (next === state) return;
     gameSound.cardSlide();
@@ -282,6 +296,7 @@ export function SolitaireBoard({
   };
 
   const doubleClick = (card: Card) => {
+    if (isAutoFinishing) return;
     apply(tryAutoMoveCardToFoundation(state, card.id));
   };
 
