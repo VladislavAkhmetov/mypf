@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { Press_Start_2P } from "next/font/google";
 import {
   useMinesweeperSession,
   minesweeperStore,
@@ -16,7 +17,11 @@ import {
   getMinesweeperWindowBounds,
   MINESWEEPER_WINDOW_PRESETS,
 } from "@/lib/xp/minesweeper-game";
+import { forestTexture } from "./minesweeper/pixel-art";
 import styles from "./minesweeper/minesweeper.module.css";
+
+// Self-hosted at build time (works on static hosting); has Cyrillic glyphs.
+const pixelFont = Press_Start_2P({ weight: "400", subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-pixel" });
 
 export function MinesweeperWindow() {
   const session = useMinesweeperSession();
@@ -77,7 +82,7 @@ export function MinesweeperWindow() {
   }, []);
 
   return (
-    <div className={styles.shell}>
+    <div className={`${styles.shell} ${pixelFont.variable}`} style={{ "--tex-forest": forestTexture() } as React.CSSProperties}>
       <MinesweeperHud
         minesLeft={session.state.minesLeft}
         elapsedSeconds={session.elapsedSeconds}
@@ -125,21 +130,14 @@ export function MinesweeperWindow() {
 
       {/* Pause Screen Overlay */}
       {session.isPaused && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-xs">
-          <div className="p-6 rounded-xl border border-[#405DE8] bg-[#172244] text-center shadow-2xl">
-            <h3 className="font-mono font-bold text-lg text-[#F4F7FF] mb-2">
-              Операция приостановлена
-            </h3>
-            <p className="text-xs text-[#a5b4fc] mb-4">
-              Окно свернуто или потеряло системный фокус.
-            </p>
-            <button
-              onClick={() => minesweeperStore.setPaused(false)}
-              className="px-5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider bg-[#405DE8] text-white hover:bg-[#728AFF] transition cursor-pointer"
-            >
-              Продолжить операцию
-            </button>
-          </div>
+        <div className={styles.resultBackdrop}>
+          <section className={styles.result}>
+            <h3>Пауза</h3>
+            <p>Окно свёрнуто или потеряло фокус.</p>
+            <div className={styles.resultActions}>
+              <button onClick={() => minesweeperStore.setPaused(false)}>Продолжить</button>
+            </div>
+          </section>
         </div>
       )}
     </div>

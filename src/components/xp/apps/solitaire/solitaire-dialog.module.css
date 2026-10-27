@@ -1,31 +1,41 @@
-.overlay { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: #142d2680; backdrop-filter: blur(8px); font: 15px/1.45 "Segoe UI", sans-serif; }
-.panel { position: relative; width: min(100%, 600px); max-height: 100%; overflow: auto; padding: 28px; border-radius: 24px; color: #244b40; background: #f3f3e9; box-shadow: 0 24px 80px #102b2940; }
-.panel header { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.panel h2 { margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -.04em; line-height: 1.15; }
-.panel p { margin: 12px 0 24px; color: #5c7367; }
-.panel button { border: 0; border-radius: 12px; padding: 12px 16px; font: inherit; font-weight: 500; color: #244b40; background: #dce5d6; cursor: pointer; }
-.panel button:hover { background: #cbdcc6; }
-.panel button:focus-visible, .panel input:focus-visible { outline: 3px solid #658c6d; outline-offset: 3px; }
-.panel .primary { color: white; background: #315b4e; }
-.actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+/* Atelier dialogs: frosted studio scrim, ivory panels, Playfair headings, pill buttons. */
+.overlay { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(214, 211, 218, 0.62); backdrop-filter: blur(10px); font-size: 14px; line-height: 1.45; }
+.panel { position: relative; width: min(100%, 600px); max-height: 100%; overflow: auto; padding: 30px; border-radius: 24px; color: #1d1a22; background: #f8f6f2; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 40px 80px -30px rgba(29, 26, 34, 0.5); }
+.panel header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.overlay .panel h2 { margin: 0; font-family: var(--font-display), Georgia, serif; font-size: 32px; font-weight: 600; font-style: italic; line-height: 1.05; letter-spacing: -0.01em; }
+.panel p { margin: 10px 0 22px; color: #77727f; }
+.panel button { min-height: 42px; padding: 0 18px; border: 0; border-radius: 999px; color: #1d1a22; background: rgba(29, 26, 34, 0.06); font: inherit; font-weight: 600; cursor: var(--xp-cursor-pointer, pointer); transition: background 0.15s ease; }
+.panel button:hover { background: rgba(29, 26, 34, 0.11); }
+.panel button:focus-visible, .panel input:focus-visible { outline: 2px solid #c9a45c; outline-offset: 3px; }
+.panel .primary { color: #f4ecdc; background: #1d1a22; box-shadow: 0 8px 18px -8px rgba(29, 26, 34, 0.6); }
+.panel .primary:hover { background: #2d2934; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
 .gallery { width: min(100%, 1000px); }
-.cardGrid { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 12px; }
-.cardGrid button { padding: 0; background: none; }
-.inspector { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: #e7ede2; overflow: auto; }
-.largeCard { width: min(200px, 42%); flex-shrink: 0; }
+.cardGrid { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 10px; }
+.cardGrid button { min-height: 0; padding: 0; border-radius: 0; background: none; transition: transform 0.18s ease; }
+.cardGrid button:hover { background: none; transform: translateY(-4px); }
+.inspector { position: absolute; z-index: 5; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow: auto; background: radial-gradient(120% 80% at 50% 0%, #f4f3f6, #e1dfe4); }
+.largeCard { width: min(230px, 44%); flex-shrink: 0; }
 .tableScroll { overflow: auto; }
 .panel table { width: 100%; border-collapse: collapse; text-align: left; font-variant-numeric: tabular-nums; }
-.panel th { color: #5c7367; font-weight: 500; }
-.panel td, .panel th { padding: 12px 8px; }
+.panel th { padding: 10px 8px; color: #77727f; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.panel td { padding: 11px 8px; border-top: 1px solid rgba(29, 26, 34, 0.08); }
 .panel td:not(:first-child), .panel th:not(:first-child) { text-align: right; }
-.panel tbody tr:nth-child(odd) { background: #e5ebdf; }
-.panel tr.highlight { background: #cfdfc9; font-weight: 600; }
-.victory { text-align: center; width: min(100%, 500px); }
-.victoryMark { font: 64px/1 Georgia, serif; }
-.victory h2 { margin-top: 16px; font-size: 36px; }
-.stats { display: flex; justify-content: space-around; gap: 16px; margin: 24px 0; }
-.stats span { display: grid; color: #5c7367; }
-.stats b { color: #244b40; font-size: 24px; font-weight: 500; }
-.panel label { display: block; }
-.panel input { min-width: 0; width: 150px; flex: 1; padding: 12px; border: 0; border-radius: 12px; background: white; color: #244b40; font: inherit; }
-@media (max-width: 640px) { .overlay { padding: 12px; } .panel { padding: 20px; border-radius: 20px; } .panel header { align-items: start; gap: 12px; flex-direction: column; } .cardGrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; } .panel h2 { font-size: 26px; } .panel td, .panel th { padding: 10px 4px; font-size: 13px; } }
+.panel tr.highlight td { background: rgba(201, 164, 92, 0.18); font-weight: 700; }
+.victory { width: min(100%, 480px); text-align: center; }
+.victoryMark { display: block; width: 56px; height: 56px; margin: 0 auto 16px; filter: drop-shadow(0 8px 16px rgba(21, 32, 58, 0.3)); }
+.overlay .victory h2 { font-size: 38px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 22px 0; padding: 6px; border-radius: 16px; background: rgba(29, 26, 34, 0.04); }
+.stats span { display: grid; gap: 2px; padding: 10px 6px; color: #77727f; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.stats span + span { box-shadow: -1px 0 0 rgba(29, 26, 34, 0.08); }
+.overlay .stats b { color: #1d1a22; font-family: var(--font-display), Georgia, serif; font-size: 28px; font-weight: 600; letter-spacing: 0; text-transform: none; font-variant-numeric: lining-nums; }
+.panel label { display: block; font-weight: 600; }
+.panel input { flex: 1; width: 150px; min-width: 0; min-height: 42px; padding: 0 16px; border: 0; border-radius: 999px; color: #1d1a22; background: #fff; box-shadow: inset 0 0 0 1px rgba(29, 26, 34, 0.12); font: inherit; }
+@media (max-width: 640px) {
+  .overlay { padding: 12px; }
+  .panel { padding: 20px; border-radius: 20px; }
+  .panel header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .cardGrid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  .overlay .panel h2 { font-size: 26px; }
+  .panel td, .panel th { padding: 9px 4px; font-size: 13px; }
+}

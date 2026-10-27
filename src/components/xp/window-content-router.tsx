@@ -9,13 +9,13 @@ import { NotepadWindow } from "./apps/notepad-window";
 import { StoriesViewerWindow } from "./apps/stories-viewer-window";
 import { CmdWindow } from "./apps/cmd-window";
 import { DisplayPropertiesDialog } from "./apps/display-properties-dialog";
-import { RecycleBinWindow } from "./apps/recycle-bin-window";
 import { PropertiesDialog } from "./apps/properties-dialog";
 import { ResumeWindow } from "./apps/resume-window";
 import dynamic from "next/dynamic";
 import { ToolsWindow } from "./apps/tools-window";
 import { WordWindow } from "./apps/word-window";
 import { PaintWindow } from "./apps/paint-window";
+import { HelpCenterWindow } from "./apps/help/help-center-window";
 import { PortfolioBrowserWindow } from "./apps/portfolio-browser-window";
 import { FocusDirection } from "@/lib/xp/navigation";
 import { NotesWindow } from "@/components/notes/notes-window";
@@ -89,12 +89,12 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
       return <CmdWindow />;
     case "display-properties":
       return <DisplayPropertiesDialog />;
-    case "recycle-bin":
-      return <RecycleBinWindow />;
     case "properties":
       return <PropertiesDialog slug={(win.props?.slug as string) || "kora"} />;
     case "resume":
       return <ResumeWindow />;
+    case "help":
+      return <HelpCenterWindow initialTopicId={win.props?.topicId as string | undefined} />;
     default:
       return <div className="p-4 bg-white">Window content</div>;
   }

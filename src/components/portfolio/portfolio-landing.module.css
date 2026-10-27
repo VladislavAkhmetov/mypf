@@ -12,7 +12,7 @@
 .landing.landing, .landing.landing * { font-family: var(--font-onest), Arial, sans-serif; box-sizing: border-box; }
 .landing :is(h1, h2, h3, p) { margin: 0; }
 .landing button { text-align: inherit; }
-.landing :is(button, a) { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.landing :is(button, a) { cursor: var(--xp-cursor-pointer, pointer); -webkit-tap-highlight-color: transparent; }
 .landing :is(button, a):focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }
 .about {
   --card-width: clamp(230px, 26cqw, 340px);
@@ -116,7 +116,7 @@
   flex: 0 0 clamp(240px, 25cqw, 300px);
   min-width: 0;
   scroll-snap-align: start;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   display: flex;
   flex-direction: column;
 }

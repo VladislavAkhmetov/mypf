@@ -17,6 +17,7 @@ import {
   NotepadIcon,
   CmdIcon,
   StoriesIcon,
+  HelpCenterIcon,
   MyDocumentsIcon,
   MyComputerIcon,
   ControlPanelIcon,
@@ -193,7 +194,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "tools",
                 type: "tools",
-                title: "Инструменты — Плагины и скрипты",
+                title: "Инструменты",
                 iconType: "tools",
                 x: 80,
                 y: 45,
@@ -264,7 +265,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <StoriesIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Заметки</span>
+            <span className="font-semibold text-xs">Журнал</span>
           </div>
 
           {/* For Employers / HR & Leads */}
@@ -348,7 +349,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 openWindow({
                   id: "solitaire",
                   type: "solitaire",
-                  title: "Косынка — Maison Solitaire",
+                  title: "Косынка",
                   iconType: "solitaire",
                   x: 60,
                   y: 15,
@@ -374,7 +375,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
                 openWindow({
                   id: "minesweeper",
                   type: "minesweeper",
-                  title: "Сапёр — Pulsefield",
+                  title: "Сапёр",
                   iconType: "minesweeper",
                   ...bounds,
                 });
@@ -447,7 +448,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               openWindow({
                 id: "tools",
                 type: "tools",
-                title: "Инструменты — Плагины и скрипты",
+                title: "Инструменты",
                 iconType: "tools",
                 x: 80,
                 y: 45,
@@ -462,6 +463,30 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <ToolsIcon className="w-6 h-6 flex-shrink-0" />
             <span className="font-bold text-xs">Инструменты</span>
+          </div>
+
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openWindow({
+                id: "help",
+                type: "help",
+                title: "Центр справки и поддержки",
+                iconType: "help",
+                x: 70,
+                y: 30,
+                width: Math.min(940, window.innerWidth - 60),
+                height: Math.min(680, window.innerHeight - 80),
+              });
+            }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"help"}'
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <HelpCenterIcon className="w-6 h-6 flex-shrink-0" />
+            <span className="font-bold text-xs">Справка и поддержка</span>
           </div>
 
           <div

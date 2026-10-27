@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8de0"/>
+      <stop offset=".55" stop-color="#1f5bbd"/>
+      <stop offset="1" stop-color="#123d88"/>
+    </linearGradient>
+    <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0d2f6e"/>
+      <stop offset="1" stop-color="#1c4fa6"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fffdf3"/>
+      <stop offset="1" stop-color="#e3dcc4"/>
+    </linearGradient>
+    <linearGradient id="label" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f0ead6"/>
+    </linearGradient>
+    <linearGradient id="pen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3a42"/>
+      <stop offset=".45" stop-color="#8c8c99"/>
+      <stop offset="1" stop-color="#26262c"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- shadow -->
+  <ellipse cx="25" cy="44.5" rx="17" ry="2.2" fill="#000" opacity=".22"/>
+  <!-- page block -->
+  <path d="M12 6h26.5c1 0 1.5.6 1.5 1.5V41c0 .9-.5 1.5-1.5 1.5H12z" fill="url(#pages)" stroke="#9c9277" stroke-width=".8"/>
+  <path d="M38.3 9v31M36.8 8.5v32" stroke="#cfc6aa" stroke-width=".5"/>
+  <!-- cover -->
+  <path d="M8.5 4.5h27.3c1.2 0 2 .8 2 2v33.3c0 1.2-.8 2-2 2H8.5z" fill="url(#cover)" stroke="#0b2b66" stroke-width="1"/>
+  <path d="M8.5 4.5h5v37.3h-5z" fill="url(#spine)"/>
+  <path d="M13.5 4.5v37.3" stroke="#6fa3ea" stroke-width=".6" opacity=".7"/>
+  <path d="M14 5.2h21.6c.9 0 1.5.6 1.5 1.5V19C28 21 20 19 14 22z" fill="url(#gloss)"/>
+  <!-- label -->
+  <rect x="17.5" y="11" width="15.5" height="10" rx="1.2" fill="url(#label)" stroke="#8a826a" stroke-width=".6"/>
+  <path d="M19.8 14.2h11M19.8 16.6h9M19.8 19h6.5" stroke="#7d8db0" stroke-width=".9" stroke-linecap="round"/>
+  <!-- elastic band -->
+  <path d="M31.5 4.5v37.3" stroke="#0a1f4d" stroke-width="1.6"/>
+  <path d="M31.1 4.5v37.3" stroke="#3d6cc0" stroke-width=".4" opacity=".8"/>
+  <!-- ribbon bookmark -->
+  <path d="M26 41.5v5l1.8-1.5 1.8 1.5v-5z" fill="#d8322a" stroke="#8c1712" stroke-width=".6"/>
+  <!-- pen -->
+  <g transform="rotate(-38 30 33)">
+    <rect x="15" y="31.2" width="22" height="3.6" rx="1.8" fill="url(#pen)" stroke="#17171c" stroke-width=".6"/>
+    <rect x="26.5" y="31.2" width="2.2" height="3.6" fill="#d9b44a" stroke="#7a5d14" stroke-width=".4"/>
+    <path d="M37 31.4l5 1.6-5 1.6z" fill="#c9c9d2" stroke="#4a4a52" stroke-width=".5" stroke-linejoin="round"/>
+    <path d="M17 31.9h8" stroke="#fff" stroke-opacity=".55" stroke-width=".6" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+-- Run once in the YDB console (Database -> Navigation -> New SQL query).
+CREATE TABLE likes (
+    note Utf8,
+    likes Int64,
+    PRIMARY KEY (note)
+);
+
+CREATE TABLE comments (
+    note Utf8,
+    id Utf8,
+    author Utf8,
+    body Utf8,
+    created Timestamp,
+    visible Bool,
+    PRIMARY KEY (note, id)
+);

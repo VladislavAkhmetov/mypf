@@ -23,13 +23,13 @@ export type WindowType =
   | "stories"
   | "cmd"
   | "display-properties"
-  | "recycle-bin"
   | "properties"
   | "resume"
   | "tools"
   | "word"
   | "minesweeper"
-  | "paint";
+  | "paint"
+  | "help";
 
 export interface WindowItem {
   id: string;

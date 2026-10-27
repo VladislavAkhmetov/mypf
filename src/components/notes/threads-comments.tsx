@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   type NoteComment,
   addComment,
+  isThreadsApiEnabled,
   toggleCommentLike,
 } from "@/lib/notes/threads-store";
 import styles from "./threads-comments.module.css";
@@ -120,6 +121,7 @@ export function ThreadsComments({
                     <time className={styles.commentTime} dateTime={comment.createdAt}>
                       {formatCommentDate(comment.createdAt)}
                     </time>
+                    {comment.pending && <span className={styles.pendingBadge}>на модерации</span>}
                   </div>
 
                   <p className={styles.commentText}>{comment.text}</p>
@@ -196,7 +198,9 @@ export function ThreadsComments({
           />
 
           <div className={styles.replyBottomRow}>
-            <span className={styles.shortcutHint}>Ctrl + Enter</span>
+            <span className={styles.shortcutHint}>
+              {isThreadsApiEnabled ? "Появится после модерации · Ctrl + Enter" : "Ctrl + Enter"}
+            </span>
             <motion.button
               type="submit"
               whileHover={{ scale: 1.05 }}

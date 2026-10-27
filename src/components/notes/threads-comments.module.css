@@ -84,6 +84,15 @@
   color: #777777;
 }
 
+.pendingBadge {
+  font-size: 11px;
+  line-height: 1;
+  color: #a3a3a3;
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+  padding: 3px 7px;
+}
+
 .commentText {
   font-size: 15px;
   line-height: 1.45;
@@ -108,7 +117,7 @@
   padding: 4px 6px 4px 0;
   color: #777777;
   font-size: 12px;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   border-radius: 6px;
   transition: color 0.15s ease, transform 0.15s ease;
 }
@@ -213,7 +222,7 @@
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   transition: opacity 0.15s ease, transform 0.1s ease;
 }
 

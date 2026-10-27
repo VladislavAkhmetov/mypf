@@ -21,14 +21,13 @@ import {
   MyDocumentsIcon,
   WindowsMediaPlayerIcon,
   NotepadIcon,
-  RecycleBinIcon,
   StoriesIcon,
+  HelpCenterIcon,
   SolitaireIcon,
   ToolsIcon,
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
-  PdfIcon,
   InternetExplorerIcon,
 } from "./xp-icons";
 
@@ -130,7 +129,7 @@ export function Desktop() {
     type: "folder" | "file";
   }>>([]);
 
-  // Deleted icon IDs (moved to Recycle Bin)
+  // Deleted (hidden) icon IDs
   const [deletedIconIds, setDeletedIconIds] = useState<string[]>([]);
 
   // Refresh flicker state
@@ -150,11 +149,6 @@ export function Desktop() {
         icon: <InternetExplorerIcon className="w-12 h-12" />,
       },
       {
-        id: "resume",
-        title: "Резюме.pdf",
-        icon: <PdfIcon className="w-12 h-12" />,
-      },
-      {
         id: "my-computer",
         title: "Мой компьютер",
         icon: <MyComputerIcon className="w-12 h-12" />,
@@ -166,13 +160,8 @@ export function Desktop() {
       },
       {
         id: "stories",
-        title: "Заметки",
+        title: "Журнал",
         icon: <StoriesIcon className="w-12 h-12" />,
-      },
-      {
-        id: "recycle-bin",
-        title: "Корзина",
-        icon: <RecycleBinIcon className="w-12 h-12" />,
       },
       {
         id: "solitaire",
@@ -193,6 +182,11 @@ export function Desktop() {
         id: "paint",
         title: "Paint",
         icon: <PaintIcon className="w-12 h-12" />,
+      },
+      {
+        id: "help",
+        title: "Справка",
+        icon: <HelpCenterIcon className="w-12 h-12" />,
       },
     ],
     [],
@@ -270,7 +264,6 @@ export function Desktop() {
           if (id.startsWith("doc-")) return 4;
           if (id === "my-computer" || id === "media-player") return 5;
           if (id.startsWith("project-")) return 6;
-          if (id === "recycle-bin") return 99;
           return 7;
         };
         sorted.sort((a, b) => order(a.id) - order(b.id));
@@ -510,19 +503,6 @@ export function Desktop() {
           openNotes();
           break;
 
-        case "recycle-bin":
-          openWindow({
-            id: "recycle-bin",
-            type: "recycle-bin",
-            title: "Корзина",
-            iconType: "recycle",
-            x: 100,
-            y: 80,
-            width: 520,
-            height: 360,
-          });
-          break;
-
         case "solitaire":
           openWindow({
             id: "solitaire",
@@ -540,7 +520,7 @@ export function Desktop() {
           openWindow({
             id: "tools",
             type: "tools",
-            title: "Инструменты — Плагины и скрипты",
+            title: "Инструменты",
             iconType: "tools",
             x: 80,
             y: 45,
@@ -567,7 +547,7 @@ export function Desktop() {
           openWindow({
             id: "minesweeper",
             type: "minesweeper",
-            title: "Сапёр — Pulsefield",
+            title: "Сапёр",
             iconType: "minesweeper",
             ...bounds,
           });
@@ -581,9 +561,22 @@ export function Desktop() {
             title: "Paint",
             iconType: "paint",
             x: 90,
-            y: 45,
-            width: 780,
-            height: 540,
+            y: 40,
+            width: 880,
+            height: 600,
+          });
+          break;
+
+        case "help":
+          openWindow({
+            id: "help",
+            type: "help",
+            title: "Центр справки и поддержки",
+            iconType: "help",
+            x: 70,
+            y: 30,
+            width: typeof window !== "undefined" ? Math.min(940, window.innerWidth - 60) : 940,
+            height: typeof window !== "undefined" ? Math.min(680, window.innerHeight - 80) : 680,
           });
           break;
 

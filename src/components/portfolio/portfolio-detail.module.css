@@ -1,7 +1,7 @@
 .page { --orange: #ff4b16; --paper: #f2f1ee; container-type: inline-size; flex: 0 0 auto; width: 100%; min-width: 0; color: var(--paper); background: #111110; user-select: text; }
 .page.page, .page.page * { font-family: var(--font-onest), Arial, sans-serif; box-sizing: border-box; }
 .page :is(h1,h2,h3,p,dl,dd) { margin: 0; }
-.page :is(button,a,summary) { cursor: pointer; }
+.page :is(button,a,summary) { cursor: var(--xp-cursor-pointer, pointer); }
 .page button { text-align: inherit; }
 .page a { text-decoration: none; }
 .page :is(button,a,input,textarea,summary):focus-visible { outline: 2px solid var(--orange); outline-offset: 5px; }

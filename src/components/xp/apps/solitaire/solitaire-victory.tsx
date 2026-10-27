@@ -4,6 +4,7 @@ import { gameSound } from "@/lib/xp/games/game-sound";
 import { calculateSolitaireScore, isSolitaireHighScore, addSolitaireScore, getSavedPlayerName } from "@/lib/xp/games/leaderboards";
 import { useDialogFocus } from "@/lib/xp/use-dialog-focus";
 import styles from "./solitaire-dialog.module.css";
+import { DeckMonogram } from "./card-assets";
 
 export function SolitaireVictory({ moveCount, elapsedSeconds, onNewGame, onOpenLeaderboard }: { moveCount: number; elapsedSeconds: number; onNewGame: () => void; onOpenLeaderboard: (recordId?: string) => void }) {
   const [playerName, setPlayerName] = useState(() => getSavedPlayerName());
@@ -18,7 +19,7 @@ export function SolitaireVictory({ moveCount, elapsedSeconds, onNewGame, onOpenL
   return (
     <div ref={dialogRef} className={styles.overlay} role="dialog" aria-modal="true" aria-label="Победа">
       <section className={`${styles.panel} ${styles.victory}`}>
-        <span className={styles.victoryMark} aria-hidden="true">♠</span>
+        <DeckMonogram className={styles.victoryMark} />
         <h2>Красиво сыграно.</h2>
         <p>Все 52 карты на своих местах.</p>
         <div className={styles.stats}>

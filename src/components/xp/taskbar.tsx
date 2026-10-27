@@ -21,8 +21,8 @@ import {
   MyComputerIcon,
   MyDocumentsIcon,
   StoriesIcon,
+  HelpCenterIcon,
   CmdIcon,
-  RecycleBinIcon,
 } from "./xp-icons";
 
 interface TaskbarProps {
@@ -182,6 +182,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
                 {win.type === "word" && <WordDocIcon className="w-3.5 h-3.5" />}
                 {win.type === "minesweeper" && <MinesweeperIcon className="w-3.5 h-3.5" />}
                 {win.type === "paint" && <PaintIcon className="w-3.5 h-3.5" />}
+                {win.type === "help" && <HelpCenterIcon className="w-3.5 h-3.5" />}
                 {win.type === "resume" && <PdfIcon className="w-3.5 h-3.5" />}
                 {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
                 {win.type === "portfolio" && <InternetExplorerIcon className="w-3.5 h-3.5" />}
@@ -191,7 +192,6 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
                 {win.type === "stories" && <StoriesIcon className="w-3.5 h-3.5" />}
                 {win.type === "cmd" && <CmdIcon className="w-3.5 h-3.5" />}
                 {win.type === "display-properties" && <span>⚙️</span>}
-                {win.type === "recycle-bin" && <RecycleBinIcon className="w-3.5 h-3.5" />}
               </div>
               <span className="xp-task-btn-title">{win.title}</span>
             </button>

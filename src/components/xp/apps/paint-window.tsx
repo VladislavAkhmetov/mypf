@@ -3,390 +3,626 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useWindowManager } from "../window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
-import { xpCursors } from "@/lib/xp/cursors";
-type Particle = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  tone: 0 | 1 | 2;
-  orbit: number;
-  phase: number;
-  spin: number;
-};
+import {
+  BrushStyle,
+  PaintOp,
+  Point,
+  ShapeFill,
+  ShapeOp,
+  StrokeOp,
+  Tool,
+  XP_PALETTE,
+  drawShape,
+  drawStroke,
+  floodFill,
+  renderDocument,
+} from "./paint/paint-engine";
+import { startPhysics, type PhysicsController } from "./paint/paint-physics";
+import { exportTimelapseGif, playTimelapse } from "./paint/paint-timelapse";
+import { ToolIcon } from "./paint/paint-icons";
+import styles from "./paint/paint.module.css";
 
-type Palette = {
-  bg: string;
-  tones: [string, string, string];
-};
+// Windows XP Paint, rebuilt: classic toolbox/palette/menus, with modern internals —
+// pressure-smoothed strokes (perfect-freehand), procedural "Harmony" brushes,
+// a physics mode where the drawing comes alive (matter-js) and a timelapse/GIF replay.
 
-const PALETTES: Palette[] = [
-  { bg: "#00354d", tones: ["#d3ff6a", "#9fe7f2", "#ffffff"] },
-  { bg: "#0b1220", tones: ["#ff8ed8", "#244bff", "#f4f7ff"] },
-  { bg: "#1a140c", tones: ["#ffb703", "#fb8500", "#fff6e5"] },
-  { bg: "#ece9d8", tones: ["#245edc", "#c43e1c", "#13211f"] },
-  { bg: "#081c14", tones: ["#7dffb3", "#eaff6a", "#f7fff8"] },
+const TOOLS: Array<{ id: Tool; label: string; hint: string }> = [
+  { id: "eraser", label: "Ластик", hint: "Стирает цветом фона." },
+  { id: "fill", label: "Заливка", hint: "Заливает замкнутую область цветом." },
+  { id: "picker", label: "Выбор цветов", hint: "Берёт цвет с рисунка. Правая кнопка — цвет фона." },
+  { id: "pencil", label: "Карандаш", hint: "Рисует тонкой линией." },
+  { id: "brush", label: "Кисть", hint: "Рисует кистью выбранного стиля." },
+  { id: "airbrush", label: "Распылитель", hint: "Распыляет краску." },
+  { id: "line", label: "Линия", hint: "Рисует прямую линию." },
+  { id: "rect", label: "Прямоугольник", hint: "Рисует прямоугольник." },
+  { id: "ellipse", label: "Эллипс", hint: "Рисует эллипс." },
+  { id: "roundrect", label: "Скруглённый прямоугольник", hint: "Рисует прямоугольник со скруглёнными углами." },
 ];
 
-const FOLDS = [4, 6, 8] as const;
+const BRUSHES: Array<{ id: BrushStyle; label: string }> = [
+  { id: "smooth", label: "Гладкая" },
+  { id: "sketchy", label: "Набросок" },
+  { id: "shaded", label: "Штриховка" },
+  { id: "web", label: "Паутина" },
+  { id: "fur", label: "Мех" },
+];
 
-type FieldState = {
-  particles: Particle[];
-  pointer: { x: number; y: number; inside: boolean; down: boolean };
-  folds: number;
-  paletteIndex: number;
-  width: number;
-  height: number;
-  time: number;
-};
+const SIZES = [1, 2, 3, 5, 8];
+const FILLS: ShapeFill[] = ["outline", "both", "fill"];
+type Mode = "draw" | "physics" | "timelapse" | "exporting";
+type Menu = "file" | "edit" | "image" | "help" | null;
 
-function spawn(state: FieldState, count: number, origin?: { x: number; y: number }) {
-  const cx = origin?.x ?? state.width * 0.5;
-  const cy = origin?.y ?? state.height * 0.5;
-  const reach = Math.min(state.width, state.height);
-  for (let i = 0; i < count; i += 1) {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = origin ? Math.random() * 26 : 12 + Math.random() * reach * 0.22;
-    const speed = origin ? 1.8 + Math.random() * 2.8 : 0.2 + Math.random() * 0.7;
-    state.particles.push({
-      x: cx + Math.cos(angle) * radius,
-      y: cy + Math.sin(angle) * radius,
-      vx: Math.cos(angle + 0.7) * speed,
-      vy: Math.sin(angle + 0.7) * speed,
-      size: origin ? 2.2 + Math.random() * 5.5 : 2.6 + Math.random() * 7,
-      tone: ((Math.random() * 3) | 0) as 0 | 1 | 2,
-      orbit: origin ? 18 + Math.random() * 90 : 28 + Math.random() * reach * 0.28,
-      phase: Math.random() * Math.PI * 2,
-      spin: 0.35 + Math.random() * 1.1,
-    });
-  }
-  if (state.particles.length > 160) {
-    state.particles.splice(0, state.particles.length - 160);
-  }
+function brushPreview(style: BrushStyle) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 104;
+  canvas.height = 28;
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(2, 2);
+  const points: Point[] = Array.from({ length: 34 }, (_, i) => ({ x: 4 + i * 1.3, y: 7 + Math.sin(i / 4.5) * 4, p: 0.5 }));
+  drawStroke(ctx, { kind: "stroke", tool: "brush", style, color: "#000000", size: 2, seed: 7, simulatePressure: true, points });
+  return canvas.toDataURL();
 }
 
-function snapshotCanvas(source: HTMLCanvasElement, mime: string, quality: number, maxWidth: number) {
+/** Seed for procedural brushes so replays redraw them identically. */
+function nextSeed() {
+  return Math.floor(Math.random() * 1e9);
+}
+
+function snapshot(source: HTMLCanvasElement, mime: string, quality: number, maxWidth: number) {
   const scale = Math.min(1, maxWidth / source.width);
   const out = document.createElement("canvas");
   out.width = Math.max(1, Math.round(source.width * scale));
   out.height = Math.max(1, Math.round(source.height * scale));
-  const ctx = out.getContext("2d");
-  if (!ctx) return source.toDataURL(mime, quality);
-  ctx.drawImage(source, 0, 0, out.width, out.height);
+  out.getContext("2d")!.drawImage(source, 0, 0, out.width, out.height);
   return out.toDataURL(mime, quality);
 }
 
+function download(url: string, filename: string) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 export function PaintWindow() {
-  const { setWallpaper, showBalloon } = useWindowManager();
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stateRef = useRef<FieldState>({
-    particles: [],
-    pointer: { x: 0, y: 0, inside: false, down: false },
-    folds: 6,
-    paletteIndex: 0,
-    width: 1,
-    height: 1,
-    time: 0,
-  });
+  const { setWallpaper, showBalloon, activeWindowId } = useWindowManager();
+  const [tool, setTool] = useState<Tool>("brush");
+  const [brushStyle, setBrushStyle] = useState<BrushStyle>("smooth");
+  const [size, setSize] = useState(3);
+  const [shapeFill, setShapeFill] = useState<ShapeFill>("outline");
+  const [fg, setFg] = useState("#000000");
+  const [bg, setBg] = useState("#ffffff");
+  const [mode, setMode] = useState<Mode>("draw");
+  const [menu, setMenu] = useState<Menu>(null);
+  const [coords, setCoords] = useState<string>("");
+  const [canvasSize, setCanvasSize] = useState<{ w: number; h: number } | null>(null);
+  const [counts, setCounts] = useState({ ops: 0, redo: 0 });
+  const [previews] = useState(() => Object.fromEntries(BRUSHES.map(b => [b.id, brushPreview(b.id)])) as Record<BrushStyle, string>);
 
-  const [folds, setFolds] = useState(6);
-  const [paletteIndex, setPaletteIndex] = useState(0);
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const baseRef = useRef<HTMLCanvasElement>(null);
+  const liveRef = useRef<HTMLCanvasElement>(null);
+  const opsRef = useRef<PaintOp[]>([]);
+  const redoRef = useRef<PaintOp[]>([]);
+  const currentRef = useRef<{ op: StrokeOp | ShapeOp; drawn: number } | null>(null);
+  const physicsRef = useRef<PhysicsController | null>(null);
+  const stopReplayRef = useRef<(() => void) | null>(null);
+  const dpr = typeof window === "undefined" ? 1 : Math.min(2, window.devicePixelRatio || 1);
 
-  const applyPalette = useCallback((index: number) => {
-    stateRef.current.paletteIndex = index;
-    setPaletteIndex(index);
+  const hasOps = counts.ops > 0;
+  const canRedo = counts.redo > 0;
+  const bump = () => setCounts({ ops: opsRef.current.length, redo: redoRef.current.length });
+
+  const contexts = useCallback(() => {
+    const base = baseRef.current?.getContext("2d", { willReadFrequently: true }) ?? null;
+    const live = liveRef.current?.getContext("2d") ?? null;
+    return { base, live };
   }, []);
 
-  const applyFolds = useCallback((value: number) => {
-    stateRef.current.folds = value;
-    setFolds(value);
-  }, []);
+  const redraw = useCallback(() => {
+    const { base, live } = contexts();
+    if (!base || !live) return;
+    base.setTransform(dpr, 0, 0, dpr, 0, 0);
+    live.setTransform(dpr, 0, 0, dpr, 0, 0);
+    renderDocument(base, opsRef.current, dpr);
+    live.clearRect(0, 0, live.canvas.width / dpr, live.canvas.height / dpr);
+  }, [contexts, dpr]);
 
-  const reshuffle = useCallback(() => {
-    xpSound.click();
-    const state = stateRef.current;
-    const nextPalette = (state.paletteIndex + 1 + Math.floor(Math.random() * (PALETTES.length - 1))) % PALETTES.length;
-    const nextFolds = FOLDS[Math.floor(Math.random() * FOLDS.length)];
-    state.particles = [];
-      spawn(state, 88);
-    applyPalette(nextPalette);
-    applyFolds(nextFolds);
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (canvas && ctx) {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = PALETTES[nextPalette].bg;
-      ctx.fillRect(0, 0, state.width, state.height);
-    }
-  }, [applyFolds, applyPalette]);
-
-  const captureFrame = useCallback((kind: "wallpaper" | "download") => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    if (kind === "wallpaper") return snapshotCanvas(canvas, "image/jpeg", 0.82, 1280);
-    return snapshotCanvas(canvas, "image/png", 1, 1920);
-  }, []);
-
-  const handleWallpaper = useCallback(() => {
-    const url = captureFrame("wallpaper");
-    if (!url) return;
-    try {
-      setWallpaper(url);
-      showBalloon("Обои установлены", "Это поле теперь на рабочем столе.");
-    } catch {
-      showBalloon("Не удалось сохранить", "Снимок не поместился в браузер. Попробуй ещё раз.");
-    }
-  }, [captureFrame, setWallpaper, showBalloon]);
-
-  const handleDownload = useCallback(() => {
-    xpSound.click();
-    const url = captureFrame("download");
-    if (!url) return;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `amazi-field-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [captureFrame]);
-
+  // The canvas follows the window while it is empty, then keeps its size (like Paint).
   useEffect(() => {
-    const wrap = wrapRef.current;
-    const canvas = canvasRef.current;
-    if (!wrap || !canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const state = stateRef.current;
-    let frame = 0;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
+    const el = workspaceRef.current;
+    if (!el) return;
     const fit = () => {
-      const rect = wrap.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.max(1, Math.floor(rect.width));
-      const height = Math.max(1, Math.floor(rect.height));
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const resized = Math.abs(state.width - width) > 48 || Math.abs(state.height - height) > 48;
-      state.width = width;
-      state.height = height;
-      if (state.particles.length === 0 || resized) {
-        state.particles = [];
-        spawn(state, 88);
-      }
-      ctx.fillStyle = PALETTES[state.paletteIndex].bg;
-      ctx.fillRect(0, 0, width, height);
+      if (opsRef.current.length && canvasSize) return;
+      const w = Math.round(Math.max(320, Math.min(1600, el.clientWidth - 24)));
+      const h = Math.round(Math.max(220, Math.min(1000, el.clientHeight - 24)));
+      setCanvasSize(prev => (prev && prev.w === w && prev.h === h ? prev : { w, h }));
     };
-
-    const pointerToLocal = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      };
-    };
-
-    const onPointerMove = (event: PointerEvent) => {
-      const point = pointerToLocal(event);
-      state.pointer.x = point.x;
-      state.pointer.y = point.y;
-      state.pointer.inside = true;
-    };
-
-    const onPointerDown = (event: PointerEvent) => {
-      canvas.setPointerCapture(event.pointerId);
-      const point = pointerToLocal(event);
-      state.pointer.x = point.x;
-      state.pointer.y = point.y;
-      state.pointer.inside = true;
-      state.pointer.down = true;
-      spawn(state, 18, point);
-    };
-
-    const onPointerUp = () => {
-      state.pointer.down = false;
-    };
-
-    const onPointerLeave = () => {
-      state.pointer.inside = false;
-      state.pointer.down = false;
-    };
-
-    const tick = () => {
-      frame = requestAnimationFrame(tick);
-      state.time += reduceMotion ? 0.008 : 0.016;
-      const { width: w, height: h } = state;
-      const palette = PALETTES[state.paletteIndex];
-      const idleX = w * 0.5 + Math.cos(state.time * 0.55) * Math.min(w, h) * 0.08;
-      const idleY = h * 0.5 + Math.sin(state.time * 0.42) * Math.min(w, h) * 0.06;
-      const targetX = state.pointer.inside ? state.pointer.x : idleX;
-      const targetY = state.pointer.inside ? state.pointer.y : idleY;
-      const cx = w * 0.5;
-      const cy = h * 0.5;
-
-      if (state.pointer.down && !reduceMotion) spawn(state, 3, state.pointer);
-
-      for (const particle of state.particles) {
-        const seatX = targetX + Math.cos(state.time * particle.spin + particle.phase) * particle.orbit;
-        const seatY = targetY + Math.sin(state.time * particle.spin + particle.phase) * particle.orbit * 0.82;
-        particle.vx += (seatX - particle.x) * (state.pointer.down ? 0.045 : 0.02);
-        particle.vy += (seatY - particle.y) * (state.pointer.down ? 0.045 : 0.02);
-        particle.vx += -(particle.y - cy) * 0.00018;
-        particle.vy += (particle.x - cx) * 0.00018;
-        particle.vx *= 0.9;
-        particle.vy *= 0.9;
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-      }
-
-      ctx.globalAlpha = reduceMotion ? 0.2 : 0.055;
-      ctx.fillStyle = palette.bg;
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalAlpha = 1;
-
-      const foldsCount = state.folds;
-      ctx.lineCap = "round";
-      for (const particle of state.particles) {
-        const color = palette.tones[particle.tone];
-        for (let i = 0; i < foldsCount; i += 1) {
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate((Math.PI * 2 * i) / foldsCount);
-          if (i % 2 === 1) ctx.scale(1, -1);
-          ctx.translate(-cx, -cy);
-          ctx.fillStyle = color;
-          ctx.globalAlpha = 0.22;
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size * 2.4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 0.95;
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = color;
-          ctx.globalAlpha = 0.7;
-          ctx.lineWidth = Math.max(1.4, particle.size * 0.55);
-          ctx.beginPath();
-          ctx.moveTo(particle.x, particle.y);
-          ctx.lineTo(particle.x - particle.vx * 8, particle.y - particle.vy * 8);
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-      ctx.globalAlpha = 1;
-    };
-
     fit();
     const observer = new ResizeObserver(fit);
-    observer.observe(wrap);
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointerup", onPointerUp);
-    canvas.addEventListener("pointercancel", onPointerUp);
-    canvas.addEventListener("pointerleave", onPointerLeave);
-    frame = requestAnimationFrame(tick);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [canvasSize]);
 
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointerup", onPointerUp);
-      canvas.removeEventListener("pointercancel", onPointerUp);
-      canvas.removeEventListener("pointerleave", onPointerLeave);
-    };
+  useEffect(() => {
+    if (canvasSize) redraw();
+  }, [canvasSize, redraw]);
+
+  useEffect(() => () => {
+    physicsRef.current?.stop();
+    stopReplayRef.current?.();
   }, []);
 
+  const toPoint = (clientX: number, clientY: number, pressure: number, pointerType: string): Point => {
+    const rect = liveRef.current!.getBoundingClientRect();
+    return {
+      x: Math.round((clientX - rect.left) * 10) / 10,
+      y: Math.round((clientY - rect.top) * 10) / 10,
+      p: pointerType === "pen" ? pressure || 0.5 : 0.5,
+    };
+  };
+  const point = (event: React.PointerEvent) => toPoint(event.clientX, event.clientY, event.pressure, event.pointerType);
+
+  const commit = (op: PaintOp) => {
+    opsRef.current = [...opsRef.current, op];
+    redoRef.current = [];
+    bump();
+  };
+
+  // ---------- Drawing ----------
+  const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (mode !== "draw") return;
+    setMenu(null);
+    const { base, live } = contexts();
+    if (!base || !live) return;
+    const p = point(event);
+    const secondary = event.button === 2;
+    const color = secondary ? bg : fg;
+
+    if (tool === "picker") {
+      const [r, g, b] = base.getImageData(Math.floor(p.x * dpr), Math.floor(p.y * dpr), 1, 1).data;
+      const hex = `#${[r, g, b].map(v => v.toString(16).padStart(2, "0")).join("")}`;
+      if (secondary) setBg(hex);
+      else setFg(hex);
+      return;
+    }
+    if (tool === "fill") {
+      floodFill(base, p.x, p.y, color, dpr);
+      commit({ kind: "fill", x: p.x, y: p.y, color });
+      return;
+    }
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (tool === "line" || tool === "rect" || tool === "ellipse" || tool === "roundrect") {
+      currentRef.current = {
+        op: { kind: "shape", shape: tool, color, fillColor: secondary ? fg : bg, fill: shapeFill, size: SIZES[size - 1], x0: p.x, y0: p.y, x1: p.x, y1: p.y },
+        drawn: 0,
+      };
+      return;
+    }
+    const op: StrokeOp = {
+      kind: "stroke",
+      tool,
+      style: tool === "brush" ? brushStyle : "smooth",
+      color: tool === "eraser" ? bg : color,
+      size: tool === "airbrush" ? [3, 5, 8][Math.min(2, Math.floor((size - 1) / 2))] : SIZES[size - 1],
+      seed: nextSeed(),
+      simulatePressure: event.pointerType !== "pen",
+      points: [p],
+    };
+    currentRef.current = { op, drawn: 0 };
+    renderLive();
+  };
+
+  const renderLive = () => {
+    const current = currentRef.current;
+    const live = liveRef.current?.getContext("2d");
+    if (!current || !live) return;
+    const { op } = current;
+    const incremental = op.kind === "stroke" && (op.tool === "airbrush" || (op.tool === "brush" && op.style !== "smooth"));
+    if (!incremental) live.clearRect(0, 0, live.canvas.width / dpr, live.canvas.height / dpr);
+    if (op.kind === "shape") drawShape(live, op);
+    else if (incremental) {
+      drawStroke(live, op, op.points.length, current.drawn);
+      current.drawn = op.points.length;
+    } else drawStroke(live, op);
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const p = point(event);
+    setCoords(`${Math.round(p.x)}, ${Math.round(p.y)}`);
+    const current = currentRef.current;
+    if (!current || mode !== "draw") return;
+    if (current.op.kind === "shape") {
+      let { x, y } = p;
+      if (event.shiftKey) {
+        // Shift: perfect squares/circles and 45° lines, as in Paint.
+        const dx = x - current.op.x0;
+        const dy = y - current.op.y0;
+        const d = Math.max(Math.abs(dx), Math.abs(dy));
+        x = current.op.x0 + Math.sign(dx || 1) * d;
+        y = current.op.y0 + Math.sign(dy || 1) * d;
+      }
+      current.op = { ...current.op, x1: x, y1: y };
+    } else {
+      const native = event.nativeEvent;
+      const events = typeof native.getCoalescedEvents === "function" ? native.getCoalescedEvents() : [];
+      const list = events.length ? events.map(e => toPoint(e.clientX, e.clientY, e.pressure, e.pointerType)) : [p];
+      current.op.points.push(...list);
+    }
+    renderLive();
+  };
+
+  const onPointerUp = () => {
+    const current = currentRef.current;
+    currentRef.current = null;
+    if (!current) return;
+    const { base, live } = contexts();
+    if (!base || !live) return;
+    const { op } = current;
+    if (op.kind === "shape") {
+      if (op.x0 === op.x1 && op.y0 === op.y1) {
+        live.clearRect(0, 0, live.canvas.width / dpr, live.canvas.height / dpr);
+        return;
+      }
+      drawShape(base, op);
+    } else if (op.tool === "airbrush" || (op.tool === "brush" && op.style !== "smooth")) {
+      // Procedural strokes: copy the exact live pixels.
+      base.save();
+      base.setTransform(1, 0, 0, 1, 0, 0);
+      base.drawImage(live.canvas, 0, 0);
+      base.restore();
+    } else drawStroke(base, op);
+    live.clearRect(0, 0, live.canvas.width / dpr, live.canvas.height / dpr);
+    commit(op);
+  };
+
+  // ---------- Commands ----------
+  const undo = useCallback(() => {
+    if (mode !== "draw" || !opsRef.current.length) return;
+    redoRef.current = [...redoRef.current, opsRef.current.at(-1)!];
+    opsRef.current = opsRef.current.slice(0, -1);
+    redraw();
+    bump();
+  }, [mode, redraw]);
+
+  const redo = useCallback(() => {
+    if (mode !== "draw" || !redoRef.current.length) return;
+    opsRef.current = [...opsRef.current, redoRef.current.at(-1)!];
+    redoRef.current = redoRef.current.slice(0, -1);
+    redraw();
+    bump();
+  }, [mode, redraw]);
+
+  const stopEffects = () => {
+    physicsRef.current?.stop();
+    physicsRef.current = null;
+    stopReplayRef.current?.();
+    stopReplayRef.current = null;
+    setMode("draw");
+  };
+
+  const clearAll = () => {
+    stopEffects();
+    opsRef.current = [];
+    redoRef.current = [];
+    redraw();
+    bump();
+  };
+
+  const toggleLife = () => {
+    xpSound.click();
+    setMenu(null);
+    if (mode === "physics") {
+      stopEffects();
+      redraw();
+      return;
+    }
+    if (!hasOps || !baseRef.current || !canvasSize) return;
+    stopEffects();
+    physicsRef.current = startPhysics(baseRef.current, opsRef.current, canvasSize.w, canvasSize.h, dpr);
+    setMode("physics");
+  };
+
+  const runTimelapse = () => {
+    xpSound.click();
+    setMenu(null);
+    const { base, live } = contexts();
+    if (!hasOps || !base || !live) return;
+    stopEffects();
+    redraw();
+    setMode("timelapse");
+    stopReplayRef.current = playTimelapse(base, live, opsRef.current, dpr, () => {
+      stopReplayRef.current = null;
+      redraw();
+      setMode("draw");
+    });
+  };
+
+  const saveGif = async () => {
+    xpSound.click();
+    setMenu(null);
+    if (!hasOps || !canvasSize) return;
+    stopEffects();
+    redraw();
+    setMode("exporting");
+    try {
+      const blob = await exportTimelapseGif(opsRef.current, canvasSize.w, canvasSize.h);
+      const url = URL.createObjectURL(blob);
+      download(url, "risunok-timelapse.gif");
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showBalloon("Таймлапс сохранён", "GIF с процессом рисования скачан.");
+    } catch {
+      showBalloon("Не удалось сохранить GIF", "Попробуйте ещё раз.");
+    } finally {
+      setMode("draw");
+    }
+  };
+
+  const savePng = () => {
+    xpSound.click();
+    setMenu(null);
+    if (baseRef.current) download(snapshot(baseRef.current, "image/png", 1, 3200), "risunok.png");
+  };
+
+  const toWallpaper = () => {
+    xpSound.click();
+    setMenu(null);
+    if (!baseRef.current) return;
+    try {
+      setWallpaper(snapshot(baseRef.current, "image/jpeg", 0.85, 1600));
+      showBalloon("Фоновый рисунок", "Рисунок теперь на рабочем столе.");
+    } catch {
+      showBalloon("Не удалось сохранить", "Рисунок не поместился в браузер.");
+    }
+  };
+
+  useEffect(() => {
+    if (activeWindowId !== "paint") return;
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLowerCase();
+      if (key === "z" && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+      } else if (key === "y" || (key === "z" && event.shiftKey)) {
+        event.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeWindowId, undo, redo]);
+
+  // ---------- UI ----------
+  const busy = mode === "timelapse" || mode === "exporting";
+  const toolInfo = TOOLS.find(t => t.id === tool)!;
+  const status =
+    mode === "physics"
+      ? "Рисунок ожил: хватайте и бросайте его мышью. «Остановить» вернёт всё на место."
+      : mode === "timelapse"
+        ? "Воспроизведение таймлапса…"
+        : mode === "exporting"
+          ? "Создаю GIF…"
+          : !hasOps
+            ? "Нарисуйте что-нибудь, а потом нажмите «Ожить» или «Таймлапс»."
+            : tool === "brush"
+              ? `Кисть «${BRUSHES.find(b => b.id === brushStyle)!.label}». ${toolInfo.hint}`
+              : toolInfo.hint;
+
+  type Command = "new" | "png" | "gif" | "wallpaper" | "undo" | "redo" | "clear" | "life" | "timelapse" | "about";
+  const menuItems: Record<Exclude<Menu, null>, Array<{ id: Command; label: string; shortcut?: string; disabled?: boolean } | "sep">> = {
+    file: [
+      { id: "new", label: "Создать" },
+      "sep",
+      { id: "png", label: "Сохранить как PNG…" },
+      { id: "gif", label: "Сохранить таймлапс (GIF)…", disabled: !hasOps },
+      "sep",
+      { id: "wallpaper", label: "Сделать фоновым рисунком рабочего стола" },
+    ],
+    edit: [
+      { id: "undo", label: "Отменить", shortcut: "Ctrl+Z", disabled: !hasOps },
+      { id: "redo", label: "Повторить", shortcut: "Ctrl+Y", disabled: !canRedo },
+      "sep",
+      { id: "clear", label: "Очистить рисунок" },
+    ],
+    image: [
+      { id: "life", label: mode === "physics" ? "Остановить" : "Ожить", disabled: !hasOps },
+      { id: "timelapse", label: "Таймлапс", disabled: !hasOps },
+    ],
+    help: [{ id: "about", label: "О программе Paint" }],
+  };
+
+  const runCommand = (command: Command) => {
+    setMenu(null);
+    switch (command) {
+      case "new":
+      case "clear":
+        xpSound.click();
+        clearAll();
+        break;
+      case "png":
+        savePng();
+        break;
+      case "gif":
+        void saveGif();
+        break;
+      case "wallpaper":
+        toWallpaper();
+        break;
+      case "undo":
+        undo();
+        break;
+      case "redo":
+        redo();
+        break;
+      case "life":
+        toggleLife();
+        break;
+      case "timelapse":
+        runTimelapse();
+        break;
+      case "about":
+        showBalloon("Paint", "Кисти Harmony, перо perfect-freehand, физика matter-js и таймлапс в GIF.");
+        break;
+    }
+  };
+
   return (
-    <div className="flex h-full flex-col bg-[#ece9d8] text-xs text-slate-800 select-none">
-      <div className="xp-toolbar flex-shrink-0">
-          {FOLDS.map((value) => (
+    <div className={styles.paint} onPointerDown={event => { if (!(event.target as HTMLElement).closest("[data-menu]")) setMenu(null); }}>
+      <nav className={styles.menuBar} aria-label="Меню Paint">
+        {([["file", "Файл"], ["edit", "Правка"], ["image", "Рисунок"], ["help", "Справка"]] as Array<[Exclude<Menu, null>, string]>).map(([id, label]) => (
+          <div key={id} className={styles.menuRoot} data-menu>
             <button
-              key={value}
               type="button"
-              className="xp-toolbar-btn min-w-7 justify-center font-mono text-[11px]"
-              aria-pressed={folds === value}
-              onClick={() => {
-                xpSound.click();
-                applyFolds(value);
-              }}
-              style={{
-                cursor: xpCursors.pointer,
-                background: folds === value ? "#fff" : undefined,
-                borderColor: folds === value ? "#7a9eb5" : undefined,
-              }}
-              title={`${value} осей`}
+              className={menu === id ? styles.menuOpen : ""}
+              onClick={() => setMenu(menu === id ? null : id)}
+              onMouseEnter={() => menu && setMenu(id)}
             >
-              {value}
+              <u>{label[0]}</u>{label.slice(1)}
             </button>
-          ))}
+            {menu === id && (
+              <div className={styles.menuList} role="menu">
+                {menuItems[id].map((item, index) =>
+                  item === "sep" ? (
+                    <hr key={index} />
+                  ) : (
+                    <button key={item.id} type="button" role="menuitem" disabled={item.disabled || busy} onClick={() => runCommand(item.id)}>
+                      <span>{item.label}</span>
+                      {item.shortcut && <kbd>{item.shortcut}</kbd>}
+                    </button>
+                  ),
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </nav>
 
-          <div className="xp-toolbar-sep" />
+      <div className={styles.toolbar}>
+        <button type="button" className={styles.toolbarButton} onClick={undo} disabled={!hasOps || mode !== "draw"} title="Отменить (Ctrl+Z)">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 2 7l4 4" /><path d="M2.5 7H10a4 4 0 0 1 0 8H8" /></svg>
+          Отменить
+        </button>
+        <button type="button" className={styles.toolbarButton} onClick={redo} disabled={!canRedo || mode !== "draw"} title="Повторить (Ctrl+Y)">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3 4 4-4 4" /><path d="M13.5 7H6a4 4 0 0 0 0 8h2" /></svg>
+        </button>
+        <span className={styles.separator} />
+        <button type="button" className={`${styles.toolbarButton} ${styles.magic} ${mode === "physics" ? styles.pressed : ""}`} onClick={toggleLife} disabled={!hasOps || busy}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="5" cy="11" r="3" /><path d="M9.5 2.5l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" /></svg>
+          {mode === "physics" ? "Остановить" : "Ожить"}
+        </button>
+        <button type="button" className={`${styles.toolbarButton} ${mode === "timelapse" ? styles.pressed : ""}`} onClick={runTimelapse} disabled={!hasOps || busy}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" /><path d="M6.5 5.5v5l4-2.5z" /></svg>
+          Таймлапс
+        </button>
+        <button type="button" className={styles.toolbarButton} onClick={saveGif} disabled={!hasOps || busy}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" /></svg>
+          {mode === "exporting" ? "Создаю…" : "GIF"}
+        </button>
+        <span className={styles.separator} />
+        <button type="button" className={styles.toolbarButton} onClick={toWallpaper} disabled={busy} data-ym-goal="paint_set_wallpaper">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" /><path d="M5 14.5h6M8 11.5v3" /></svg>
+          На рабочий стол
+        </button>
+      </div>
 
-          {PALETTES.map((palette, index) => (
+      <div className={styles.main}>
+        <aside className={styles.toolbox} aria-label="Инструменты">
+          <div className={styles.toolGrid}>
+            {TOOLS.map(t => (
+              <button
+                key={t.id}
+                type="button"
+                title={t.label}
+                aria-label={t.label}
+                aria-pressed={tool === t.id}
+                className={tool === t.id ? styles.toolActive : ""}
+                disabled={mode !== "draw"}
+                onClick={() => { xpSound.click(); setTool(t.id); }}
+              >
+                <ToolIcon tool={t.id} />
+              </button>
+            ))}
+          </div>
+          <div className={styles.optionBox}>
+            {tool === "brush" &&
+              BRUSHES.map(b => (
+                <button key={b.id} type="button" title={b.label} aria-label={`Стиль кисти: ${b.label}`} className={brushStyle === b.id ? styles.optionActive : ""} onClick={() => { xpSound.click(); setBrushStyle(b.id); }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={previews[b.id]} alt="" width={52} height={14} />
+                </button>
+              ))}
+            {(tool === "rect" || tool === "ellipse" || tool === "roundrect") &&
+              FILLS.map(fill => (
+                <button key={fill} type="button" aria-label={{ outline: "Только контур", both: "Контур и заливка", fill: "Только заливка" }[fill]} className={shapeFill === fill ? styles.optionActive : ""} onClick={() => setShapeFill(fill)}>
+                  <span className={`${styles.fillSample} ${styles[`fill_${fill}`]}`} />
+                </button>
+              ))}
+            {(tool === "pencil" || tool === "eraser" || tool === "line" || tool === "airbrush" || (tool === "brush" && brushStyle === "smooth") || tool === "rect" || tool === "ellipse" || tool === "roundrect") && (
+              <div className={styles.sizes}>
+                {SIZES.map((s, i) => (
+                  <button key={s} type="button" aria-label={`Толщина ${s}`} className={size === i + 1 ? styles.optionActive : ""} onClick={() => setSize(i + 1)}>
+                    <i style={{ height: Math.max(1, Math.round(s * 0.75)) }} />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <div ref={workspaceRef} className={styles.workspace}>
+          {canvasSize && (
+            <div className={styles.canvasWrap} style={{ width: canvasSize.w, height: canvasSize.h }}>
+              <canvas ref={baseRef} width={canvasSize.w * dpr} height={canvasSize.h * dpr} style={{ width: canvasSize.w, height: canvasSize.h }} className={mode === "physics" ? styles.grabbable : ""} aria-label="Холст" />
+              <canvas
+                ref={liveRef}
+                width={canvasSize.w * dpr}
+                height={canvasSize.h * dpr}
+                style={{ width: canvasSize.w, height: canvasSize.h, pointerEvents: mode === "physics" ? "none" : undefined }}
+                className={`${styles.live} ${styles[`cursor_${tool}`] ?? ""}`}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
+                onPointerLeave={() => setCoords("")}
+                onContextMenu={event => event.preventDefault()}
+              />
+              <i className={`${styles.handle} ${styles.handleRight}`} />
+              <i className={`${styles.handle} ${styles.handleBottom}`} />
+              <i className={`${styles.handle} ${styles.handleCorner}`} />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <footer className={styles.paletteBar}>
+        <div className={styles.current} aria-label="Текущие цвета">
+          <span className={styles.bgSwatch} style={{ background: bg }} />
+          <span className={styles.fgSwatch} style={{ background: fg }} />
+        </div>
+        <div className={styles.palette} role="listbox" aria-label="Палитра">
+          {XP_PALETTE.map(color => (
             <button
-              key={palette.bg}
+              key={color}
               type="button"
-              aria-label={`Палитра ${index + 1}`}
-              aria-pressed={paletteIndex === index}
-              onClick={() => {
-                xpSound.click();
-                applyPalette(index);
-              }}
-              className="h-5 w-5 rounded-sm border"
-              style={{
-                cursor: xpCursors.pointer,
-                background: palette.bg,
-                boxShadow: `inset 0 0 0 2px ${palette.tones[0]}`,
-                outline: paletteIndex === index ? "2px solid #316ac5" : "none",
-                outlineOffset: 1,
+              aria-label={`Цвет ${color}`}
+              style={{ background: color }}
+              onClick={() => setFg(color)}
+              onContextMenu={event => {
+                event.preventDefault();
+                setBg(color);
               }}
             />
           ))}
+        </div>
+      </footer>
 
-          <div className="xp-toolbar-sep" />
-
-          <button
-            type="button"
-            className="xp-toolbar-btn"
-            onClick={reshuffle}
-            style={{ cursor: xpCursors.pointer }}
-          >
-            Ещё
-          </button>
-          <button
-            type="button"
-            className="xp-toolbar-btn"
-            onClick={handleDownload}
-            style={{ cursor: xpCursors.pointer }}
-            title="Скачать кадр"
-          >
-            PNG
-          </button>
-          <button
-            type="button"
-            onClick={handleWallpaper}
-            className="ml-auto rounded-sm border border-[#003c9f] bg-[#245edc] px-2.5 py-0.5 font-semibold text-white hover:bg-[#1f4fc0]"
-            style={{ cursor: xpCursors.pointer }}
-            data-ym-goal="paint_set_wallpaper"
-          >
-            На стол
-          </button>
-      </div>
-
-      <div ref={wrapRef} className="relative min-h-0 flex-1 overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          className="block h-full w-full touch-none"
-          style={{ cursor: "crosshair" }}
-        />
+      <div className={styles.statusBar}>
+        <span>{status}</span>
+        <span className={styles.statusCell}>{coords}</span>
+        <span className={styles.statusCell}>{canvasSize ? `${canvasSize.w}×${canvasSize.h}` : ""}</span>
       </div>
     </div>
   );

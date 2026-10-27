@@ -28,8 +28,8 @@ export interface MinesweeperWindowBounds {
 export const MINESWEEPER_WINDOW_PRESETS: Record<DifficultyLevel, { width: number; height: number }> = {
   sprint: { width: 420, height: 550 },
   beginner: { width: 460, height: 590 },
-  intermediate: { width: 640, height: 720 },
-  expert: { width: 1020, height: 730 },
+  intermediate: { width: 660, height: 840 },
+  expert: { width: 1040, height: 840 },
 };
 
 export function getMinesweeperWindowBounds(

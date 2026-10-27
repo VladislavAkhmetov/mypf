@@ -5,7 +5,8 @@ import { motion } from "motion/react";
 import { GameState, chordCell, revealCell, toggleFlagCell } from "@/lib/xp/minesweeper-game";
 import { gameSound } from "@/lib/xp/games/game-sound";
 import { EffectsCanvas, EffectsCanvasHandle } from "./effects-canvas";
-import { PulseCell } from "./pulse-cell";
+import { MeadowCell, type CellEdges } from "./meadow-cell";
+import { ART, fringeTexture, grassTexture, hedgeTexture, soilTexture, spriteUrl } from "./pixel-art";
 import styles from "./minesweeper.module.css";
 
 interface MinesweeperBoardProps {
@@ -16,10 +17,11 @@ interface MinesweeperBoardProps {
   effectsMode?: "full" | "reduced";
 }
 
-function ModeIcon({ flag = false }: { flag?: boolean }) {
-  return flag
-    ? <svg viewBox="0 0 24 24"><path d="M7 21V4m0 1h10l-3 4 3 4H7M4 21h7"/></svg>
-    : <svg viewBox="0 0 24 24"><path d="m14 5 5 5M12 7l5 5M6 21l6-6M4 17l3 3 10-10-3-3L4 17Z"/></svg>;
+const ZOOM_STEPS = [1, 0.82, 0.68];
+
+/** Snap to whole art pixels so every sprite pixel has the same on-screen size. */
+function snapCell(size: number) {
+  return Math.max(ART * 2, Math.floor(size / ART) * ART);
 }
 
 export function MinesweeperBoard({
@@ -45,70 +47,47 @@ export function MinesweeperBoard({
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
 
   const reducedMotion = effectsMode === "reduced" || systemReducedMotion;
-  const cols = state.config.cols;
-  const rows = state.config.rows;
+  const { cols, rows } = state.config;
   const isLargeBoard = cols >= 16;
-  const gap = 4;
 
-  // Track viewport container size to calculate responsive cell size
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
-    const updateSize = () => {
-      setViewportSize({
-        width: el.clientWidth,
-        height: el.clientHeight,
-      });
-    };
-    updateSize();
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) {
-        setViewportSize({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
+    const update = () => setViewportSize({ width: el.clientWidth, height: el.clientHeight });
+    update();
+    const observer = new ResizeObserver(update);
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-
-
   const baseCellSize = useMemo(() => {
-    if (!viewportSize || viewportSize.width <= 0 || viewportSize.height <= 0) {
-      return isLargeBoard ? (cols >= 30 ? 28 : 30) : 36;
-    }
-
-    // GridFrame has 9px padding and 1px border on each side = 20px total
-    // ContentRect of viewport already excludes viewport padding (13px * 2)
-    // We deduct 24px for grid frame padding/border and subpixel margin
-    const availW = Math.max(0, viewportSize.width - 24);
-    const availH = Math.max(0, viewportSize.height - 24);
-
-    const maxWCell = Math.floor((availW - (cols - 1) * gap) / cols);
-    const maxHCell = Math.floor((availH - (rows - 1) * gap) / rows);
-    const fitCell = Math.min(maxWCell, maxHCell);
-
-    // Upper limit per board configuration
-    const maxLimit = cols >= 30 ? 30 : cols >= 16 ? 34 : 40;
-    // Lower limit so cell remains playable even on small screens
-    const minLimit = 16;
-
-    if (fitCell < minLimit) return minLimit;
-    return Math.min(maxLimit, fitCell);
+    if (!viewportSize || viewportSize.width <= 0 || viewportSize.height <= 0) return isLargeBoard ? 30 : 40;
+    // The hedge frame is half a cell thick on each side: one extra cell per axis.
+    const fit = Math.min((viewportSize.width - 24) / (cols + 1), (viewportSize.height - 24) / (rows + 1));
+    const maxLimit = cols >= 30 ? 30 : cols >= 16 ? 40 : 50;
+    return Math.min(maxLimit, snapCell(fit));
   }, [viewportSize, cols, rows, isLargeBoard]);
 
-  const cellSize = Math.round(baseCellSize * zoomScale);
-  const totalGridWidth = cols * cellSize + (cols - 1) * gap + 24;
-  const hasOverflow = viewportSize ? totalGridWidth > viewportSize.width : false;
+  const cellSize = zoomScale === 1 ? baseCellSize : snapCell(baseCellSize * zoomScale);
+  const pixel = cellSize / ART;
+  const framePad = cellSize / 2;
+  const totalGridWidth = cols * cellSize + framePad * 2;
+  const hasOverflow = viewportSize ? totalGridWidth > viewportSize.width - 24 : false;
 
-  const openedSafeCells = useMemo(
-    () => state.grid.flat().filter((cell) => cell.isOpen && !cell.isMine).length,
-    [state.grid],
+  const textures = useMemo(
+    () =>
+      ({
+        "--tex-grass": grassTexture(),
+        "--tex-soil": soilTexture(),
+        "--tex-fringe": fringeTexture(),
+        "--tex-hedge": hedgeTexture(),
+        "--sprite-brackets": spriteUrl("brackets"),
+      }) as React.CSSProperties,
+    [],
   );
-  const totalSafeCells = state.config.rows * state.config.cols - state.config.mines;
+
+  const openedSafeCells = useMemo(() => state.grid.flat().filter(cell => cell.isOpen && !cell.isMine).length, [state.grid]);
+  const totalSafeCells = rows * cols - state.config.mines;
   const progress = totalSafeCells ? Math.round((openedSafeCells / totalSafeCells) * 100) : 0;
 
   useEffect(() => {
@@ -119,10 +98,18 @@ export function MinesweeperBoard({
     return () => media.removeEventListener("change", update);
   }, []);
 
-  useEffect(() => () => {
-    timers.current.forEach(clearTimeout);
-    canvasRef.current?.clear();
-  }, []);
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+      canvasRef.current?.clear();
+    },
+    [],
+  );
+
+  const isClosed = (row: number, col: number) => {
+    const cell = state.grid[row]?.[col];
+    return Boolean(cell && !cell.isOpen);
+  };
 
   const cellCenter = (row: number, col: number) => {
     const cell = gridRef.current?.querySelector(`[data-cell="${row},${col}"]`);
@@ -135,19 +122,26 @@ export function MinesweeperBoard({
   const explode = (row: number, col: number) => {
     gameSound.explosion();
     if (reducedMotion) return;
-    setShakeKey((key) => key + 1);
+    setShakeKey(key => key + 1);
     const point = cellCenter(row, col);
     if (point) canvasRef.current?.emitExplosion(point.x, point.y);
   };
 
+  const celebrate = () => {
+    gameSound.minesweeperVictory();
+    if (reducedMotion || !gridRef.current) return;
+    const { width, height } = gridRef.current.getBoundingClientRect();
+    canvasRef.current?.emitVictoryBurst(width / 2, height / 2);
+  };
+
   const revealWave = (wave: Array<{ row: number; col: number; dist: number }>) => {
-    gameSound.cascadeWave(1);
+    gameSound.cascadeWave(Math.max(...wave.map(cell => cell.dist)));
     if (reducedMotion) return;
     const groups = new Map<number, Array<{ row: number; col: number }>>();
     wave.forEach(({ row, col, dist }) => groups.set(dist, [...(groups.get(dist) ?? []), { row, col }]));
     groups.forEach((cells, distance) => {
       const timer = setTimeout(() => {
-        cells.slice(0, 4).forEach(({ row, col }) => {
+        cells.slice(0, 3).forEach(({ row, col }) => {
           const point = cellCenter(row, col);
           if (point) canvasRef.current?.emitWaveRipple(point.x, point.y);
         });
@@ -160,7 +154,8 @@ export function MinesweeperBoard({
     event?.preventDefault();
     const cell = state.grid[row][col];
     if (cell.isOpen || state.status === "lost" || state.status === "won") return;
-    gameSound.flagPop();
+    if (cell.isFlagged) gameSound.flagRemove();
+    else gameSound.flagPop();
     const next = toggleFlagCell(state, row, col, allowQuestionMarks);
     if (!cell.isFlagged && !reducedMotion) {
       const point = cellCenter(row, col);
@@ -181,33 +176,43 @@ export function MinesweeperBoard({
       if (next === state) return;
       gameSound.chordSound();
       if (next.status === "lost") explode(next.lastEvent?.centerRow ?? row, next.lastEvent?.centerCol ?? col);
-      if (next.status === "won") gameSound.minesweeperVictory();
+      if (next.status === "won") celebrate();
       onApplyState(next);
       return;
     }
     if (cell.isOpen || cell.isFlagged) return;
-    gameSound.cellClick();
     const next = revealCell(state, row, col);
     if (next.status === "lost") explode(row, col);
     else if (next.revealedWave && next.revealedWave.length > 1) revealWave(next.revealedWave);
-    if (next.status === "won") gameSound.minesweeperVictory();
+    else gameSound.cellClick();
+    if (next.status === "won") celebrate();
     onApplyState(next);
   };
 
+  const selectMode = (mode: "reveal" | "flag") => {
+    gameSound.uiBlip();
+    setTouchMode(mode);
+  };
+
   return (
-    <div className={styles.board}>
-      <div className={styles.progress} title={`Поле очищено на ${progress}%`}><i style={{ width: `${progress}%` }} /></div>
+    <div className={styles.board} style={{ "--px": `${pixel}px` } as React.CSSProperties}>
+      <div className={styles.progress} title={`Поле очищено на ${progress}%`} aria-hidden="true">
+        <i style={{ width: `${progress}%` }} />
+      </div>
       {isLargeBoard && (
         <div className={styles.zoomBar}>
           <span>
-            {cols}×{rows} {hasOverflow ? "· прокручивайте поле" : "· масштаб"}
+            {cols}×{rows} {hasOverflow ? "· листайте поле" : "· масштаб"}
           </span>
           <div className={styles.zoomButtons}>
-            {[1, 0.82, 0.68].map((scale) => (
+            {ZOOM_STEPS.map(scale => (
               <button
                 key={scale}
                 className={zoomScale === scale ? styles.zoomActive : ""}
-                onClick={() => setZoomScale(scale)}
+                onClick={() => {
+                  gameSound.uiBlip();
+                  setZoomScale(scale);
+                }}
               >
                 {Math.round(scale * 100)}%
               </button>
@@ -219,35 +224,60 @@ export function MinesweeperBoard({
       <motion.div
         ref={viewportRef}
         className={styles.viewport}
-        animate={!reducedMotion && shakeKey ? { x: [0, -3, 3, -2, 1, 0], y: [0, 1, -1, 0] } : undefined}
-        transition={{ duration: 0.18 }}
+        animate={!reducedMotion && shakeKey ? { x: [0, -pixel * 2, pixel * 2, -pixel, pixel, 0] } : undefined}
+        transition={{ duration: 0.22, ease: "linear" }}
       >
-        <div className={styles.gridFrame} ref={gridRef}>
-          <EffectsCanvas ref={canvasRef} />
-          <div className={styles.grid} style={{ gridTemplateColumns: `repeat(${state.config.cols}, ${cellSize}px)` }} role="grid" aria-label={`Поле сапёра ${state.config.cols} на ${state.config.rows}`}>
-            {state.grid.flatMap((row, rowIndex) => row.map((cell, colIndex) => (
-              <PulseCell
-                key={`${rowIndex}-${colIndex}`}
-                cell={cell}
-                cellSize={cellSize}
-                onClick={() => openCell(rowIndex, colIndex)}
-                onRightClick={(event) => toggleFlag(rowIndex, colIndex, event)}
-                onLongPress={() => toggleFlag(rowIndex, colIndex)}
-                onPointerPressStateChange={onPointerPressStateChange}
-                reducedMotion={reducedMotion}
-              />
-            )))}
+        <div className={styles.gridFrame} ref={gridRef} style={{ ...textures, padding: framePad }}>
+          <EffectsCanvas ref={canvasRef} pixel={pixel} />
+          <div
+            className={styles.grid}
+            style={{ gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`, "--cell": `${cellSize}px` } as React.CSSProperties}
+            role="grid"
+            aria-label={`Поле сапёра ${cols} на ${rows}`}
+          >
+            {state.grid.flatMap((row, rowIndex) =>
+              row.map((cell, colIndex) => {
+                const edges: CellEdges = {
+                  top: rowIndex > 0 && isClosed(rowIndex - 1, colIndex),
+                  left: colIndex > 0 && isClosed(rowIndex, colIndex - 1),
+                  right: colIndex < cols - 1 && isClosed(rowIndex, colIndex + 1),
+                  bottom: rowIndex < rows - 1 && isClosed(rowIndex + 1, colIndex),
+                };
+                return (
+                  <MeadowCell
+                    key={`${rowIndex}-${colIndex}`}
+                    cell={cell}
+                    cellSize={cellSize}
+                    edges={edges}
+                    onClick={() => openCell(rowIndex, colIndex)}
+                    onRightClick={event => toggleFlag(rowIndex, colIndex, event)}
+                    onLongPress={() => toggleFlag(rowIndex, colIndex)}
+                    onPointerPressStateChange={onPointerPressStateChange}
+                    reducedMotion={reducedMotion}
+                  />
+                );
+              }),
+            )}
           </div>
         </div>
       </motion.div>
 
       <footer className={styles.controlDock}>
-        <span className={styles.modeLabel}>Режим касания</span>
-        <div className={styles.modeSwitch}>
-          <button className={touchMode === "reveal" ? styles.revealActive : ""} onClick={() => setTouchMode("reveal")} aria-pressed={touchMode === "reveal"}><ModeIcon /><span>Открывать</span></button>
-          <button className={touchMode === "flag" ? styles.flagActive : ""} onClick={() => setTouchMode("flag")} aria-pressed={touchMode === "flag"}><ModeIcon flag /><span>Флаг</span></button>
+        <div className={styles.modeSwitch} role="group" aria-label="Режим касания">
+          <button className={touchMode === "reveal" ? styles.modeActive : ""} onClick={() => selectMode("reveal")} aria-pressed={touchMode === "reveal"}>
+            <span className={styles.icon} style={{ backgroundImage: spriteUrl("shovel") }} aria-hidden="true" />
+            <span>Копать</span>
+          </button>
+          <button className={touchMode === "flag" ? styles.modeActive : ""} onClick={() => selectMode("flag")} aria-pressed={touchMode === "flag"}>
+            <span className={styles.icon} style={{ backgroundImage: spriteUrl("flag") }} aria-hidden="true" />
+            <span>Флаг</span>
+          </button>
         </div>
-        <span className={styles.hint}>ЛКМ — открыть · ПКМ — флаг<br />Число — открыть соседей</span>
+        <span className={styles.hint}>
+          ЛКМ копать · ПКМ флаг
+          <br />
+          Цифра: открыть соседей
+        </span>
       </footer>
     </div>
   );

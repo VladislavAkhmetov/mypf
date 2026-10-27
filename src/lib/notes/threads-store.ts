@@ -1,5 +1,11 @@
-// Threads Store & Storage Layer
-// Manages likes, comments and user interactions with local persistence and backend-ready adapter
+// Threads store: likes, comments and bookmarks for the notes feed.
+//
+// Hosting model (static bucket + Yandex Cloud Function + YDB):
+// - Seed likes/comments below are a small hand-written baseline so the feed is not empty.
+// - When NEXT_PUBLIC_THREADS_API_URL is set at build time, real likes and approved comments
+//   are fetched from the Cloud Function (see cloud/threads-api) and added on top of the seed.
+// - Without it (local dev / pure static), everything works per-browser via localStorage.
+// - Bookmarks and comment likes are always personal and stay in localStorage.
 
 export interface NoteComment {
   id: string;
@@ -11,6 +17,8 @@ export interface NoteComment {
   createdAt: string;
   likesCount: number;
   liked?: boolean;
+  /** Own comment that is waiting for moderation (visible only to its author). */
+  pending?: boolean;
 }
 
 export interface ThreadsState {
@@ -20,256 +28,252 @@ export interface ThreadsState {
   comments: Record<string, NoteComment[]>;
 }
 
-// Initial seed like counts to give an authentic Threads feel
 const SEED_LIKE_COUNTS: Record<string, number> = {
-  "portfolio-in-progress": 28,
-  "small-tools": 19,
-  "unfinished": 14,
-  "kora-process": 35,
-  "city-notes": 22,
-  "start": 41,
+  "portfolio-in-progress": 5,
+  "small-tools": 4,
+  "unfinished": 1,
+  "kora-process": 6,
+  "city-notes": 2,
+  "start": 3,
 };
 
-// Initial seed comments for notes
-const SEED_COMMENTS: Record<string, NoteComment[]> = {
-  "portfolio-in-progress": [
-    {
-      id: "c-pip-1",
-      noteId: "portfolio-in-progress",
-      authorName: "Денис Марков",
-      authorHandle: "denism",
-      text: "Очень крутой подход с показом процесса. Портфолио в виде ОС вообще пушка 🔥",
-      createdAt: "2026-09-22T13:40:00+03:00",
-      likesCount: 5,
-    },
-    {
-      id: "c-pip-2",
-      noteId: "portfolio-in-progress",
-      authorName: "Алина",
-      authorHandle: "alina_design",
-      text: "Зонт на обложке создаёт особое настроение. Ждём новые посты!",
-      createdAt: "2026-09-22T15:10:00+03:00",
-      likesCount: 2,
-    },
-  ],
-  "kora-process": [
-    {
-      id: "c-kora-1",
-      noteId: "kora-process",
-      authorName: "Михаил Ч.",
-      authorHandle: "mch",
-      text: "Шрифтовая пластика просто восторг. Особенно в крупном кегле.",
-      createdAt: "2026-09-09T14:30:00+03:00",
-      likesCount: 8,
-    },
-  ],
-  "city-notes": [
-    {
-      id: "c-city-1",
-      noteId: "city-notes",
-      authorName: "Артур",
-      authorHandle: "arthur_v",
-      text: "Ереван по типографике — это отдельный музей под открытым небом.",
-      createdAt: "2026-09-04T20:15:00+03:00",
-      likesCount: 4,
-    },
-  ],
-};
+const SEED_COMMENTS: NoteComment[] = [
+  {
+    id: "seed-pip-1",
+    noteId: "portfolio-in-progress",
+    authorName: "Дима",
+    text: "Залип в сапёра минут на двадцать. Кейсы посмотрю завтра, честно.",
+    createdAt: "2026-09-22T13:40:00+03:00",
+    likesCount: 2,
+  },
+  {
+    id: "seed-kora-1",
+    noteId: "kora-process",
+    authorName: "Лена",
+    text: "А Кору где-нибудь можно потрогать? Хочется набрать пару строк самой.",
+    createdAt: "2026-09-09T14:30:00+03:00",
+    likesCount: 1,
+  },
+];
 
-const STORAGE_KEY = "amazi-threads-v2";
-// Legacy key to maintain compatibility with existing tests
+export const THREADS_API_URL = (process.env.NEXT_PUBLIC_THREADS_API_URL || "").trim();
+export const isThreadsApiEnabled = THREADS_API_URL.length > 0;
+
+const STORAGE_KEY = "amazi-threads-v3";
+const PREVIOUS_STORAGE_KEY = "amazi-threads-v2";
+// Legacy key kept in sync for older builds and tests.
 const LEGACY_STORAGE_KEY = "amazi-notes-marks-v1";
 
-function readInitialState(): ThreadsState {
-  if (typeof window === "undefined") {
-    return {
-      likedNoteIds: [],
-      noteLikeCounts: { ...SEED_LIKE_COUNTS },
-      savedNoteIds: [],
-      comments: { ...SEED_COMMENTS },
-    };
-  }
+type LocalState = {
+  likedNoteIds: string[];
+  savedNoteIds: string[];
+  likedCommentIds: string[];
+  ownComments: NoteComment[];
+};
 
+const emptyLocal = (): LocalState => ({ likedNoteIds: [], savedNoteIds: [], likedCommentIds: [], ownComments: [] });
+
+function readStrings(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function readJson(key: string): Record<string, unknown> {
   try {
-    let legacyLiked: string[] = [];
-    let legacySaved: string[] = [];
-    try {
-      const leg = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || "{}");
-      if (Array.isArray(leg?.liked)) legacyLiked = leg.liked;
-      if (Array.isArray(leg?.saved)) legacySaved = leg.saved;
-    } catch {
-      // ignore
-    }
-
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) {
-      return {
-        likedNoteIds: legacyLiked,
-        noteLikeCounts: { ...SEED_LIKE_COUNTS },
-        savedNoteIds: legacySaved,
-        comments: { ...SEED_COMMENTS },
-      };
-    }
-
-    const parsed = JSON.parse(saved);
-    return {
-      likedNoteIds: Array.from(new Set([...(parsed.likedNoteIds || []), ...legacyLiked])),
-      noteLikeCounts: { ...SEED_LIKE_COUNTS, ...(parsed.noteLikeCounts || {}) },
-      savedNoteIds: Array.from(new Set([...(parsed.savedNoteIds || []), ...legacySaved])),
-      comments: { ...SEED_COMMENTS, ...(parsed.comments || {}) },
-    };
+    const parsed = JSON.parse(localStorage.getItem(key) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
   } catch {
-    return {
-      likedNoteIds: [],
-      noteLikeCounts: { ...SEED_LIKE_COUNTS },
-      savedNoteIds: [],
-      comments: { ...SEED_COMMENTS },
-    };
+    return {};
   }
 }
 
-export function saveState(state: ThreadsState): void {
+function readLocal(): LocalState {
+  if (typeof window === "undefined") return emptyLocal();
+  try {
+    const current = readJson(STORAGE_KEY);
+    const previous = readJson(PREVIOUS_STORAGE_KEY);
+    const legacy = readJson(LEGACY_STORAGE_KEY);
+    const ownComments = Array.isArray(current.ownComments)
+      ? (current.ownComments as NoteComment[]).filter(c => c && typeof c.id === "string" && typeof c.noteId === "string" && typeof c.text === "string")
+      : [];
+    return {
+      likedNoteIds: Array.from(new Set([...readStrings(current.likedNoteIds), ...readStrings(previous.likedNoteIds), ...readStrings(legacy.liked)])),
+      savedNoteIds: Array.from(new Set([...readStrings(current.savedNoteIds), ...readStrings(previous.savedNoteIds), ...readStrings(legacy.saved)])),
+      likedCommentIds: readStrings(current.likedCommentIds),
+      ownComments,
+    };
+  } catch {
+    return emptyLocal();
+  }
+}
+
+function writeLocal(state: LocalState): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    // sync legacy marks for backwards compatibility
-    localStorage.setItem(
-      LEGACY_STORAGE_KEY,
-      JSON.stringify({ liked: state.likedNoteIds, saved: state.savedNoteIds })
-    );
+    localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify({ liked: state.likedNoteIds, saved: state.savedNoteIds }));
   } catch (e) {
     console.warn("Could not save to localStorage", e);
   }
 }
 
+let local: LocalState = readLocal();
+let remoteLikes: Record<string, number> = {};
+let remoteComments: NoteComment[] = [];
+
+function buildState(): ThreadsState {
+  const noteLikeCounts: Record<string, number> = {};
+  const noteIds = new Set([...Object.keys(SEED_LIKE_COUNTS), ...Object.keys(remoteLikes), ...local.likedNoteIds]);
+  for (const id of noteIds) {
+    const base = (SEED_LIKE_COUNTS[id] ?? 0) + (remoteLikes[id] ?? 0);
+    // With the API, own likes are already part of the remote counter (optimistically applied).
+    noteLikeCounts[id] = base + (!isThreadsApiEnabled && local.likedNoteIds.includes(id) ? 1 : 0);
+  }
+
+  const comments: Record<string, NoteComment[]> = {};
+  const seen = new Set<string>();
+  const remoteIds = new Set(remoteComments.map(c => c.id));
+  const all = [
+    ...SEED_COMMENTS,
+    ...remoteComments,
+    // Own comments: hidden once the server returns them as approved.
+    ...local.ownComments.filter(c => !remoteIds.has(c.id)),
+  ];
+  for (const comment of all) {
+    if (seen.has(comment.id)) continue;
+    seen.add(comment.id);
+    const liked = local.likedCommentIds.includes(comment.id);
+    (comments[comment.noteId] ||= []).push({ ...comment, liked, likesCount: comment.likesCount + (liked ? 1 : 0) });
+  }
+  for (const list of Object.values(comments)) list.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+
+  return { likedNoteIds: local.likedNoteIds, savedNoteIds: local.savedNoteIds, noteLikeCounts, comments };
+}
+
 type Listener = (state: ThreadsState) => void;
 const listeners = new Set<Listener>();
+let currentState: ThreadsState = buildState();
 
-let currentState: ThreadsState = readInitialState();
+function commit(nextLocal: LocalState = local): void {
+  local = nextLocal;
+  writeLocal(local);
+  currentState = buildState();
+  for (const listener of listeners) listener(currentState);
+}
+
+/** @deprecated Kept for compatibility; state is persisted automatically. */
+export function saveState(state: ThreadsState): void {
+  commit({ ...local, likedNoteIds: state.likedNoteIds, savedNoteIds: state.savedNoteIds });
+}
+
+// ---------- Remote API (Yandex Cloud Function) ----------
+
+type RemoteComment = { id: string; note: string; author: string; body: string; created: string };
+
+async function callApi<T>(payload?: Record<string, unknown>): Promise<T> {
+  // text/plain keeps this a "simple" CORS request, so no preflight is needed.
+  const response = await fetch(THREADS_API_URL, payload
+    ? { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(payload) }
+    : { method: "GET" });
+  if (!response.ok) throw new Error(`Threads API ${response.status}`);
+  return response.json() as Promise<T>;
+}
+
+function fromRemote(comment: RemoteComment): NoteComment {
+  return { id: comment.id, noteId: comment.note, authorName: comment.author, text: comment.body, createdAt: comment.created, likesCount: 0 };
+}
+
+let syncPromise: Promise<void> | null = null;
+
+/** Loads real likes and approved comments once per page load. Safe to call repeatedly. */
+export function syncThreadsFromRemote(): Promise<void> {
+  if (!isThreadsApiEnabled || typeof window === "undefined") return Promise.resolve();
+  syncPromise ||= callApi<{ likes?: Record<string, number>; comments?: RemoteComment[] }>()
+    .then(data => {
+      remoteLikes = data.likes && typeof data.likes === "object" ? data.likes : {};
+      remoteComments = Array.isArray(data.comments) ? data.comments.map(fromRemote) : [];
+      const approved = new Set(remoteComments.map(c => c.id));
+      // Drop local copies of own comments that are now published.
+      commit({ ...local, ownComments: local.ownComments.filter(c => !approved.has(c.id)) });
+    })
+    .catch(error => {
+      console.warn("Threads API is unavailable, showing local data", error);
+    });
+  return syncPromise;
+}
+
+// ---------- Public actions ----------
 
 export function subscribeToThreadsState(listener: Listener): () => void {
   listeners.add(listener);
+  void syncThreadsFromRemote();
   return () => {
     listeners.delete(listener);
   };
 }
 
-function notify(): void {
-  for (const listener of listeners) {
-    listener(currentState);
-  }
-}
-
 export function getThreadsState(): ThreadsState {
-  if (typeof window !== "undefined" && currentState.likedNoteIds.length === 0 && currentState.savedNoteIds.length === 0) {
-    // re-read on mount if needed
-    currentState = readInitialState();
-  }
   return currentState;
 }
 
 export function toggleNoteLike(noteId: string): { isLiked: boolean; count: number } {
-  const isLiked = currentState.likedNoteIds.includes(noteId);
-  const nextLiked = isLiked
-    ? currentState.likedNoteIds.filter(id => id !== noteId)
-    : [...currentState.likedNoteIds, noteId];
-
-  const currentCount = currentState.noteLikeCounts[noteId] ?? (SEED_LIKE_COUNTS[noteId] || 0);
-  const nextCount = isLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
-
-  currentState = {
-    ...currentState,
-    likedNoteIds: nextLiked,
-    noteLikeCounts: {
-      ...currentState.noteLikeCounts,
-      [noteId]: nextCount,
-    },
-  };
-
-  saveState(currentState);
-  notify();
-  return { isLiked: !isLiked, count: nextCount };
+  const isLiked = local.likedNoteIds.includes(noteId);
+  const delta = isLiked ? -1 : 1;
+  if (isThreadsApiEnabled) {
+    remoteLikes = { ...remoteLikes, [noteId]: Math.max(0, (remoteLikes[noteId] ?? 0) + delta) };
+    void callApi<{ likes?: number }>({ action: "like", note: noteId, delta }).catch(error => {
+      console.warn("Could not sync like", error);
+    });
+  }
+  commit({
+    ...local,
+    likedNoteIds: isLiked ? local.likedNoteIds.filter(id => id !== noteId) : [...local.likedNoteIds, noteId],
+  });
+  return { isLiked: !isLiked, count: currentState.noteLikeCounts[noteId] ?? 0 };
 }
 
 export function toggleNoteSaved(noteId: string): boolean {
-  const isSaved = currentState.savedNoteIds.includes(noteId);
-  const nextSaved = isSaved
-    ? currentState.savedNoteIds.filter(id => id !== noteId)
-    : [...currentState.savedNoteIds, noteId];
-
-  currentState = {
-    ...currentState,
-    savedNoteIds: nextSaved,
-  };
-
-  saveState(currentState);
-  notify();
+  const isSaved = local.savedNoteIds.includes(noteId);
+  commit({
+    ...local,
+    savedNoteIds: isSaved ? local.savedNoteIds.filter(id => id !== noteId) : [...local.savedNoteIds, noteId],
+  });
   return !isSaved;
 }
 
-export function addComment(
-  noteId: string,
-  authorName: string,
-  text: string
-): NoteComment {
-  const cleanName = authorName.trim() || "Гость";
-  const cleanText = text.trim();
-
-  const newComment: NoteComment = {
-    id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+export function addComment(noteId: string, authorName: string, text: string): NoteComment {
+  const cleanName = authorName.trim().slice(0, 40) || "Гость";
+  const cleanText = text.trim().slice(0, 1000);
+  const comment: NoteComment = {
+    id: `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     noteId,
     authorName: cleanName,
-    authorHandle: cleanName.toLowerCase().replace(/\s+/g, "_"),
     text: cleanText,
     createdAt: new Date().toISOString(),
     likesCount: 0,
-    liked: false,
+    pending: isThreadsApiEnabled,
   };
+  commit({ ...local, ownComments: [...local.ownComments, comment] });
 
-  const existing = currentState.comments[noteId] || [];
-  currentState = {
-    ...currentState,
-    comments: {
-      ...currentState.comments,
-      [noteId]: [...existing, newComment],
-    },
-  };
-
-  saveState(currentState);
-  notify();
-  return newComment;
+  if (isThreadsApiEnabled) {
+    void callApi<{ visible?: boolean }>({ action: "comment", id: comment.id, note: noteId, author: cleanName, body: cleanText })
+      .then(result => {
+        if (result.visible) {
+          commit({ ...local, ownComments: local.ownComments.map(c => (c.id === comment.id ? { ...c, pending: false } : c)) });
+        }
+      })
+      .catch(error => {
+        console.warn("Could not send comment", error);
+      });
+  }
+  return comment;
 }
 
-export function toggleCommentLike(
-  noteId: string,
-  commentId: string
-): { isLiked: boolean; count: number } {
-  const existing = currentState.comments[noteId] || [];
-  let updatedIsLiked = false;
-  let updatedCount = 0;
-
-  const nextComments = existing.map(c => {
-    if (c.id !== commentId) return c;
-    const isLiked = !c.liked;
-    const count = isLiked ? c.likesCount + 1 : Math.max(0, c.likesCount - 1);
-    updatedIsLiked = isLiked;
-    updatedCount = count;
-    return {
-      ...c,
-      liked: isLiked,
-      likesCount: count,
-    };
+export function toggleCommentLike(noteId: string, commentId: string): { isLiked: boolean; count: number } {
+  const isLiked = local.likedCommentIds.includes(commentId);
+  commit({
+    ...local,
+    likedCommentIds: isLiked ? local.likedCommentIds.filter(id => id !== commentId) : [...local.likedCommentIds, commentId],
   });
-
-  currentState = {
-    ...currentState,
-    comments: {
-      ...currentState.comments,
-      [noteId]: nextComments,
-    },
-  };
-
-  saveState(currentState);
-  notify();
-  return { isLiked: updatedIsLiked, count: updatedCount };
+  const comment = currentState.comments[noteId]?.find(c => c.id === commentId);
+  return { isLiked: !isLiked, count: comment?.likesCount ?? 0 };
 }

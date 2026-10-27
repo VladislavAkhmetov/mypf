@@ -1,67 +1,109 @@
-.shell { --face-step: clamp(22px, 3.2cqw, 36px); --back-step: clamp(10px, 1.5cqw, 16px); position: relative; display: flex; height: 100%; min-height: 0; flex-direction: column; overflow: hidden; color: #f5f7ed; background: #315b4e; font: 15px/1.4 "Segoe UI", sans-serif; container-type: inline-size; }
-.shell button { font: inherit; }
-.shell button:focus-visible, .cardPosition:focus-visible { outline: 3px solid #f0d783; outline-offset: 4px; }
-.header { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 20px; padding: 20px 28px 16px; }
-.brand { display: flex; align-items: center; gap: 12px; }
-.brand > svg { width: 28px; height: 32px; }
-.brand > span { display: grid; gap: 2px; }
-.brand b { font-size: 24px; font-weight: 600; letter-spacing: -.045em; }
-.brand small { color: #c2d8c9; font-size: 14px; }
-.stats { display: flex; gap: 28px; }
-.stats > span { display: grid; gap: 3px; }
-.stats small { color: #c2d8c9; font-size: 13px; }
-.stats b { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1; }
-.table { flex: 1; min-height: 0; overflow: auto; padding: 18px 28px 28px; scrollbar-width: thin; scrollbar-color: #94b3a4 transparent; }
-.topRow, .tableau { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(6px, 1.8cqw, 24px); margin-inline: auto; width: min(100%, 1000px); }
+/* Solitaire — "Atelier": studio-grey backdrop, debossed slots, lacquered patterned cards,
+   Playfair Display for numerals and titles, Manrope for interface text. */
+.root {
+  --ink: #1d1a22;
+  --muted: #77727f;
+  --hair: rgba(29, 26, 34, 0.1);
+  --gold: #c9a45c;
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 80% at 50% 0%, #f1f0f3 0%, #e3e1e6 55%, #d6d3da 100%);
+}
+/* Beats the global ".xp-system *" font rule. */
+.root.root, .root.root * { font-family: var(--font-ui), "Segoe UI", sans-serif; }
+.root.root .display, .root.root .display * { font-family: var(--font-display), Georgia, serif; }
+
+.shell { --face-step: clamp(24px, 4.4cqw, 46px); --back-step: clamp(8px, 1.2cqw, 13px); --gap: clamp(8px, 1.8cqw, 22px); position: relative; display: flex; height: 100%; min-height: 0; flex-direction: column; overflow: hidden; font-size: 14px; line-height: 1.4; container-type: inline-size; }
+.shell button { font: inherit; color: inherit; }
+.shell button:focus-visible, .cardPosition:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ---------- Header ---------- */
+.header { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 30px 6px; }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.mark { width: 38px; height: 38px; flex: 0 0 auto; filter: drop-shadow(0 4px 8px rgba(21, 32, 58, 0.25)); }
+.brand > span { display: grid; gap: 3px; }
+.brand b { font-size: 28px; font-weight: 600; font-style: italic; line-height: 1; letter-spacing: -0.01em; }
+.brand small { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.stats { display: flex; gap: 6px; padding: 6px; border-radius: 16px; background: rgba(255, 255, 255, 0.45); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(29, 26, 34, 0.06); }
+.stats > span { display: grid; min-width: 76px; gap: 2px; padding: 6px 12px; border-radius: 11px; }
+.stats > span + span { box-shadow: -1px 0 0 var(--hair); border-radius: 0 11px 11px 0; }
+.stats small { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.stats b { font-size: 24px; font-weight: 600; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+
+/* ---------- Table ---------- */
+.table { flex: 1; min-height: 0; overflow: auto; padding: 18px 30px 22px; scrollbar-width: thin; scrollbar-color: #b6b2bc transparent; }
+.topRow, .tableau { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--gap); width: min(100%, 1000px); margin-inline: auto; }
 .stockGroup, .foundations { display: contents; }
 .foundations > :first-child { grid-column: 4; }
 .pile, .foundation, .waste { position: relative; width: 100%; aspect-ratio: 5 / 7; }
-.pile, .foundation, .cardPosition, .kingSlot, .waste > button { border: 0; padding: 0; color: inherit; background: transparent; touch-action: none; }
-.stock, .foundation, .waste > button { cursor: pointer; }
-.stock em { position: absolute; right: -5px; bottom: -5px; display: grid; min-width: 28px; height: 28px; place-items: center; padding: 0 6px; border-radius: 999px; color: #244b40; background: #fffcf5; font-size: 14px; font-weight: 600; font-style: normal; }
+.pile, .foundation, .cardPosition, .kingSlot, .waste > button { padding: 0; border: 0; color: inherit; background: transparent; touch-action: none; }
+.stock, .foundation, .waste > button { cursor: var(--xp-cursor-pointer, pointer); }
 .waste > button { display: block; width: 100%; }
-.recycle, .emptyPile, .foundation, .kingSlot { display: grid; place-content: center; justify-items: center; border-radius: 9%; background: #24493f; color: #aecabc; }
-.recycle { height: 100%; font-size: 38px; }
-.emptyPile { font-size: 13px; }
-.foundation { position: relative; gap: 10px; }
+
+/* Debossed slots pressed into the backdrop. */
+.recycle, .emptyPile, .foundation, .kingSlot { border-radius: 7%/5%; background: rgba(29, 26, 34, 0.045); box-shadow: inset 0 1px 3px rgba(29, 26, 34, 0.14), inset 0 0 0 1px rgba(29, 26, 34, 0.06), 0 1px 0 rgba(255, 255, 255, 0.75); }
+.emptyPile, .foundation, .kingSlot, .recycle { position: relative; display: block; }
+.emptyPile span, .foundation small, .kingSlot small, .recycle small { position: absolute; left: 0; right: 0; bottom: 9%; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-align: center; text-transform: uppercase; }
+.foundation > svg { position: absolute; left: 50%; top: 45%; width: 38%; height: auto; transform: translate(-50%, -50%); color: var(--ink); opacity: 0.13; transition: opacity 0.2s ease; }
+.foundation:hover > svg { opacity: 0.22; }
 .foundation > div { position: absolute; inset: 0; }
-.foundation > svg { width: clamp(20px, 3cqw, 34px); height: auto; color: #8aad9b; }
-.foundation small { font-size: 13px; color: #aecabc; }
-.hinted { box-shadow: 0 0 0 3px #e7c96e; }
-.tableau { margin-top: clamp(22px, 3.5cqw, 38px); align-items: start; }
-.column { position: relative; min-width: 0; aspect-ratio: 5 / 7; }
-.cardPosition { position: absolute; inset-inline: 0; display: block; width: 100%; cursor: grab; border-radius: 9%; }
-.cardPosition:disabled { cursor: default; }
+.recycle { width: 100%; height: 100%; }
+.recycle svg { position: absolute; left: 50%; top: 45%; width: 32%; transform: translate(-50%, -50%); fill: none; stroke: rgba(29, 26, 34, 0.4); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.stock:hover .recycle svg { stroke: var(--ink); }
+.stock em { position: absolute; z-index: 4; right: -6px; bottom: -6px; display: grid; min-width: 28px; height: 28px; place-items: center; padding: 0 7px; border-radius: 999px; color: #f4ecdc; background: var(--ink); box-shadow: 0 0 0 2px #ebe9ee, 0 4px 10px rgba(29, 26, 34, 0.25); font-size: 12px; font-weight: 700; font-style: normal; font-variant-numeric: tabular-nums; }
+.hinted { box-shadow: 0 0 0 2px #f6f1e6, 0 0 0 4px #e9c46a, 0 0 22px 2px rgba(233, 196, 106, 0.5); }
+
+.tableau { margin-top: clamp(20px, 3.2cqw, 34px); align-items: start; }
+.column { position: relative; min-width: 0; aspect-ratio: 5 / 7; border-radius: 7%/5%; }
+.cardPosition { position: absolute; inset-inline: 0; display: block; width: 100%; border-radius: 7%/5%; cursor: grab; transition: transform 0.16s ease; }
+.cardPosition:not(:disabled):hover { transform: translateY(-2px); }
+.cardPosition:disabled { cursor: var(--xp-cursor-default, default); }
 .cardPosition:active { cursor: grabbing; }
-.kingSlot { width: 100%; aspect-ratio: 5 / 7; font-size: clamp(22px, 4cqw, 36px) !important; cursor: pointer; }
-.kingSlot small { font: 13px/1.2 "Segoe UI", sans-serif; }
-.toolbar { position: relative; display: flex; flex-shrink: 0; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 22px; background: #284f43; }
-.toolbar > div { display: flex; gap: 6px; }
-.toolbar button { display: flex; min-height: 42px; align-items: center; gap: 8px; padding: 10px 14px; border: 0; border-radius: 12px; color: #eff5e9; background: transparent; cursor: pointer; transition: background .15s; }
-.toolbar button:hover:not(:disabled) { background: #3a6556; }
-.toolbar button:disabled { opacity: .35; cursor: default; }
-.toolbar svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.toolbar .primaryButton, .toolbar .finishButton { color: #244b40; background: #dce9d5; }
-.toolbar .primaryButton:hover, .toolbar .finishButton:hover:not(:disabled) { color: #244b40; background: #edf3e8; }
-.instructions { margin: 0; padding: 0 24px 14px; color: #c2d8c9; text-align: center; font-size: 13px; }
-.toast { position: absolute; z-index: 60; bottom: 90px; left: 0; right: 0; width: fit-content; max-width: 90%; margin-inline: auto; padding: 12px 20px; border-radius: 16px; color: #244b40; background: #fffcf5; box-shadow: 0 8px 30px #102b2930; font-size: 15px; text-align: center; pointer-events: none; }
+.kingSlot { width: 100%; aspect-ratio: 5 / 7; cursor: var(--xp-cursor-pointer, pointer); }
+.kingSlot b { position: absolute; left: 0; right: 0; top: 38%; transform: translateY(-50%); color: rgba(29, 26, 34, 0.14); font-size: clamp(30px, 5cqw, 56px); font-weight: 600; text-align: center; line-height: 1; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
+
+/* ---------- Footer ---------- */
+.instructions { flex-shrink: 0; margin: 0; padding: 0 30px 10px; color: var(--muted); font-size: 12px; text-align: center; }
+.toolbar { position: relative; display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 10px; margin: 0 16px 14px; padding: 6px; border-radius: 18px; background: rgba(255, 255, 255, 0.55); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(29, 26, 34, 0.06), 0 10px 24px -14px rgba(29, 26, 34, 0.35); backdrop-filter: blur(12px); }
+.toolbar > div { display: flex; gap: 2px; }
+.toolbar button { display: flex; min-height: 40px; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); font-size: 13px; font-weight: 600; cursor: var(--xp-cursor-pointer, pointer); transition: background 0.15s ease, color 0.15s ease; }
+.toolbar button:hover:not(:disabled) { background: rgba(29, 26, 34, 0.06); }
+.toolbar button:disabled { opacity: 0.35; cursor: var(--xp-cursor-default, default); }
+.toolbar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.toolbar .primaryButton { padding-inline: 18px; color: #f4ecdc; background: var(--ink); box-shadow: 0 6px 14px -6px rgba(29, 26, 34, 0.6); }
+.toolbar .primaryButton:hover:not(:disabled) { background: #2d2934; }
+.toolbar .finishButton { color: #1d1a22; background: linear-gradient(180deg, #e3c27e, #c9a45c); }
+.toolbar .finishButton:hover:not(:disabled) { background: linear-gradient(180deg, #ecd092, #d2ae68); }
+
+.toast { position: absolute; z-index: 60; left: 0; right: 0; bottom: 92px; width: fit-content; max-width: 90%; margin-inline: auto; padding: 11px 18px; border-radius: 999px; color: #f4ecdc; background: rgba(29, 26, 34, 0.92); box-shadow: 0 12px 30px -10px rgba(29, 26, 34, 0.5); font-size: 13px; font-weight: 600; text-align: center; pointer-events: none; }
 .dragOverlay { position: fixed; z-index: 2147483647; pointer-events: none; }
 .dragOverlay > span { position: absolute; inset-inline: 0; display: block; }
+
+.pause { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 20px; background: rgba(214, 211, 218, 0.7); backdrop-filter: blur(10px); }
+.pause section { display: grid; justify-items: center; width: min(100%, 360px); padding: 30px; border-radius: 22px; background: #f8f6f2; box-shadow: 0 30px 60px -24px rgba(29, 26, 34, 0.45); text-align: center; }
+.pause h3 { margin: 14px 0 6px; font-size: 30px; font-weight: 600; font-style: italic; line-height: 1; }
+.pause p { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+.pause button { min-height: 44px; padding: 0 22px; border: 0; border-radius: 999px; color: #f4ecdc; background: var(--ink); font-size: 14px; font-weight: 600; cursor: var(--xp-cursor-pointer, pointer); }
+
 @container (max-width: 640px) {
-  .header { padding: 16px; gap: 10px; }
+  .header { padding: 14px 14px 4px; gap: 10px; }
+  .brand small, .mark { display: none; }
   .brand b { font-size: 22px; }
-  .brand small { display: none; }
-  .brand > svg { width: 22px; }
-  .stats { gap: 16px; }
+  .stats > span { min-width: 0; padding: 4px 8px; }
   .stats b { font-size: 18px; }
-  .stats small { font-size: 12px; }
-  .table { padding: 12px 12px 24px; }
-  .toolbar { padding: 10px 8px; gap: 4px; }
-  .toolbar > div { gap: 0; }
-  .toolbar button { padding: 10px; min-width: 42px; justify-content: center; }
+  .table { padding: 12px 12px 18px; }
+  .instructions { display: none; }
+  .toolbar { margin: 0 8px 8px; }
+  .toolbar button { min-width: 40px; padding: 0 10px; justify-content: center; }
   .toolbar button span { display: none; }
-  .instructions { padding-inline: 14px; font-size: 12px; }
-  .emptyPile span, .foundation small, .kingSlot small { display: none; }
-  .stock em { min-width: 22px; height: 22px; font-size: 12px; }
+  .emptyPile span, .foundation small, .kingSlot small, .recycle small { display: none; }
+  .stock em { min-width: 22px; height: 22px; font-size: 11px; right: -4px; bottom: -4px; }
 }
-@media (prefers-reduced-motion: reduce) { .toolbar button { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .toolbar button, .cardPosition, .foundation > svg { transition: none; } }

@@ -37,8 +37,13 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Деплой (статический сайт)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Сайт собирается в обычные статические файлы, поэтому сервер с Node.js не нужен.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. `npm run build`: готовый сайт появится в папке `out/`.
+2. Проверить сборку локально: `npx serve out` (или любой статический сервер).
+3. **Yandex Object Storage**: создайте бакет с публичным доступом на чтение, включите «Веб-сайт» → «Хостинг», укажите главную страницу `index.html` и страницу ошибки `404.html`, затем загрузите **содержимое** папки `out/` в корень бакета.
+4. **Любой VPS (например, FirstVDS)**: скопируйте содержимое `out/` в папку сайта nginx.
+
+Старые ссылки `/work/<slug>` открывают нужный проект через статические страницы переадресации.

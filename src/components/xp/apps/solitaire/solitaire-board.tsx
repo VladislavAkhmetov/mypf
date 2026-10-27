@@ -22,7 +22,7 @@ import {
   tryAutoMoveCardToFoundation,
 } from "@/lib/xp/solitaire-deck";
 import { gameSound } from "@/lib/xp/games/game-sound";
-import { SuitPip } from "./card-assets";
+import { DeckMonogram, SuitPip } from "./card-assets";
 import { CardBack, SolitaireCard } from "./solitaire-card";
 import styles from "./solitaire.module.css";
 
@@ -318,12 +318,15 @@ export function SolitaireBoard({
     >
       <header className={styles.header}>
         <div className={styles.brand}>
-          <SuitPip suit="spades" color="currentColor" />
-          <span><b>Косынка</b><small>Небольшой перерыв — хорошая идея</small></span>
+          <DeckMonogram className={styles.mark} />
+          <span>
+            <b className={styles.display}>Косынка</b>
+            <small>Klondike · одна колода</small>
+          </span>
         </div>
         <div className={styles.stats}>
-          <span><small>Ходы</small><b>{String(state.moveCount).padStart(2, "0")}</b></span>
-          <span><small>Время</small><b>{formatTime(elapsedSeconds)}</b></span>
+          <span><small>Ходы</small><b className={styles.display}>{state.moveCount}</b></span>
+          <span><small>Время</small><b className={styles.display}>{formatTime(elapsedSeconds)}</b></span>
         </div>
       </header>
 
@@ -331,7 +334,7 @@ export function SolitaireBoard({
         <section className={styles.topRow} aria-label="Запас, сброс и основания">
           <div className={styles.stockGroup}>
             <button className={`${styles.pile} ${styles.stock}`} onClick={handleStock} aria-label={`Запас: ${state.stock.length} карт`}>
-              {state.stock.length ? <><CardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}>↻</span>}
+              {state.stock.length ? <><CardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95" /><path d="M19 3v5h-5" /></svg><small>Заново</small></span>}
             </button>
             <div className={styles.waste}>
               {state.waste.length ? (
@@ -354,7 +357,7 @@ export function SolitaireBoard({
                   onPointerDown={(event) => card && startDrag(event, { source: "foundation", foundationIndex: index, card, cards: [card] })}
                   aria-label={`Основание ${index + 1}`}
                 >
-                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} /> : <><SuitPip suit={suit} color="currentColor" /><small>A — K</small></>}
+                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} /> : <><SuitPip suit={suit} color="currentColor" /><small>Туз</small></>}
                 </button>
               );
             })}
@@ -374,7 +377,7 @@ export function SolitaireBoard({
                 aria-label={`Колонка ${columnIndex + 1}`}
                 style={{ marginBottom: stackOffset(column.slice(0, -1)) }}
               >
-                {!column.length && <button className={styles.kingSlot} aria-label={`Пустая колонка ${columnIndex + 1}: положить короля`}>K<small>Король</small></button>}
+                {!column.length && <button className={styles.kingSlot} aria-label={`Пустая колонка ${columnIndex + 1}: положить короля`}><b className={styles.display}>K</b><small>Король</small></button>}
                 {column.map((card, cardIndex) => {
                   const top = stackOffset(column.slice(0, cardIndex));
                   const chosen = selected?.source === "tableau" && selected.columnIndex === columnIndex && selected.cardIndex !== undefined && cardIndex >= selected.cardIndex;
@@ -399,7 +402,7 @@ export function SolitaireBoard({
           })}
         </section>
       </main>
-      <p className={styles.instructions}>Чередуй цвета, раскладывай по убыванию. Двойной клик — карта в основание.</p>
+      <p className={styles.instructions}>Чередуйте цвета и раскладывайте по убыванию · двойной клик отправляет карту в основание</p>
 
       <AnimatePresence>
         {message && <motion.div role="status" className={styles.toast} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>{message}</motion.div>}

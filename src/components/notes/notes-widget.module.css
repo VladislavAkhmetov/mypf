@@ -26,7 +26,7 @@
 }
 
 .widget button {
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
 }
 
 .header {
@@ -63,7 +63,7 @@
   background: #1c1c1c;
   border: 1px solid #282828;
   padding: 0;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   transition: color 0.15s ease, background 0.15s ease;
 }
 
@@ -92,7 +92,7 @@
   padding: 0 0 20px;
   background: transparent;
   border: none;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   text-align: left;
 }
 
@@ -192,7 +192,7 @@
   font-weight: 600;
   box-shadow: 0 4px 18px rgba(255, 255, 255, 0.08);
   transition: background 0.15s ease, transform 0.15s ease;
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   text-align: left;
 }
 

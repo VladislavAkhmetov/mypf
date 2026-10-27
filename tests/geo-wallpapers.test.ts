@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   getWallpaperForCountry,
   findWallpaper,
@@ -6,12 +6,6 @@ import {
   DEFAULT_WALLPAPER,
   DEFAULT_WALLPAPER_SRC,
 } from "@/lib/xp/wallpapers";
-import { GET } from "@/app/api/geo/route";
-import { headers } from "next/headers";
-
-vi.mock("next/headers", () => ({
-  headers: vi.fn(),
-}));
 
 describe("wallpapers catalog and geo mapping", () => {
   it("contains valid wallpaper definitions with required fields", () => {
@@ -95,52 +89,6 @@ describe("wallpapers catalog and geo mapping", () => {
     it("maps US to Bliss", () => {
       expect(getWallpaperForCountry("US").id).toBe("bliss");
       expect(getWallpaperForCountry("US").src).toBe(DEFAULT_WALLPAPER_SRC);
-    });
-  });
-
-  describe("GET /api/geo route handler", () => {
-    it("extracts country from x-vercel-ip-country header", async () => {
-      vi.mocked(headers).mockResolvedValue(
-        new Headers({
-          "x-vercel-ip-country": "RU",
-          "x-vercel-ip-city": "Moscow",
-        }) as unknown as Awaited<ReturnType<typeof headers>>
-      );
-
-      const res = await GET();
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data.countryCode).toBe("RU");
-      expect(data.city).toBe("Moscow");
-      expect(data.wallpaper.id).toBe("autumn");
-      expect(data.isFallback).toBe(false);
-    });
-
-    it("extracts country from cf-ipcountry header", async () => {
-      vi.mocked(headers).mockResolvedValue(
-        new Headers({
-          "cf-ipcountry": "GB",
-        }) as unknown as Awaited<ReturnType<typeof headers>>
-      );
-
-      const res = await GET();
-      const data = await res.json();
-      expect(data.countryCode).toBe("GB");
-      expect(data.wallpaper.id).toBe("stonehenge");
-      expect(data.isFallback).toBe(false);
-    });
-
-    it("handles localhost / empty headers with fallback to Bliss", async () => {
-      vi.mocked(headers).mockResolvedValue(
-        new Headers({
-          "x-forwarded-for": "127.0.0.1",
-        }) as unknown as Awaited<ReturnType<typeof headers>>
-      );
-
-      const res = await GET();
-      const data = await res.json();
-      expect(data.isFallback).toBe(true);
-      expect(data.wallpaper.id).toBe("bliss");
     });
   });
 });

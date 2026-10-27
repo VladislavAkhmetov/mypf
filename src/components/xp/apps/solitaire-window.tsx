@@ -10,6 +10,13 @@ import { DeckGalleryModal } from "./solitaire/deck-gallery-modal";
 import { SolitaireVictory } from "./solitaire/solitaire-victory";
 import { SolitaireLeaderboardModal } from "./solitaire/solitaire-leaderboard-modal";
 import { useWindowManager } from "../window-manager-context";
+import { Manrope, Playfair_Display } from "next/font/google";
+import { DeckDefs, DeckMonogram } from "./solitaire/card-assets";
+import styles from "./solitaire/solitaire.module.css";
+
+// Self-hosted at build time (static hosting friendly); both have Cyrillic.
+const displayFont = Playfair_Display({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], style: ["normal", "italic"], variable: "--font-display", display: "swap" });
+const uiFont = Manrope({ subsets: ["latin", "cyrillic"], weight: ["500", "600", "700"], variable: "--font-ui", display: "swap" });
 
 export function SolitaireWindow() {
   const session = useSolitaireSession();
@@ -35,7 +42,8 @@ export function SolitaireWindow() {
   }, [activeWindowId, isGalleryOpen, isLeaderboardOpen, session.isPaused]);
 
   return (
-    <div className="relative w-full h-full flex flex-col bg-[#315b4e] overflow-hidden select-none">
+    <div className={`${styles.root} ${displayFont.variable} ${uiFont.variable}`}>
+      <DeckDefs />
       {/* Active Board */}
       <SolitaireBoard
         key={session.sessionId}
@@ -82,21 +90,13 @@ export function SolitaireWindow() {
 
       {/* Pause Screen Overlay */}
       {session.isPaused && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="p-8 rounded-3xl bg-[#fffcf5] text-center shadow-2xl">
-            <h3 className="font-semibold text-2xl text-[#244b40] mb-2">
-              Игра на паузе
-            </h3>
-            <p className="text-base text-[#52685d] mb-6">
-              Окно было свернуто или потеряло фокус.
-            </p>
-            <button
-              onClick={() => solitaireStore.setPaused(false)}
-              className="px-6 py-3 rounded-xl font-semibold text-base bg-[#315b4e] text-white hover:bg-[#244b40] transition cursor-pointer"
-            >
-              Продолжить
-            </button>
-          </div>
+        <div className={styles.pause}>
+          <section>
+            <DeckMonogram className={styles.mark} />
+            <h3 className={styles.display}>Пауза</h3>
+            <p>Окно было свёрнуто или потеряло фокус.</p>
+            <button onClick={() => solitaireStore.setPaused(false)}>Продолжить</button>
+          </section>
         </div>
       )}
     </div>

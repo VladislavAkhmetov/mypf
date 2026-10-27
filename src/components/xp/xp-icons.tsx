@@ -82,22 +82,11 @@ export function InternetExplorerIcon({ className = "w-8 h-8" }: { className?: st
   );
 }
 
-export function RecycleBinIcon({ className = "w-8 h-8" }: { className?: string }) {
-  return (
-    <img
-      src="/icons/xp/recycle-bin.png"
-      alt="Корзина"
-      className={`${className} object-contain select-none pointer-events-none`}
-      draggable={false}
-    />
-  );
-}
-
 export function StoriesIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
-      src="/icons/xp/stories.png"
-      alt="Истории"
+      src="/icons/xp/journal.svg"
+      alt="Журнал"
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -285,3 +274,14 @@ export function DisplayThemeIcon({ className = "w-8 h-8" }: { className?: string
 
 
 
+
+export function HelpCenterIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/help.svg"
+      alt="Центр справки и поддержки"
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}

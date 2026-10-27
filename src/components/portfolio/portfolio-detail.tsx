@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getMakingOf } from "@/data/making-of";
+import { MakingOfSection } from "./making-of";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import { toolsList, type ToolItem } from "@/data/tools";
@@ -71,6 +73,7 @@ export function PortfolioDetail({ project, tool, nextProject, nextTool, onBack, 
   const isPrintforge = project?.slug === "printforge";
   const relatedTools = project ? toolsList.filter(item => item.caseStudySlug === project.slug) : [];
   const featureInfo = printforgeFeatures[feature];
+  const makingOfData = getMakingOf(project?.slug);
   // Existing generic Community/Telegram URLs are not download links.
   const toolUrl = tool?.primaryAction.url;
   const hasDirectToolLink = !!toolUrl && toolUrl !== site.telegram && !/^https:\/\/www\.figma\.com\/community\/?$/.test(toolUrl);
@@ -137,6 +140,8 @@ export function PortfolioDetail({ project, tool, nextProject, nextTool, onBack, 
         { src: "/placeholders/covers/altyn-solok-products.jpg", alt: "Витрина продуктов" },
         { src: "/placeholders/covers/altyn-solok-cards.jpg", alt: "Карточки и детали" },
       ].map(item => <button type="button" key={item.src} onClick={() => setZoom(item)}><Image src={item.src} alt={item.alt} width={1000} height={800} unoptimized /><span>{item.alt}<span>↗</span></span></button>)}</div><details className={styles.fullPage}><summary>Весь сайт целиком <span>＋</span></summary><Image src="/placeholders/covers/altyn-solok-fullpage.jpg" alt="Полная страница Алтын Солок" width={1920} height={10039} unoptimized /></details></section>}
+
+      {makingOfData && <MakingOfSection data={makingOfData} onZoom={setZoom} />}
 
       {relatedTools.length > 0 && <section className={styles.relatedTools}><h2>Инструменты рядом с проектом<span>.</span></h2>{relatedTools.map(item => <button type="button" key={item.slug} onClick={() => onOpenTool(item.slug)}><span>{item.title}<small>{item.platformLabel}</small></span><span>↗</span></button>)}</section>}
     </div>

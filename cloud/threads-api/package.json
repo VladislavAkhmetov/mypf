@@ -1,0 +1,9 @@
+{
+  "name": "threads-api",
+  "private": true,
+  "description": "Yandex Cloud Function: likes and comments for the notes feed (YDB serverless).",
+  "main": "index.js",
+  "dependencies": {
+    "ydb-sdk": "^5.11.1"
+  }
+}

@@ -4,28 +4,74 @@ function toDataUri(svg: string): string {
   return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
 }
 
-// 1. Classic Windows XP Default Arrow Cursor (hotspot: 0, 0)
-const defaultCursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <defs>
-    <filter id="xp-shadow" x="-20%" y="-20%" width="150%" height="150%">
-      <feDropShadow dx="1.5" dy="1.5" stdDeviation="1" flood-color="#000" flood-opacity="0.38" />
-    </filter>
-  </defs>
-  <path filter="url(#xp-shadow)" d="M1 1 L1 22 L6.5 17.5 L11 27 L14 25.5 L9.5 16 L16 16 Z" fill="#ffffff" stroke="#000000" stroke-width="1.2" stroke-linejoin="round" />
-</svg>`;
+// Pixel bitmaps of the original XP cursors. B = black outline, W = white fill.
+// Rendered 1:1 on a 32px canvas with a soft offset shadow, like the XP originals.
+const ARROW_BITMAP = [
+  "B",
+  "BB",
+  "BWB",
+  "BWWB",
+  "BWWWB",
+  "BWWWWB",
+  "BWWWWWB",
+  "BWWWWWWB",
+  "BWWWWWWWB",
+  "BWWWWWWWWB",
+  "BWWWWWWWWWB",
+  "BWWWWWWBBBBB",
+  "BWWWBWWB",
+  "BWWBBWWB",
+  "BWB..BWWB",
+  "BB...BWWB",
+  "B.....BWWB",
+  "......BWWB",
+  ".......BB",
+];
 
-// 2. Classic Windows XP Hand / Pointer Cursor (hotspot: 6, 1)
-const pointerCursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <defs>
-    <filter id="xp-hand-shadow" x="-20%" y="-20%" width="150%" height="150%">
-      <feDropShadow dx="1.5" dy="1.5" stdDeviation="1" flood-color="#000" flood-opacity="0.35" />
-    </filter>
-  </defs>
-  <g filter="url(#xp-hand-shadow)">
-    <path d="M7 11 L7 1 C7 0 8 -0.2 9 0.5 C10 1.2 10.5 2 10.5 4 L10.5 10 L13 10 C14 10 14.5 10.5 14.5 11.5 L14.5 13 L16.5 13 C17.5 13 18 13.8 18 14.8 L18 16.5 L20 16.5 C21 16.5 21.5 17.3 21.5 18.5 L21.5 22 C21.5 27 18 30 13 30 C9 30 5.5 27 4.5 23 L2 18 C1.2 16.5 2.5 15 4 16 L6 17.5 L6 11 Z" fill="#ffffff" stroke="#000000" stroke-width="1.1" stroke-linejoin="round"/>
-    <rect x="7" y="27" width="8" height="3" fill="#2563eb" rx="1" />
-  </g>
+// "Link select" hand: index finger up, knuckle lines, thumb on the left.
+const HAND_BITMAP = [
+  ".....BB",
+  "....BWWB",
+  "....BWWB",
+  "....BWWB",
+  "....BWWB",
+  "....BWWBBB",
+  "....BWWBWWBBB",
+  "....BWWBWWBWWBB",
+  ".BB.BWWBWWBWWBWB",
+  "BWWBBWWWWWWWWBWB",
+  "BWWWBWWWWWWWWWWB",
+  ".BWWWWWWWWWWWWWB",
+  "..BWWWWWWWWWWWWB",
+  "..BWWWWWWWWWWWWB",
+  "...BWWWWWWWWWWB",
+  "...BWWWWWWWWWWB",
+  "....BWWWWWWWWB",
+  "....BWWWWWWWWB",
+  "....BBBBBBBBBB",
+];
+
+function bitmapToSvg(bitmap: string[], originX: number, originY: number): string {
+  const cells = (char: string) =>
+    bitmap
+      .flatMap((row, y) => [...row].map((c, x) => (c === char ? `M${x + originX} ${y + originY}h1v1h-1z` : "")))
+      .join("");
+  const shadow = bitmap
+    .flatMap((row, y) => [...row].map((c, x) => (c === "." ? "" : `M${x + originX + 2} ${y + originY + 2}h1v1h-1z`)))
+    .join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <defs><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="0.7"/></filter></defs>
+  <path d="${shadow}" fill="#000" fill-opacity="0.28" filter="url(#s)"/>
+  <path d="${cells("W")}" fill="#fff"/>
+  <path d="${cells("B")}" fill="#000"/>
 </svg>`;
+}
+
+// 1. Default arrow (hotspot at the tip)
+const defaultCursorSvg = bitmapToSvg(ARROW_BITMAP, 1, 1);
+
+// 2. Hand / pointer (hotspot at the fingertip)
+const pointerCursorSvg = bitmapToSvg(HAND_BITMAP, 1, 1);
 
 // 3. Move / 4-way arrow cursor (hotspot: 16, 16)
 const moveCursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -81,8 +127,8 @@ const waitCursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height
 </svg>`;
 
 export const xpCursors = {
-  default: `${toDataUri(defaultCursorSvg)} 0 0, default`,
-  pointer: `${toDataUri(pointerCursorSvg)} 6 1, pointer`,
+  default: `${toDataUri(defaultCursorSvg)} 1 1, default`,
+  pointer: `${toDataUri(pointerCursorSvg)} 7 1, pointer`,
   move: `${toDataUri(moveCursorSvg)} 16 16, move`,
   ewResize: `${toDataUri(ewResizeSvg)} 16 16, ew-resize`,
   nsResize: `${toDataUri(nsResizeSvg)} 16 16, ns-resize`,
@@ -91,3 +137,9 @@ export const xpCursors = {
   wait: `${toDataUri(waitCursorSvg)} 16 16, wait`,
   text: "text",
 };
+
+/** Exposes the XP cursors as CSS variables used by globals.css and CSS modules. */
+export function applyXpCursorVariables(root: HTMLElement = document.documentElement): void {
+  root.style.setProperty("--xp-cursor-default", xpCursors.default);
+  root.style.setProperty("--xp-cursor-pointer", xpCursors.pointer);
+}

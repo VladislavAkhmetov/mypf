@@ -2,7 +2,8 @@
 
 import React from "react";
 import { DifficultyLevel, GameStatus } from "@/lib/xp/minesweeper-game";
-import { MascotFace, MineIcon } from "./pulse-assets";
+import { gameSound } from "@/lib/xp/games/game-sound";
+import { faceUrl, spriteUrl } from "./pixel-art";
 import styles from "./minesweeper.module.css";
 
 interface MinesweeperHudProps {
@@ -28,10 +29,6 @@ function formatCounter(value: number) {
   return clamped < 0 ? `-${String(Math.abs(clamped)).padStart(2, "0")}` : String(clamped).padStart(3, "0");
 }
 
-function TimerIcon() {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="13" r="8"/><path d="M9 2h6M12 13l3-3"/></svg>;
-}
-
 export function MinesweeperHud({
   minesLeft,
   elapsedSeconds,
@@ -45,24 +42,33 @@ export function MinesweeperHud({
   return (
     <header className={styles.hud}>
       <div className={styles.hudTop}>
-        <div className={`${styles.counter} ${styles.mineCount}`}>
-          <span className={styles.counterIcon}><MineIcon /></span>
-          <span className={styles.counterText}><small>Осталось</small><strong>{formatCounter(minesLeft)}</strong></span>
+        <div className={styles.counter}>
+          <span className={styles.icon} style={{ backgroundImage: spriteUrl("mine") }} aria-hidden="true" />
+          <span className={styles.counterText}>
+            <small>Мины</small>
+            <strong className={styles.mineCount}>{formatCounter(minesLeft)}</strong>
+          </span>
         </div>
 
         <button
           className={styles.restart}
-          onClick={onRestart}
-          title="Новая партия"
+          onClick={() => {
+            gameSound.uiBlip();
+            onRestart();
+          }}
+          title="Новая партия (F2)"
           aria-label="Начать новую партию"
           data-ym-goal="minesweeper_restart"
         >
-          <MascotFace state={status} isPressing={isPressing} />
+          <span className={styles.face} style={{ backgroundImage: faceUrl(status, isPressing) }} aria-hidden="true" />
         </button>
 
-        <div className={`${styles.counter} ${styles.timer}`}>
-          <span className={styles.counterText}><small>Время</small><strong>{formatCounter(elapsedSeconds)}</strong></span>
-          <span className={styles.counterIcon}><TimerIcon /></span>
+        <div className={`${styles.counter} ${styles.counterRight}`}>
+          <span className={styles.counterText}>
+            <small>Время</small>
+            <strong className={styles.timer}>{formatCounter(elapsedSeconds)}</strong>
+          </span>
+          <span className={styles.icon} style={{ backgroundImage: spriteUrl("clock") }} aria-hidden="true" />
         </div>
       </div>
 
@@ -71,22 +77,29 @@ export function MinesweeperHud({
           <button
             key={id}
             className={currentDifficulty === id ? styles.active : ""}
-            onClick={() => onSelectDifficulty(id)}
+            onClick={() => {
+              gameSound.uiBlip();
+              onSelectDifficulty(id);
+            }}
             aria-pressed={currentDifficulty === id}
             data-ym-goal="minesweeper_difficulty"
             data-ym-params={JSON.stringify({ difficulty: id })}
           >
-            <b>{label}</b><small>{size}</small>
+            <b>{label}</b>
+            <small>{size}</small>
           </button>
         ))}
         <button
           type="button"
-          onClick={onOpenLeaderboard}
+          onClick={() => {
+            gameSound.uiBlip();
+            onOpenLeaderboard();
+          }}
           data-ym-goal="minesweeper_leaderboard_open"
           className={styles.leaderboardBtn}
           title="Таблица рекордов"
         >
-          <span>🏆</span>
+          <span className={styles.icon} style={{ backgroundImage: spriteUrl("trophy") }} aria-hidden="true" />
           <span>Топ</span>
         </button>
       </nav>

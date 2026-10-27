@@ -101,7 +101,7 @@ test("opening the journal preserves the already open portfolio case", async ({ p
   await page.goto("/?project=kora");
   const portfolio = page.locator("#window-portfolio");
   await expect(portfolio.getByRole("heading", { name: "Kora", exact: true })).toBeVisible();
-  await page.locator(".xp-desktop-icon").filter({ hasText: "Заметки" }).dblclick();
+  await page.locator(".xp-desktop-icon").filter({ hasText: "Журнал" }).dblclick();
   const journal = page.locator("#window-notes");
   await expect(journal).toBeVisible();
   await expect(portfolio.getByRole("heading", { name: "Kora", exact: true })).toBeVisible();

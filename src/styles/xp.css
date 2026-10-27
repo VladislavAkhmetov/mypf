@@ -1033,3 +1033,28 @@ button.xp-btn-ctrl:focus-visible {
     display: none !important;
   }
 }
+
+/* XP pixel cursors (variables are set by applyXpCursorVariables in xp-app).
+   Base layer: explicit Tailwind utilities and component styles still win. */
+@layer base {
+  html,
+  body {
+    cursor: var(--xp-cursor-default, default);
+  }
+
+  :where(a[href], button:not(:disabled), [role="button"], [role="tab"], [role="menuitem"], [role="option"], summary, label[for], select, input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"], input[type="file"]) {
+    cursor: var(--xp-cursor-pointer, pointer);
+  }
+
+  :where(button:disabled, [aria-disabled="true"]) {
+    cursor: var(--xp-cursor-default, default);
+  }
+}
+
+.cursor-pointer {
+  cursor: var(--xp-cursor-pointer, pointer);
+}
+
+.cursor-default {
+  cursor: var(--xp-cursor-default, default);
+}

@@ -12,7 +12,7 @@ async function saveScreenshot(page: Page, filename: string, selector: string) {
   await page.locator(selector).screenshot({ path: path.join(SCREENSHOTS_DIR, filename) });
 }
 
-test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
+test.describe("Atelier Solitaire and Minesweeper Meadow", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.addInitScript(() => window.localStorage.clear());
@@ -30,7 +30,7 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
     const gameWindow = page.locator("#window-solitaire");
     await expect(gameWindow).toBeVisible({ timeout: 15_000 });
     await expect(gameWindow.getByText("Косынка", { exact: true }).last()).toBeVisible();
-    await saveScreenshot(page, "solitaire-maison-table.png", "#window-solitaire");
+    await saveScreenshot(page, "solitaire-atelier-table.png", "#window-solitaire");
 
     await gameWindow.getByRole("button", { name: "Запас: 24 карт" }).click();
     await expect(gameWindow.getByRole("button", { name: "Запас: 23 карт" })).toBeVisible();
@@ -44,11 +44,11 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
     await gameWindow.getByRole("button", { name: "Коллекция" }).click();
     await expect(gameWindow.getByText("Одна колода. 52 карты.", { exact: true })).toBeVisible();
     await expect(gameWindow.getByTestId("gallery-card")).toHaveCount(52);
-    await saveScreenshot(page, "solitaire-maison-collection.png", "#window-solitaire");
+    await saveScreenshot(page, "solitaire-atelier-collection.png", "#window-solitaire");
 
     await gameWindow.getByTestId("gallery-card").first().click();
     await gameWindow.getByRole("button", { name: "Показать рубашку", exact: true }).click();
-    await saveScreenshot(page, "solitaire-maison-card-back.png", "#window-solitaire");
+    await saveScreenshot(page, "solitaire-atelier-card-back.png", "#window-solitaire");
     await gameWindow.getByRole("button", { name: "Закрыть просмотр карты" }).click();
     await gameWindow.getByRole("button", { name: "Вернуться к игре" }).click();
 
@@ -64,11 +64,11 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
     const gameWindow = page.locator("#window-minesweeper");
     await expect(gameWindow).toBeVisible({ timeout: 15_000 });
     await expect(gameWindow.getByRole("grid", { name: "Поле сапёра 9 на 9" })).toBeVisible();
-    await saveScreenshot(page, "minesweeper-pulsefield-board.png", "#window-minesweeper");
+    await saveScreenshot(page, "minesweeper-meadow-board.png", "#window-minesweeper");
 
     await gameWindow.locator("[data-cell='4,4']").click();
     await expect(gameWindow.getByRole("button", { name: /Открыто:/ }).first()).toBeVisible();
-    await saveScreenshot(page, "minesweeper-pulsefield-cascade.png", "#window-minesweeper");
+    await saveScreenshot(page, "minesweeper-meadow-cascade.png", "#window-minesweeper");
 
     const closedCell = gameWindow.getByRole("button", { name: "Закрытая клетка" }).first();
     await closedCell.click({ button: "right" });
@@ -77,13 +77,13 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
     await gameWindow.getByRole("button", { name: /Эксперт/ }).click();
     await expect(gameWindow.getByRole("grid", { name: "Поле сапёра 30 на 16" })).toBeVisible();
     await gameWindow.getByRole("button", { name: "82%" }).click();
-    await saveScreenshot(page, "minesweeper-pulsefield-expert.png", "#window-minesweeper");
+    await saveScreenshot(page, "minesweeper-meadow-expert.png", "#window-minesweeper");
 
     await gameWindow.getByRole("button", { name: "Начать новую партию" }).click();
     await gameWindow.getByRole("button", { name: /Спринт/ }).click();
     await gameWindow.locator("[data-cell='3,3']").click();
 
-    const resultHeading = gameWindow.getByRole("heading", { name: /Импульс потерян|Поле очищено/ });
+    const resultHeading = gameWindow.getByRole("heading", { name: /Бабах!|Поле очищено/ });
     for (let attempt = 0; attempt < 64 && await resultHeading.count() === 0; attempt += 1) {
       const remaining = gameWindow.getByRole("button", { name: "Закрытая клетка" });
       if (await remaining.count() === 0) break;
@@ -92,6 +92,6 @@ test.describe("Maison Solitaire and Minesweeper Pulsefield", () => {
 
     await expect(resultHeading).toBeVisible();
     await expect(gameWindow.getByRole("button", { name: "Сыграть ещё раз" })).toBeVisible();
-    await saveScreenshot(page, "minesweeper-pulsefield-result.png", "#window-minesweeper");
+    await saveScreenshot(page, "minesweeper-meadow-result.png", "#window-minesweeper");
   });
 });

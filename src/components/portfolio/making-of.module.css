@@ -1,0 +1,36 @@
+/* Matches portfolio-detail: paper background, orange accent, large tight headings. */
+.section { --orange: #ff4b16; padding: 48px 0 64px; border-top: 1px solid #cecec6; }
+.heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; padding-bottom: 32px; }
+.heading h2 { width: 61%; }
+.eyebrow { padding-top: 8px; font-size: 15px; line-height: 1.5; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { display: flex; flex-direction: column; gap: 28px; min-height: 200px; padding: 24px; border-radius: 16px; background: #e3e2dc; }
+.card > span { color: #707065; font-size: 15px; }
+.card p { font-size: clamp(17px, 1.9cqw, 24px); line-height: 1.4; letter-spacing: -0.03em; text-wrap: pretty; }
+.cardAccent { color: #fff; background: #252521; }
+.cardAccent > span { color: var(--orange); }
+.steps { margin: 40px 0 0; padding: 0; list-style: none; }
+.steps > li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 20px; padding: 28px 0; border-top: 1px solid #cecec6; }
+.stepIndex { padding-top: 6px; color: var(--orange); font-size: 15px; font-variant-numeric: tabular-nums; }
+.steps h3 { margin: 0 0 10px; font-size: clamp(20px, 2.4cqw, 30px); font-weight: 500; letter-spacing: -0.04em; }
+.steps p { max-width: 720px; color: #4a4a43; font-size: 17px; line-height: 1.65; letter-spacing: -0.02em; }
+.prompt { margin: 18px 0 0; overflow: hidden; border-radius: 12px; background: #1b1b19; }
+.prompt figcaption { padding: 10px 16px; border-bottom: 1px solid #ffffff1a; color: #92928a; font-size: 13px; }
+.prompt pre { margin: 0; padding: 14px 16px 16px; overflow-x: auto; color: #e9e8e2; font: 14px/1.6 ui-monospace, "SF Mono", Consolas, monospace; white-space: pre-wrap; }
+.image { display: block; width: 100%; margin-top: 18px; padding: 0; overflow: hidden; border: 0; border-radius: 14px; background: #d9d8d1; }
+.image img { display: block; width: 100%; height: auto; max-height: 420px; object-fit: cover; }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 32px 0 0; }
+.results > div { padding: 22px 24px; border-radius: 16px; background: #e3e2dc; }
+.results dt { margin-bottom: 14px; color: #707065; font-size: 15px; }
+.results dd { margin: 0; font-size: clamp(22px, 2.8cqw, 36px); font-weight: 500; letter-spacing: -0.045em; }
+.lessons { display: grid; grid-template-columns: 1fr 1.6fr; gap: 9%; margin-top: 40px; padding-top: 28px; border-top: 1px solid #cecec6; }
+.lessons > span { color: #707065; font-size: 15px; }
+.lessons ul { margin: 0; padding: 0; list-style: none; }
+.lessons li { padding: 14px 0; border-bottom: 1px solid #cecec6; font-size: 17px; line-height: 1.6; }
+.lessons li:first-child { padding-top: 0; }
+@container (max-width: 720px) {
+  .heading { flex-direction: column; gap: 10px; }
+  .heading h2 { width: 100%; }
+  .split, .lessons { grid-template-columns: 1fr; }
+  .steps > li { grid-template-columns: 1fr; gap: 8px; }
+}

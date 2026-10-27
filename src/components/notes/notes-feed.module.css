@@ -29,7 +29,7 @@
 }
 
 .notes :is(button, a) {
-  cursor: pointer;
+  cursor: var(--xp-cursor-pointer, pointer);
   -webkit-tap-highlight-color: transparent;
   border: none;
   background: transparent;
