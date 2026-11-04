@@ -6,8 +6,10 @@ import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 import { site } from "@/data/site";
 import notesWidgetStyles from "@/components/notes/notes-widget.module.css";
+import { useLocale } from "@/lib/i18n";
 
 export function Clippy() {
+  const { locale, tr } = useLocale();
   const { openWindow, openProject, activeWindowId } = useWindowManager();
   const [isOpen, setIsOpen] = useState(false); // Calm closed state by default (A01, A10, A11)
   const [currentPose, setCurrentPose] = useState<"rest" | "eyebrow" | "look-left" | "wave">("rest");
@@ -82,7 +84,7 @@ export function Clippy() {
   const handleOpenTopProjects = () => {
     xpSound.click();
     setIsOpen(false);
-    openProject("kora");
+    openProject("dombro");
   };
 
   const poseFileName =
@@ -105,7 +107,7 @@ export function Clippy() {
 
   return (
     <div
-      className={`fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)] ${!activeWindowId ? notesWidgetStyles.desktopHelper : ""}`}
+      className={`fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)] ${!activeWindowId ? notesWidgetStyles.desktopHelper : "max-md:hidden"}`}
       style={{ cursor: xpCursors.default, display: activeWindowId === "notes" ? "none" : undefined }}
     >
       {/* Speech Bubble */}
@@ -115,7 +117,7 @@ export function Clippy() {
           <div className="flex items-center justify-between border-b border-amber-300 pb-1.5 mb-2.5">
             <span className="font-bold text-[12px] text-blue-950 flex items-center gap-1.5">
               <span>📎</span>
-              <span>Помощник Office // Скрепка</span>
+              <span>{tr("Помощник Office // Скрепка", "Office Assistant // Clippy")}</span>
             </span>
             <button
               type="button"
@@ -124,7 +126,7 @@ export function Clippy() {
                 setIsOpen(false);
               }}
               className="text-slate-500 hover:text-red-600 font-bold px-1 text-sm leading-none transition-colors"
-              title="Закрыть помощника"
+              title={tr("Закрыть помощника", "Close assistant")}
               style={{ cursor: xpCursors.pointer }}
             >
               ✕
@@ -132,7 +134,7 @@ export function Clippy() {
           </div>
 
           <p className="text-[12px] leading-relaxed mb-3 text-slate-900 font-medium">
-            Привет! Я <strong>Скрепка</strong>. Похоже, вы оцениваете портфолио <strong>Влада Ахметова</strong>. Чем могу помочь?
+            {locale === "en" ? (<>Hi! I&apos;m <strong>Clippy</strong>. Looks like you are reviewing <strong>Vlad Akhmetov</strong>&apos;s portfolio. How can I help?</>) : (<>Привет! Я <strong>Скрепка</strong>. Похоже, вы оцениваете портфолио <strong>Влада Ахметова</strong>. Чем могу помочь?</>)}
           </p>
 
           {/* Quick Action Options */}
@@ -144,7 +146,7 @@ export function Clippy() {
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">📄</span>
-              <span>Открыть резюме и навыки (CV / HR)</span>
+              <span>{tr("Открыть резюме и навыки (CV / HR)", "Open resume and skills (CV / HR)")}</span>
             </button>
 
             <button
@@ -154,7 +156,7 @@ export function Clippy() {
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">🎬</span>
-              <span>Посмотреть визуализатор волн (WMP)</span>
+              <span>{tr("Посмотреть визуализатор волн (WMP)", "Watch the wave visualizer (WMP)")}</span>
             </button>
 
             <button
@@ -164,7 +166,7 @@ export function Clippy() {
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">⭐</span>
-              <span>Показать флагманский кейс (Kora)</span>
+              <span>{tr("Показать флагманский кейс (dombro)", "Show the flagship case (dombro)")}</span>
             </button>
 
             <a
@@ -175,7 +177,7 @@ export function Clippy() {
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">💬</span>
-              <span>Написать в Telegram @amazi</span>
+              <span>{tr("Написать в Telegram", "Message on Telegram")} {site.handle}</span>
             </a>
           </div>
 
@@ -188,19 +190,19 @@ export function Clippy() {
       <div
         onClick={handleToggle}
         className="relative group cursor-pointer active:scale-95 transition-transform mr-4"
-        title="Нажмите на Скрепку для подсказок"
+        title={tr("Нажмите на Скрепку для подсказок", "Click Clippy for tips")}
         style={{ cursor: xpCursors.pointer }}
       >
         {!isOpen && (
           <div className="absolute -top-7 right-0 bg-[#ffffe1] text-[11px] font-bold text-slate-900 border border-black px-2 py-0.5 rounded shadow-md whitespace-nowrap">
-            Помощь? 📎
+            {tr("Помощь?", "Help?")} 📎
           </div>
         )}
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={poseFileName}
-          alt="Помощник Microsoft Clippy"
+          alt={tr("Помощник Microsoft Clippy", "Microsoft Clippy assistant")}
           width={106}
           height={80}
           className="drop-shadow-[3px_6px_8px_rgba(0,0,0,0.55)] transition-transform duration-200 select-none pointer-events-none hover:scale-105"

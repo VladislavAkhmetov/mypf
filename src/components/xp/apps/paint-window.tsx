@@ -21,32 +21,35 @@ import { startPhysics, type PhysicsController } from "./paint/paint-physics";
 import { exportTimelapseGif, playTimelapse } from "./paint/paint-timelapse";
 import { ToolIcon } from "./paint/paint-icons";
 import styles from "./paint/paint.module.css";
+import { useLocale } from "@/lib/i18n";
 
 // Windows XP Paint, rebuilt: classic toolbox/palette/menus, with modern internals —
 // pressure-smoothed strokes (perfect-freehand), procedural "Harmony" brushes,
 // a physics mode where the drawing comes alive (matter-js) and a timelapse/GIF replay.
 
-const TOOLS: Array<{ id: Tool; label: string; hint: string }> = [
-  { id: "eraser", label: "Ластик", hint: "Стирает цветом фона." },
-  { id: "fill", label: "Заливка", hint: "Заливает замкнутую область цветом." },
-  { id: "picker", label: "Выбор цветов", hint: "Берёт цвет с рисунка. Правая кнопка — цвет фона." },
-  { id: "pencil", label: "Карандаш", hint: "Рисует тонкой линией." },
-  { id: "brush", label: "Кисть", hint: "Рисует кистью выбранного стиля." },
-  { id: "airbrush", label: "Распылитель", hint: "Распыляет краску." },
-  { id: "line", label: "Линия", hint: "Рисует прямую линию." },
-  { id: "rect", label: "Прямоугольник", hint: "Рисует прямоугольник." },
-  { id: "ellipse", label: "Эллипс", hint: "Рисует эллипс." },
-  { id: "roundrect", label: "Скруглённый прямоугольник", hint: "Рисует прямоугольник со скруглёнными углами." },
+const toolsFor = (tr: Tr): Array<{ id: Tool; label: string; hint: string }> => [
+  { id: "eraser", label: tr("Ластик", "Eraser"), hint: tr("Стирает цветом фона.", "Erases with the background colour.") },
+  { id: "fill", label: tr("Заливка", "Fill With Color"), hint: tr("Заливает замкнутую область цветом.", "Fills an enclosed area with colour.") },
+  { id: "picker", label: tr("Выбор цветов", "Pick Color"), hint: tr("Берёт цвет с рисунка. Правая кнопка — цвет фона.", "Picks a colour from the drawing. Right button sets the background colour.") },
+  { id: "pencil", label: tr("Карандаш", "Pencil"), hint: tr("Рисует тонкой линией.", "Draws a thin line.") },
+  { id: "brush", label: tr("Кисть", "Brush"), hint: tr("Рисует кистью выбранного стиля.", "Paints with the selected brush style.") },
+  { id: "airbrush", label: tr("Распылитель", "Airbrush"), hint: tr("Распыляет краску.", "Sprays paint.") },
+  { id: "line", label: tr("Линия", "Line"), hint: tr("Рисует прямую линию.", "Draws a straight line.") },
+  { id: "rect", label: tr("Прямоугольник", "Rectangle"), hint: tr("Рисует прямоугольник.", "Draws a rectangle.") },
+  { id: "ellipse", label: tr("Эллипс", "Ellipse"), hint: tr("Рисует эллипс.", "Draws an ellipse.") },
+  { id: "roundrect", label: tr("Скруглённый прямоугольник", "Rounded Rectangle"), hint: tr("Рисует прямоугольник со скруглёнными углами.", "Draws a rectangle with rounded corners.") },
 ];
 
-const BRUSHES: Array<{ id: BrushStyle; label: string }> = [
-  { id: "smooth", label: "Гладкая" },
-  { id: "sketchy", label: "Набросок" },
-  { id: "shaded", label: "Штриховка" },
-  { id: "web", label: "Паутина" },
-  { id: "fur", label: "Мех" },
+const brushesFor = (tr: Tr): Array<{ id: BrushStyle; label: string }> => [
+  { id: "smooth", label: tr("Гладкая", "Smooth") },
+  { id: "sketchy", label: tr("Набросок", "Sketchy") },
+  { id: "shaded", label: tr("Штриховка", "Shaded") },
+  { id: "web", label: tr("Паутина", "Web") },
+  { id: "fur", label: tr("Мех", "Fur") },
 ];
 
+type Tr = (ru: string, en: string) => string;
+const BRUSH_IDS: BrushStyle[] = ["smooth", "sketchy", "shaded", "web", "fur"];
 const SIZES = [1, 2, 3, 5, 8];
 const FILLS: ShapeFill[] = ["outline", "both", "fill"];
 type Mode = "draw" | "physics" | "timelapse" | "exporting";
@@ -88,6 +91,9 @@ function download(url: string, filename: string) {
 
 export function PaintWindow() {
   const { setWallpaper, showBalloon, activeWindowId } = useWindowManager();
+  const { tr } = useLocale();
+  const TOOLS = toolsFor(tr);
+  const BRUSHES = brushesFor(tr);
   const [tool, setTool] = useState<Tool>("brush");
   const [brushStyle, setBrushStyle] = useState<BrushStyle>("smooth");
   const [size, setSize] = useState(3);
@@ -99,7 +105,7 @@ export function PaintWindow() {
   const [coords, setCoords] = useState<string>("");
   const [canvasSize, setCanvasSize] = useState<{ w: number; h: number } | null>(null);
   const [counts, setCounts] = useState({ ops: 0, redo: 0 });
-  const [previews] = useState(() => Object.fromEntries(BRUSHES.map(b => [b.id, brushPreview(b.id)])) as Record<BrushStyle, string>);
+  const [previews] = useState(() => Object.fromEntries(BRUSH_IDS.map(id => [id, brushPreview(id)])) as Record<BrushStyle, string>);
 
   const workspaceRef = useRef<HTMLDivElement>(null);
   const baseRef = useRef<HTMLCanvasElement>(null);
@@ -352,9 +358,9 @@ export function PaintWindow() {
       const url = URL.createObjectURL(blob);
       download(url, "risunok-timelapse.gif");
       setTimeout(() => URL.revokeObjectURL(url), 2000);
-      showBalloon("Таймлапс сохранён", "GIF с процессом рисования скачан.");
+      showBalloon(tr("Таймлапс сохранён", "Timelapse saved"), tr("GIF с процессом рисования скачан.", "The GIF of your drawing process has been downloaded."));
     } catch {
-      showBalloon("Не удалось сохранить GIF", "Попробуйте ещё раз.");
+      showBalloon(tr("Не удалось сохранить GIF", "Could not save the GIF"), tr("Попробуйте ещё раз.", "Please try again."));
     } finally {
       setMode("draw");
     }
@@ -372,9 +378,9 @@ export function PaintWindow() {
     if (!baseRef.current) return;
     try {
       setWallpaper(snapshot(baseRef.current, "image/jpeg", 0.85, 1600));
-      showBalloon("Фоновый рисунок", "Рисунок теперь на рабочем столе.");
+      showBalloon(tr("Фоновый рисунок", "Background"), tr("Рисунок теперь на рабочем столе.", "Your drawing is now on the desktop."));
     } catch {
-      showBalloon("Не удалось сохранить", "Рисунок не поместился в браузер.");
+      showBalloon(tr("Не удалось сохранить", "Could not save"), tr("Рисунок не поместился в браузер.", "The drawing did not fit into browser storage."));
     }
   };
 
@@ -400,38 +406,38 @@ export function PaintWindow() {
   const toolInfo = TOOLS.find(t => t.id === tool)!;
   const status =
     mode === "physics"
-      ? "Рисунок ожил: хватайте и бросайте его мышью. «Остановить» вернёт всё на место."
+      ? tr("Рисунок ожил: хватайте и бросайте его мышью. «Остановить» вернёт всё на место.", "The drawing came alive: grab and throw it with the mouse. “Stop” puts everything back.")
       : mode === "timelapse"
-        ? "Воспроизведение таймлапса…"
+        ? tr("Воспроизведение таймлапса…", "Playing the timelapse…")
         : mode === "exporting"
-          ? "Создаю GIF…"
+          ? tr("Создаю GIF…", "Making the GIF…")
           : !hasOps
-            ? "Нарисуйте что-нибудь, а потом нажмите «Ожить» или «Таймлапс»."
+            ? tr("Нарисуйте что-нибудь, а потом нажмите «Ожить» или «Таймлапс».", "Draw something, then press “Come alive” or “Timelapse”.")
             : tool === "brush"
-              ? `Кисть «${BRUSHES.find(b => b.id === brushStyle)!.label}». ${toolInfo.hint}`
+              ? `${tr("Кисть", "Brush")} «${BRUSHES.find(b => b.id === brushStyle)!.label}». ${toolInfo.hint}`
               : toolInfo.hint;
 
   type Command = "new" | "png" | "gif" | "wallpaper" | "undo" | "redo" | "clear" | "life" | "timelapse" | "about";
   const menuItems: Record<Exclude<Menu, null>, Array<{ id: Command; label: string; shortcut?: string; disabled?: boolean } | "sep">> = {
     file: [
-      { id: "new", label: "Создать" },
+      { id: "new", label: tr("Создать", "New") },
       "sep",
-      { id: "png", label: "Сохранить как PNG…" },
-      { id: "gif", label: "Сохранить таймлапс (GIF)…", disabled: !hasOps },
+      { id: "png", label: tr("Сохранить как PNG…", "Save as PNG…") },
+      { id: "gif", label: tr("Сохранить таймлапс (GIF)…", "Save timelapse (GIF)…"), disabled: !hasOps },
       "sep",
-      { id: "wallpaper", label: "Сделать фоновым рисунком рабочего стола" },
+      { id: "wallpaper", label: tr("Сделать фоновым рисунком рабочего стола", "Set as desktop background") },
     ],
     edit: [
-      { id: "undo", label: "Отменить", shortcut: "Ctrl+Z", disabled: !hasOps },
-      { id: "redo", label: "Повторить", shortcut: "Ctrl+Y", disabled: !canRedo },
+      { id: "undo", label: tr("Отменить", "Undo"), shortcut: "Ctrl+Z", disabled: !hasOps },
+      { id: "redo", label: tr("Повторить", "Redo"), shortcut: "Ctrl+Y", disabled: !canRedo },
       "sep",
-      { id: "clear", label: "Очистить рисунок" },
+      { id: "clear", label: tr("Очистить рисунок", "Clear image") },
     ],
     image: [
-      { id: "life", label: mode === "physics" ? "Остановить" : "Ожить", disabled: !hasOps },
-      { id: "timelapse", label: "Таймлапс", disabled: !hasOps },
+      { id: "life", label: mode === "physics" ? tr("Остановить", "Stop") : tr("Ожить", "Come alive"), disabled: !hasOps },
+      { id: "timelapse", label: tr("Таймлапс", "Timelapse"), disabled: !hasOps },
     ],
-    help: [{ id: "about", label: "О программе Paint" }],
+    help: [{ id: "about", label: tr("О программе Paint", "About Paint") }],
   };
 
   const runCommand = (command: Command) => {
@@ -464,15 +470,15 @@ export function PaintWindow() {
         runTimelapse();
         break;
       case "about":
-        showBalloon("Paint", "Кисти Harmony, перо perfect-freehand, физика matter-js и таймлапс в GIF.");
+        showBalloon("Paint", tr("Кисти Harmony, перо perfect-freehand, физика matter-js и таймлапс в GIF.", "Harmony brushes, a perfect-freehand pen, matter-js physics and GIF timelapses."));
         break;
     }
   };
 
   return (
     <div className={styles.paint} onPointerDown={event => { if (!(event.target as HTMLElement).closest("[data-menu]")) setMenu(null); }}>
-      <nav className={styles.menuBar} aria-label="Меню Paint">
-        {([["file", "Файл"], ["edit", "Правка"], ["image", "Рисунок"], ["help", "Справка"]] as Array<[Exclude<Menu, null>, string]>).map(([id, label]) => (
+      <nav className={styles.menuBar} aria-label={tr("Меню Paint", "Paint menu")}>
+        {([["file", tr("Файл", "File")], ["edit", tr("Правка", "Edit")], ["image", tr("Рисунок", "Image")], ["help", tr("Справка", "Help")]] as Array<[Exclude<Menu, null>, string]>).map(([id, label]) => (
           <div key={id} className={styles.menuRoot} data-menu>
             <button
               type="button"
@@ -501,35 +507,35 @@ export function PaintWindow() {
       </nav>
 
       <div className={styles.toolbar}>
-        <button type="button" className={styles.toolbarButton} onClick={undo} disabled={!hasOps || mode !== "draw"} title="Отменить (Ctrl+Z)">
+        <button type="button" className={styles.toolbarButton} onClick={undo} disabled={!hasOps || mode !== "draw"} title={tr("Отменить (Ctrl+Z)", "Undo (Ctrl+Z)")}>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 2 7l4 4" /><path d="M2.5 7H10a4 4 0 0 1 0 8H8" /></svg>
-          Отменить
+          {tr("Отменить", "Undo")}
         </button>
-        <button type="button" className={styles.toolbarButton} onClick={redo} disabled={!canRedo || mode !== "draw"} title="Повторить (Ctrl+Y)">
+        <button type="button" className={styles.toolbarButton} onClick={redo} disabled={!canRedo || mode !== "draw"} title={tr("Повторить (Ctrl+Y)", "Redo (Ctrl+Y)")}>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3 4 4-4 4" /><path d="M13.5 7H6a4 4 0 0 0 0 8h2" /></svg>
         </button>
         <span className={styles.separator} />
         <button type="button" className={`${styles.toolbarButton} ${styles.magic} ${mode === "physics" ? styles.pressed : ""}`} onClick={toggleLife} disabled={!hasOps || busy}>
           <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="5" cy="11" r="3" /><path d="M9.5 2.5l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" /></svg>
-          {mode === "physics" ? "Остановить" : "Ожить"}
+          {mode === "physics" ? tr("Остановить", "Stop") : tr("Ожить", "Come alive")}
         </button>
         <button type="button" className={`${styles.toolbarButton} ${mode === "timelapse" ? styles.pressed : ""}`} onClick={runTimelapse} disabled={!hasOps || busy}>
           <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" /><path d="M6.5 5.5v5l4-2.5z" /></svg>
-          Таймлапс
+          {tr("Таймлапс", "Timelapse")}
         </button>
         <button type="button" className={styles.toolbarButton} onClick={saveGif} disabled={!hasOps || busy}>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" /></svg>
-          {mode === "exporting" ? "Создаю…" : "GIF"}
+          {mode === "exporting" ? tr("Создаю…", "Making…") : "GIF"}
         </button>
         <span className={styles.separator} />
         <button type="button" className={styles.toolbarButton} onClick={toWallpaper} disabled={busy} data-ym-goal="paint_set_wallpaper">
           <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" /><path d="M5 14.5h6M8 11.5v3" /></svg>
-          На рабочий стол
+          {tr("На рабочий стол", "To desktop")}
         </button>
       </div>
 
       <div className={styles.main}>
-        <aside className={styles.toolbox} aria-label="Инструменты">
+        <aside className={styles.toolbox} aria-label={tr("Инструменты", "Tools")}>
           <div className={styles.toolGrid}>
             {TOOLS.map(t => (
               <button
@@ -549,21 +555,21 @@ export function PaintWindow() {
           <div className={styles.optionBox}>
             {tool === "brush" &&
               BRUSHES.map(b => (
-                <button key={b.id} type="button" title={b.label} aria-label={`Стиль кисти: ${b.label}`} className={brushStyle === b.id ? styles.optionActive : ""} onClick={() => { xpSound.click(); setBrushStyle(b.id); }}>
+                <button key={b.id} type="button" title={b.label} aria-label={`${tr("Стиль кисти", "Brush style")}: ${b.label}`} className={brushStyle === b.id ? styles.optionActive : ""} onClick={() => { xpSound.click(); setBrushStyle(b.id); }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={previews[b.id]} alt="" width={52} height={14} />
                 </button>
               ))}
             {(tool === "rect" || tool === "ellipse" || tool === "roundrect") &&
               FILLS.map(fill => (
-                <button key={fill} type="button" aria-label={{ outline: "Только контур", both: "Контур и заливка", fill: "Только заливка" }[fill]} className={shapeFill === fill ? styles.optionActive : ""} onClick={() => setShapeFill(fill)}>
+                <button key={fill} type="button" aria-label={{ outline: tr("Только контур", "Outline only"), both: tr("Контур и заливка", "Outline and fill"), fill: tr("Только заливка", "Fill only") }[fill]} className={shapeFill === fill ? styles.optionActive : ""} onClick={() => setShapeFill(fill)}>
                   <span className={`${styles.fillSample} ${styles[`fill_${fill}`]}`} />
                 </button>
               ))}
             {(tool === "pencil" || tool === "eraser" || tool === "line" || tool === "airbrush" || (tool === "brush" && brushStyle === "smooth") || tool === "rect" || tool === "ellipse" || tool === "roundrect") && (
               <div className={styles.sizes}>
                 {SIZES.map((s, i) => (
-                  <button key={s} type="button" aria-label={`Толщина ${s}`} className={size === i + 1 ? styles.optionActive : ""} onClick={() => setSize(i + 1)}>
+                  <button key={s} type="button" aria-label={`${tr("Толщина", "Size")} ${s}`} className={size === i + 1 ? styles.optionActive : ""} onClick={() => setSize(i + 1)}>
                     <i style={{ height: Math.max(1, Math.round(s * 0.75)) }} />
                   </button>
                 ))}
@@ -575,7 +581,7 @@ export function PaintWindow() {
         <div ref={workspaceRef} className={styles.workspace}>
           {canvasSize && (
             <div className={styles.canvasWrap} style={{ width: canvasSize.w, height: canvasSize.h }}>
-              <canvas ref={baseRef} width={canvasSize.w * dpr} height={canvasSize.h * dpr} style={{ width: canvasSize.w, height: canvasSize.h }} className={mode === "physics" ? styles.grabbable : ""} aria-label="Холст" />
+              <canvas ref={baseRef} width={canvasSize.w * dpr} height={canvasSize.h * dpr} style={{ width: canvasSize.w, height: canvasSize.h }} className={mode === "physics" ? styles.grabbable : ""} aria-label={tr("Холст", "Canvas")} />
               <canvas
                 ref={liveRef}
                 width={canvasSize.w * dpr}
@@ -598,16 +604,16 @@ export function PaintWindow() {
       </div>
 
       <footer className={styles.paletteBar}>
-        <div className={styles.current} aria-label="Текущие цвета">
+        <div className={styles.current} aria-label={tr("Текущие цвета", "Current colours")}>
           <span className={styles.bgSwatch} style={{ background: bg }} />
           <span className={styles.fgSwatch} style={{ background: fg }} />
         </div>
-        <div className={styles.palette} role="listbox" aria-label="Палитра">
+        <div className={styles.palette} role="listbox" aria-label={tr("Палитра", "Palette")}>
           {XP_PALETTE.map(color => (
             <button
               key={color}
               type="button"
-              aria-label={`Цвет ${color}`}
+              aria-label={`${tr("Цвет", "Colour")} ${color}`}
               style={{ background: color }}
               onClick={() => setFg(color)}
               onContextMenu={event => {

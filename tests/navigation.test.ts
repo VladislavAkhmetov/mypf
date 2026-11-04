@@ -42,23 +42,23 @@ describe("parseNavigationParams", () => {
     expect(result.projectSlug).toBeUndefined();
   });
 
-  it("handles ?project=kora correctly", () => {
-    const result = parseNavigationParams("?project=kora");
+  it("handles ?project=dombro correctly", () => {
+    const result = parseNavigationParams("?project=dombro");
     expect(result.target).toBe("portfolio");
-    expect(result.projectSlug).toBe("kora");
+    expect(result.projectSlug).toBe("dombro");
     expect(result.projectNotFound).toBeUndefined();
   });
 
   it("prioritizes known project over view parameter", () => {
-    const result = parseNavigationParams("?project=kora&view=profile");
+    const result = parseNavigationParams("?project=dombro&view=profile");
     expect(result.target).toBe("portfolio");
-    expect(result.projectSlug).toBe("kora");
+    expect(result.projectSlug).toBe("dombro");
   });
 
   it("preserves focus with project", () => {
-    const result = parseNavigationParams("?project=kora&focus=communication");
+    const result = parseNavigationParams("?project=dombro&focus=communication");
     expect(result.target).toBe("portfolio");
-    expect(result.projectSlug).toBe("kora");
+    expect(result.projectSlug).toBe("dombro");
     expect(result.focus).toBe("communication");
   });
 
@@ -81,9 +81,9 @@ describe("parseNavigationParams", () => {
   });
 
   it("preserves extraneous query parameters", () => {
-    const result = parseNavigationParams("?project=kora&source=mail&ref=xyz");
+    const result = parseNavigationParams("?project=dombro&source=mail&ref=xyz");
     expect(result.target).toBe("portfolio");
-    expect(result.projectSlug).toBe("kora");
+    expect(result.projectSlug).toBe("dombro");
     expect(result.otherParams).toEqual({
       source: "mail",
       ref: "xyz",
@@ -99,13 +99,13 @@ describe("parseNavigationParams", () => {
 
 describe("buildNavigationQuery", () => {
   it("round-trips tool deep links with focus and unrelated parameters", () => {
-    const query = buildNavigationQuery("portfolio", { toolSlug: "auto-bezier-kern", focus: "engineering", otherParams: { source: "test" } });
-    expect(parseNavigationParams(query)).toEqual({ target: "portfolio", toolSlug: "auto-bezier-kern", focus: "engineering", otherParams: { source: "test" } });
+    const query = buildNavigationQuery("portfolio", { toolSlug: "printplix", focus: "engineering", otherParams: { source: "test" } });
+    expect(parseNavigationParams(query)).toEqual({ target: "portfolio", toolSlug: "printplix", focus: "engineering", otherParams: { source: "test" } });
   });
 
   it("routes unknown tools to the catalog and prioritizes a project", () => {
     expect(parseNavigationParams("?tool=missing").projectNotFound).toBe(true);
-    expect(parseNavigationParams("?tool=auto-bezier-kern&project=kora").projectSlug).toBe("kora");
+    expect(parseNavigationParams("?tool=printplix&project=dombro").projectSlug).toBe("dombro");
   });
   it("builds query for profile with no extra params", () => {
     expect(buildNavigationQuery("profile")).toBe("");
@@ -131,18 +131,18 @@ describe("buildNavigationQuery", () => {
 
   it("builds query for project", () => {
     expect(
-      buildNavigationQuery("portfolio", { projectSlug: "kora" })
-    ).toBe("?project=kora");
+      buildNavigationQuery("portfolio", { projectSlug: "dombro" })
+    ).toBe("?project=dombro");
   });
 
   it("builds query for project with preserved focus and extra params", () => {
     expect(
       buildNavigationQuery("portfolio", {
-        projectSlug: "kora",
+        projectSlug: "dombro",
         focus: "communication",
         otherParams: { tag: "arch" },
       })
-    ).toBe("?tag=arch&project=kora&focus=communication");
+    ).toBe("?tag=arch&project=dombro&focus=communication");
   });
 });
 

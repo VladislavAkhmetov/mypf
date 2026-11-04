@@ -9,13 +9,14 @@ export interface GameConfig {
   cols: number;
   mines: number;
   name: string;
+  nameEn: string;
 }
 
 export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, GameConfig> = {
-  sprint: { rows: 8, cols: 8, mines: 8, name: "Дизайн-спринт (8×8)" },
-  beginner: { rows: 9, cols: 9, mines: 10, name: "Новичок (9×9)" },
-  intermediate: { rows: 16, cols: 16, mines: 40, name: "Любитель (16×16)" },
-  expert: { rows: 16, cols: 30, mines: 99, name: "Профессионал (16×30)" },
+  sprint: { rows: 8, cols: 8, mines: 8, name: "Дизайн-спринт (8×8)", nameEn: "Design sprint (8×8)" },
+  beginner: { rows: 9, cols: 9, mines: 10, name: "Новичок (9×9)", nameEn: "Beginner (9×9)" },
+  intermediate: { rows: 16, cols: 16, mines: 40, name: "Любитель (16×16)", nameEn: "Intermediate (16×16)" },
+  expert: { rows: 16, cols: 30, mines: 99, name: "Профессионал (16×30)", nameEn: "Expert (16×30)" },
 };
 
 export interface MinesweeperWindowBounds {

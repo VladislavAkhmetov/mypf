@@ -19,11 +19,13 @@ import {
 } from "@/lib/xp/minesweeper-game";
 import { forestTexture } from "./minesweeper/pixel-art";
 import styles from "./minesweeper/minesweeper.module.css";
+import { useLocale } from "@/lib/i18n";
 
 // Self-hosted at build time (works on static hosting); has Cyrillic glyphs.
 const pixelFont = Press_Start_2P({ weight: "400", subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-pixel" });
 
 export function MinesweeperWindow() {
+  const { tr } = useLocale();
   const session = useMinesweeperSession();
   const preferences = useGamePreferences();
   const { windows, updateWindowBounds } = useWindowManager();
@@ -132,10 +134,10 @@ export function MinesweeperWindow() {
       {session.isPaused && (
         <div className={styles.resultBackdrop}>
           <section className={styles.result}>
-            <h3>Пауза</h3>
-            <p>Окно свёрнуто или потеряло фокус.</p>
+            <h3>{tr("Пауза", "Paused")}</h3>
+            <p>{tr("Окно свёрнуто или потеряло фокус.", "The window was minimized or lost focus.")}</p>
             <div className={styles.resultActions}>
-              <button onClick={() => minesweeperStore.setPaused(false)}>Продолжить</button>
+              <button onClick={() => minesweeperStore.setPaused(false)}>{tr("Продолжить", "Resume")}</button>
             </div>
           </section>
         </div>

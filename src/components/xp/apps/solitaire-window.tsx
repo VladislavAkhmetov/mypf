@@ -13,12 +13,14 @@ import { useWindowManager } from "../window-manager-context";
 import { Manrope, Playfair_Display } from "next/font/google";
 import { DeckDefs, DeckMonogram } from "./solitaire/card-assets";
 import styles from "./solitaire/solitaire.module.css";
+import { useLocale } from "@/lib/i18n";
 
 // Self-hosted at build time (static hosting friendly); both have Cyrillic.
 const displayFont = Playfair_Display({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], style: ["normal", "italic"], variable: "--font-display", display: "swap" });
 const uiFont = Manrope({ subsets: ["latin", "cyrillic"], weight: ["500", "600", "700"], variable: "--font-ui", display: "swap" });
 
 export function SolitaireWindow() {
+  const { tr } = useLocale();
   const session = useSolitaireSession();
   const { activeWindowId } = useWindowManager();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
@@ -93,9 +95,9 @@ export function SolitaireWindow() {
         <div className={styles.pause}>
           <section>
             <DeckMonogram className={styles.mark} />
-            <h3 className={styles.display}>Пауза</h3>
-            <p>Окно было свёрнуто или потеряло фокус.</p>
-            <button onClick={() => solitaireStore.setPaused(false)}>Продолжить</button>
+            <h3 className={styles.display}>{tr("Пауза", "Paused")}</h3>
+            <p>{tr("Окно было свёрнуто или потеряло фокус.", "The window was minimized or lost focus.")}</p>
+            <button onClick={() => solitaireStore.setPaused(false)}>{tr("Продолжить", "Resume")}</button>
           </section>
         </div>
       )}

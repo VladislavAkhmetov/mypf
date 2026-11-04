@@ -1,0 +1,81 @@
+/* Pinned scroll scene: giant tabs fly by, blur into a streak, turn to dust, then the answer. */
+.track {
+  --p: 0;
+  position: relative;
+  height: calc(var(--vh, 760px) * 6.2);
+  background: #f3f2ec;
+}
+.pin { position: sticky; top: 0; height: var(--vh, 760px); overflow: hidden; display: grid; place-items: center; padding-top: 64px; }
+.wash { position: absolute; inset: -10% -5%; z-index: 0; pointer-events: none; background: radial-gradient(34% 30% at 14% 25%, #cfe3f4 0%, transparent 70%), radial-gradient(30% 26% at 88% 30%, #fbe7c6 0%, transparent 70%), radial-gradient(40% 30% at 25% 85%, #d2e6c2 0%, transparent 70%), radial-gradient(34% 26% at 82% 88%, #e1dbf3 0%, transparent 70%); animation: wash 20s ease-in-out infinite alternate; }
+.defs { position: absolute; width: 0; height: 0; }
+
+/* Flying tabs */
+.laneWrap { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: grid; align-items: start; z-index: 1; pointer-events: none; }
+.lane {
+  --m: -35;
+  position: relative; height: calc(var(--th, 360px) + var(--pad, 72px)); overflow: hidden;
+  font-size: calc(var(--th, 360px) / 22);
+  -webkit-mask-image: linear-gradient(to right, transparent calc(var(--m) * 1%), #000 calc(var(--m) * 1% + 30%));
+  mask-image: linear-gradient(to right, transparent calc(var(--m) * 1%), #000 calc(var(--m) * 1% + 30%));
+}
+.row { position: absolute; left: 0; top: var(--pad, 72px); height: var(--th, 360px); display: flex; will-change: transform; transform: translate3d(100vw, 0, 0); }
+/* The strip spans the full width; tabs ride along it */
+.lane::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #d3e2fb 0%, #d4e3fb 52%, rgba(212, 227, 251, 0) 100%); }
+.row { z-index: 1; }
+/* Open browser tabs: a pale-blue strip with favicons only, thin dividers, white active tabs. Fades out downward. */
+.tile {
+  position: relative; flex: none; width: 14em; height: 22em; display: flex; justify-content: center; padding-top: 1.8em;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 56%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 56%, transparent 100%);
+}
+.tile::before { content: ""; position: absolute; left: 0; top: 3.6em; width: .12em; height: 5.2em; border-radius: 1em; background: rgba(58, 104, 214, .38); }
+.glyph { width: 9em; height: 9em; margin-top: 1.2em; color: var(--h); flex: none; }
+.dust { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+
+/* Headings: same size, one replaces the other */
+.frame { position: relative; z-index: 3; width: calc(1200px * var(--sc, 1)); height: calc(780px * var(--sc, 1)); }
+.canvas { position: absolute; left: 0; top: 0; width: 1200px; height: 780px; transform: scale(var(--sc, 1)); transform-origin: top left; }
+.headSlot { position: absolute; left: 0; right: 0; top: 270px; }
+.heads { display: grid; place-items: center; text-align: center; }
+.head { grid-area: 1 / 1; margin: 0; font-size: 84px; line-height: .88; letter-spacing: -.03em; font-weight: 500; color: #10291f; text-wrap: balance; max-width: 560px; }
+.headA {
+  --ki: clamp(0, calc((var(--p) - .58) / .07), 1);
+  --ko: clamp(0, calc((var(--p) - .73) / .07), 1);
+  --k: calc(var(--ki) * (1 - var(--ko)));
+  opacity: var(--k);
+  filter: blur(calc((1 - var(--k)) * 16px));
+  transform: translateY(calc((1 - var(--ki)) * 20px - var(--ko) * 18px));
+}
+.headB {
+  --k: clamp(0, calc((var(--p) - .75) / .07), 1);
+  opacity: var(--k);
+  filter: blur(calc((1 - var(--k)) * 16px));
+  transform: translateY(calc((1 - var(--k)) * 20px));
+}
+
+/* Plates appear one by one from blur */
+.plate { --k: clamp(0, calc((var(--p) - var(--s)) / .06), 1); position: absolute; width: 340px; opacity: var(--k); filter: blur(calc((1 - var(--k)) * 18px)); transform: translateY(calc((1 - var(--k)) * 24px)) scale(calc(.96 + var(--k) * .04)); }
+.pFocus { left: 0; top: 130px; }
+.pSpace { right: 0; top: 150px; }
+.pCapture { left: 400px; width: 400px; top: 580px; }
+.cap { margin-top: 14px; padding: 0 8px; color: #1d3328; }
+.capTitle { font-family: var(--font-dombro-serif), Georgia, serif; font-weight: 500; font-size: 26px; line-height: 1; letter-spacing: -.015em; }
+.capText { margin-top: 6px; font-size: 14px; line-height: 1.45; color: #5d7064; max-width: 36ch; }
+
+/* Narrow windows: the heading stays pinned, plates follow in a column */
+.narrowPin { position: relative; z-index: 3; width: 100%; padding: 0 16px; }
+.narrowPin .head { font-size: clamp(40px, 11.5cqw, 72px); max-width: 100%; }
+.stack { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 36px; padding: 0 16px 56px; background: #f3f2ec; --p: 1; }
+.plateStacked { position: static; width: min(100%, 420px); opacity: 1; filter: none; transform: none; }
+
+@keyframes wash { from { transform: translate3d(-2%, -1%, 0) scale(1); } to { transform: translate3d(2%, 2%, 0) scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .wash { animation: none; } .track { height: auto; } .pin { position: static; height: auto; min-height: 780px; } }
+
+/* Phones: the tab strip is smaller and sits in the middle of the screen */
+.track[data-narrow="true"] { --pad: 0px; }
+.track[data-narrow="true"] .pin::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 42%; z-index: 0; pointer-events: none; background: linear-gradient(180deg, #d3e2fb 0%, rgba(211, 226, 251, 0) 100%); opacity: calc(1 - clamp(0, calc((var(--p) - .02) / .1), 1)); }
+.track[data-narrow="true"] .laneWrap { align-items: center; }
+.track[data-narrow="true"] .lane::before { background: linear-gradient(180deg, rgba(211, 226, 251, 0) 0%, #d3e2fb 26%, #d4e3fb 62%, rgba(211, 226, 251, 0) 100%); }
+.track[data-narrow="true"] .tile { padding-top: 4.6em; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 62%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 62%, transparent 100%); }
+.track[data-narrow="true"] .tile::before { top: 6.4em; }
+.track[data-narrow="true"] .glyph { margin-top: .6em; }

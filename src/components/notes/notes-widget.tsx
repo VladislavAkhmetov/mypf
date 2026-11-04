@@ -5,11 +5,12 @@ import { motion } from "motion/react";
 import { newestNotes } from "@/data/notes";
 import { useWindowManager } from "@/components/xp/window-manager-context";
 import styles from "./notes-widget.module.css";
+import { useLocale } from "@/lib/i18n";
 
-function formatPostDate(iso: string): string {
+function formatPostDate(iso: string, locale: "ru" | "en"): string {
   try {
     const d = new Date(iso);
-    const month = d.toLocaleDateString("ru-RU", { month: "long" });
+    const month = d.toLocaleDateString(locale === "en" ? "en-US" : "ru-RU", { month: "long" });
     const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
     return `${capitalizedMonth} ${d.getFullYear()}`;
   } catch {
@@ -18,6 +19,7 @@ function formatPostDate(iso: string): string {
 }
 
 export function NotesWidget() {
+  const { tr, locale } = useLocale();
   const { openNotes, windows } = useWindowManager();
   const expanded = windows.some(win => win.id === "notes" && !win.isMinimized);
   const latest = newestNotes[0];
@@ -27,14 +29,14 @@ export function NotesWidget() {
   return (
     <aside
       className={styles.widget}
-      aria-label="Виджет журнала"
+      aria-label={tr("Виджет журнала", "Journal widget")}
       onPointerDown={event => event.stopPropagation()}
       onContextMenu={event => event.stopPropagation()}
     >
       {/* Widget Header */}
       <header className={styles.header}>
         <div className={styles.brandRow}>
-          <h2>Журнал</h2>
+          <h2>{tr("Журнал", "Journal")}</h2>
         </div>
 
         <motion.button
@@ -44,7 +46,7 @@ export function NotesWidget() {
           transition={{ type: "spring", stiffness: 450, damping: 22 }}
           className={styles.expand}
           onClick={() => openNotes()}
-          aria-label="Раскрыть журнал"
+          aria-label={tr("Раскрыть журнал", "Expand journal")}
         >
           <svg
             width="20"
@@ -65,59 +67,39 @@ export function NotesWidget() {
       {/* Clipped Feed */}
       <div className={styles.clippedFeed}>
         {newestNotes.slice(0, 2).map((note, index) => {
-          const media = note.media?.[0];
+          const media = note.cover;
           return (
             <button
               key={note.id}
               type="button"
               className={styles.entry}
               data-widget-note={note.id}
-              onClick={() => openNotes()}
-              aria-label={index === 0 ? "Читать последнюю запись" : "Читать предыдущую запись"}
+              onClick={() => openNotes({ noteId: note.id })}
+              aria-label={index === 0 ? tr("Читать последнюю запись", "Read the latest entry") : tr("Читать предыдущую запись", "Read the previous entry")}
             >
               {/* Date Header */}
               <div className={styles.dateRow}>
                 <time className={styles.date} dateTime={note.date}>
-                  {formatPostDate(note.date)}
+                  {formatPostDate(note.date, locale)}
                 </time>
               </div>
 
               {/* Text content */}
-              <span className={styles.excerpt}>{note.text.split("\n\n")[0]}</span>
+              <span className={styles.excerpt}><strong>{note.title}</strong> {note.excerpt}</span>
 
               {/* Media image */}
               {media && (
                 <span className={styles.cover}>
                   {media.type === "image" ? (
-                    <Image src={media.src} alt={media.alt} fill sizes="400px" unoptimized />
-                  ) : media.poster ? (
-                    <Image src={media.poster} alt={media.alt} fill sizes="400px" unoptimized />
+                    // Fixed size instead of `fill`: if the stylesheet is late (e.g. after a hot reload),
+                    // a `fill` image would position itself against the whole desktop and cover it.
+                    <Image src={media.src} alt={media.alt} width={800} height={500} unoptimized />
                   ) : (
                     <video src={media.src} preload="metadata" muted playsInline aria-label={media.alt} />
                   )}
                   {media.type === "video" && <span className={styles.play} aria-hidden="true">▶</span>}
                 </span>
               )}
-
-              {/* Mini Threads Action Bar */}
-              <div className={styles.miniActions} aria-hidden="true">
-                <span className={styles.miniActionIcon}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
-                </span>
-                <span className={styles.miniActionIcon}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                  </svg>
-                </span>
-                <span className={styles.miniActionIcon}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </span>
-              </div>
             </button>
           );
         })}
@@ -132,7 +114,7 @@ export function NotesWidget() {
         className={styles.open}
         onClick={() => openNotes()}
       >
-        <span>Открыть журнал</span>
+        <span>{tr("Открыть журнал", "Open journal")}</span>
         <span aria-hidden="true">↗</span>
       </motion.button>
     </aside>

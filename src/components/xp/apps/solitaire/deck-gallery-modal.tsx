@@ -1,11 +1,13 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { createDeck, getRankNameRu, getSuitNameRu } from "@/lib/xp/solitaire-deck";
+import { createDeck, getRankName, getSuitName } from "@/lib/xp/solitaire-deck";
 import { useDialogFocus } from "@/lib/xp/use-dialog-focus";
 import { CardBack, SolitaireCard } from "./solitaire-card";
 import styles from "./solitaire-dialog.module.css";
+import { useLocale } from "@/lib/i18n";
 
 export function DeckGalleryModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { tr, locale } = useLocale();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [back, setBack] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -20,19 +22,19 @@ export function DeckGalleryModal({ isOpen, onClose }: { isOpen: boolean; onClose
   if (!isOpen) return null;
 
   return (
-    <div ref={dialogRef} className={styles.overlay} role="dialog" aria-modal="true" aria-label="Коллекция карт">
+    <div ref={dialogRef} className={styles.overlay} role="dialog" aria-modal="true" aria-label={tr("Коллекция карт", "Card collection")}>
       <section className={`${styles.panel} ${styles.gallery}`}>
         <header>
-          <h2>Одна колода. 52 карты.</h2>
-          <button onClick={onClose} aria-label="Вернуться к игре">Вернуться к игре</button>
+          <h2>{tr("Одна колода. 52 карты.", "One deck. 52 cards.")}</h2>
+          <button onClick={onClose} aria-label={tr("Вернуться к игре", "Back to the game")}>{tr("Вернуться к игре", "Back to the game")}</button>
         </header>
-        <p>Выбери карту, чтобы рассмотреть её поближе.</p>
+        <p>{tr("Выбери карту, чтобы рассмотреть её поближе.", "Pick a card to take a closer look.")}</p>
         <div className={styles.cardGrid}>
           {deck.map(card => (
             <button
               key={card.id}
               data-testid="gallery-card"
-              aria-label={`${getRankNameRu(card.rank)}, ${getSuitNameRu(card.suit)}`}
+              aria-label={`${getRankName(card.rank, locale)}, ${getSuitName(card.suit, locale)}`}
               onClick={() => { setSelectedId(card.id); setBack(false); }}
             >
               <SolitaireCard card={card} />
@@ -43,8 +45,8 @@ export function DeckGalleryModal({ isOpen, onClose }: { isOpen: boolean; onClose
           <div className={styles.inspector}>
             <div className={styles.largeCard}>{back ? <CardBack /> : <SolitaireCard card={selected} />}</div>
             <div className={styles.actions}>
-              <button onClick={() => setBack(!back)}>{back ? "Показать лицевую сторону" : "Показать рубашку"}</button>
-              <button aria-label="Закрыть просмотр карты" onClick={() => setSelectedId(null)}>Закрыть</button>
+              <button onClick={() => setBack(!back)}>{back ? tr("Показать лицевую сторону", "Show the face") : tr("Показать рубашку", "Show the back")}</button>
+              <button aria-label={tr("Закрыть просмотр карты", "Close card view")} onClick={() => setSelectedId(null)}>{tr("Закрыть", "Close")}</button>
             </div>
           </div>
         )}

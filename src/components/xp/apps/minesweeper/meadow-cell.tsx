@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { Cell } from "@/lib/xp/minesweeper-game";
 import { ART, MEADOW, cellSpriteUrl, digitUrl } from "./pixel-art";
 import styles from "./minesweeper.module.css";
+import { useLocale } from "@/lib/i18n";
 
 export interface CellEdges {
   top: boolean;
@@ -37,6 +38,7 @@ export function MeadowCell({
   onPointerPressStateChange,
   reducedMotion = false,
 }: MeadowCellProps) {
+  const { tr } = useLocale();
   const [isPressing, setIsPressing] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startPosition = useRef<{ x: number; y: number } | null>(null);
@@ -82,13 +84,13 @@ export function MeadowCell({
   const px = cellSize / ART;
   const label = cell.isOpen
     ? cell.isMine
-      ? `Мина, строка ${cell.row + 1}, столбец ${cell.col + 1}`
-      : `Открыто: ${cell.neighborMines || "пусто"}`
+      ? `${tr("Мина, строка", "Mine, row")} ${cell.row + 1}, ${tr("столбец", "column")} ${cell.col + 1}`
+      : `${tr("Открыто", "Open")}: ${cell.neighborMines || tr("пусто", "empty")}`
     : cell.isFlagged
-      ? "Установлен флаг"
+      ? tr("Установлен флаг", "Flagged")
       : cell.isQuestion
-        ? "Помечено вопросом"
-        : "Закрытая клетка";
+        ? tr("Помечено вопросом", "Marked with a question")
+        : tr("Закрытая клетка", "Hidden cell");
 
   // Texture continues across cells: offset by the cell's position inside a 4×4-cell tile.
   const style: React.CSSProperties = {

@@ -31,7 +31,7 @@ export function MyComputerIcon({ className = "w-8 h-8" }: { className?: string }
   return (
     <img
       src="/icons/xp/my-computer.png"
-      alt="Мой компьютер"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -42,7 +42,7 @@ export function MyDocumentsIcon({ className = "w-8 h-8" }: { className?: string 
   return (
     <img
       src="/icons/xp/my-documents.png"
-      alt="Мои документы"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -64,7 +64,7 @@ export function NotepadIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/notepad.png"
-      alt="Блокнот"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -86,7 +86,7 @@ export function StoriesIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/journal.svg"
-      alt="Журнал"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -182,7 +182,7 @@ export function CmdIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/cmd.png"
-      alt="Командная строка"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -193,7 +193,7 @@ export function SolitaireIcon({ className = "w-8 h-8" }: { className?: string })
   return (
     <img
       src="/icons/xp/solitaire.png"
-      alt="Косынка"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -204,7 +204,7 @@ export function ToolsIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/briefcase.png"
-      alt="Инструменты"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -226,7 +226,7 @@ export function MinesweeperIcon({ className = "w-8 h-8" }: { className?: string 
   return (
     <img
       src="/icons/xp/minesweeper.png"
-      alt="Сапёр"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -248,7 +248,7 @@ export function PdfIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/pdf.png"
-      alt="Резюме PDF"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />
@@ -275,11 +275,55 @@ export function DisplayThemeIcon({ className = "w-8 h-8" }: { className?: string
 
 
 
+export function DombroIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/dombro.svg"
+      alt="dombro"
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}
+
+export function KroomiIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/kroomi.svg"
+      alt="kroomi"
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}
+
+export function BaltikaIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/baltika.webp"
+      alt=""
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}
+
+export function DesignerGameIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/designer-game.svg"
+      alt=""
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}
+
 export function HelpCenterIcon({ className = "w-8 h-8" }: { className?: string }) {
   return (
     <img
       src="/icons/xp/help.svg"
-      alt="Центр справки и поддержки"
+      alt=""
       className={`${className} object-contain select-none pointer-events-none`}
       draggable={false}
     />

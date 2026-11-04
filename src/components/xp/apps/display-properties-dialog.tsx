@@ -5,58 +5,46 @@ import { useWindowManager, XpTheme } from "../window-manager-context";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 import { getWallpaperPeriod, TIME_WALLPAPERS } from "@/lib/xp/time-wallpaper";
-import { DEFAULT_WALLPAPER_SRC } from "@/lib/xp/wallpapers";
+import { ThemePreview } from "./theme-preview";
 
 interface ThemeOption {
   id: XpTheme;
   name: string;
   subtitle: string;
-  titlebarBg: string;
-  startBtnBg: string;
-  taskbarBg: string;
   description: string;
 }
 
-const themeOptions: ThemeOption[] = [
+const themeOptionsFor = (tr: Tr): ThemeOption[] => [
   {
     id: "luna-blue",
-    name: "Luna Blue (Классический синий)",
-    subtitle: "Оригинальная палитра Windows XP",
-    titlebarBg: "linear-gradient(180deg, #0058ee 0%, #3593ff 10%, #0054e3 40%, #0030b4 100%)",
-    startBtnBg: "linear-gradient(180deg, #44a530 0%, #2c841a 50%, #226f12 100%)",
-    taskbarBg: "linear-gradient(180deg, #316ac5 0%, #1742b6 30%, #163da8 100%)",
-    description: "Культовый синий глянец, изумрудная кнопка «Пуск», высокая насыщенность и мягкие блики.",
+    name: tr("Luna Blue (Классический синий)", "Luna Blue (Classic blue)"),
+    subtitle: tr("Оригинальная палитра Windows XP", "The original Windows XP palette"),
+    description: tr("Культовый синий глянец, изумрудная кнопка «Пуск», высокая насыщенность и мягкие блики.", "The iconic blue gloss, an emerald Start button, rich saturation and soft highlights."),
   },
   {
     id: "luna-silver",
-    name: "Luna Silver (Металлик)",
-    subtitle: "Сдержанная графическая эстетика",
-    titlebarBg: "linear-gradient(180deg, #e2e8f0 0%, #94a3b8 50%, #475569 100%)",
-    startBtnBg: "linear-gradient(180deg, #64748b 0%, #475569 50%, #334155 100%)",
-    taskbarBg: "linear-gradient(180deg, #94a3b8 0%, #475569 50%, #334155 100%)",
-    description: "Шлифованный алюминий, контрастный графит, нейтральная подача для фокуса на работах.",
+    name: tr("Luna Silver (Металлик)", "Luna Silver (Metallic)"),
+    subtitle: tr("Сдержанная графическая эстетика", "Restrained graphic look"),
+    description: tr("Шлифованный алюминий, контрастный графит, нейтральная подача для фокуса на работах.", "Brushed aluminium and contrasting graphite, a neutral look that keeps the focus on the work."),
   },
   {
     id: "classic",
     name: "Windows Classic (2000 Pro)",
-    subtitle: "Индустриальная геометрия и фаски",
-    titlebarBg: "linear-gradient(90deg, #000080 0%, #1084d0 100%)",
-    startBtnBg: "#d4d0c8",
-    taskbarBg: "#d4d0c8",
-    description: "Прямоугольные формы, чистый синий градиент, серое полотно #d4d0c8 и осязаемый bevel-объем.",
+    subtitle: tr("Индустриальная геометрия и фаски", "Industrial geometry and bevels"),
+    description: tr("Прямоугольные формы, чистый синий градиент, серое полотно #d4d0c8 и осязаемый bevel-объем.", "Rectangular shapes, a clean blue gradient, the grey #d4d0c8 canvas and tactile bevels."),
   },
   {
     id: "royale-noir",
-    name: "Royale Noir (Темная тема)",
-    subtitle: "Обсидиановый монохром с неоном",
-    titlebarBg: "linear-gradient(180deg, #334155 0%, #0f172a 50%, #020617 100%)",
-    startBtnBg: "linear-gradient(180deg, #0284c7 0%, #0369a1 50%, #075985 100%)",
-    taskbarBg: "linear-gradient(180deg, #1e293b 0%, #0f172a 50%, #020617 100%)",
-    description: "Глубокий полуночный сланец, минимальные блики и аккуратный электрический акцент.",
+    name: tr("Royale Noir (Темная тема)", "Royale Noir (Dark theme)"),
+    subtitle: tr("Обсидиановый монохром с неоном", "Obsidian monochrome with neon"),
+    description: tr("Глубокий полуночный сланец, минимальные блики и аккуратный электрический акцент.", "Deep midnight slate, minimal highlights and a careful electric accent."),
   },
 ];
 
-import { WALLPAPERS } from "@/lib/xp/wallpapers";
+import { WALLPAPERS, wallpaperText } from "@/lib/xp/wallpapers";
+import { useLocale } from "@/lib/i18n";
+
+type Tr = (ru: string, en: string) => string;
 
 export function DisplayPropertiesDialog() {
   const {
@@ -68,13 +56,17 @@ export function DisplayPropertiesDialog() {
     setTheme,
     closeWindow,
   } = useWindowManager();
+  const { tr, locale } = useLocale();
+  const themeOptions = themeOptionsFor(tr);
   const [activeTab, setActiveTab] = useState<"themes" | "wallpapers">("themes");
   const [selectedTheme, setSelectedTheme] = useState<XpTheme>(theme);
+  const [hoverTheme, setHoverTheme] = useState<XpTheme | null>(null);
   const [selectedWp, setSelectedWp] = useState<string>(wallpaper);
   const [selectedMode, setSelectedMode] = useState(wallpaperSource);
   const previewWp = selectedMode === "time" ? TIME_WALLPAPERS[getWallpaperPeriod(new Date())] : selectedWp;
 
-  const currentThemeObj = themeOptions.find((t) => t.id === selectedTheme) || themeOptions[0];
+  const shownTheme = hoverTheme ?? selectedTheme;
+  const shownThemeObj = themeOptions.find((t) => t.id === shownTheme) || themeOptions[0];
 
   const handleApply = () => {
     xpSound.click();
@@ -113,7 +105,7 @@ export function DisplayPropertiesDialog() {
           }`}
           style={{ cursor: xpCursors.pointer }}
         >
-          Темы оформления (Themes)
+          {tr("Темы", "Themes")}
         </button>
         <button
           type="button"
@@ -128,54 +120,21 @@ export function DisplayPropertiesDialog() {
           }`}
           style={{ cursor: xpCursors.pointer }}
         >
-          Фоновый рисунок (Wallpapers)
+          {tr("Фон рабочего стола", "Desktop")}
         </button>
       </div>
 
-      {/* Monitor CRT Preview */}
-      <div className="flex justify-center mb-3">
-        <div className="w-56 h-36 bg-[#d0d5dd] border-2 border-slate-500 rounded p-1.5 shadow-md flex flex-col items-center">
-          {/* CRT Screen Tube */}
-          <div
-            className="w-full h-28 rounded border border-slate-600 overflow-hidden relative flex flex-col justify-between"
-            style={{
-              background: previewWp.startsWith("/") ? `url(${previewWp}) center/cover, url(${DEFAULT_WALLPAPER_SRC}) center/cover` : previewWp,
-            }}
-          >
-            {/* Simulated Mini XP Window inside preview */}
-            <div className="m-1.5 rounded shadow overflow-hidden border border-slate-700 bg-[#ece9d8] w-36">
-              {/* Window Titlebar */}
-              <div
-                className="h-4 px-1.5 flex items-center justify-between text-[8px] font-bold text-white"
-                style={{ background: currentThemeObj.titlebarBg }}
-              >
-                <span className="truncate">Активное окно</span>
-                <div className="flex gap-0.5">
-                  <span className="w-2 h-2 rounded-xs bg-red-500 inline-block" />
-                </div>
-              </div>
-              {/* Window Body */}
-              <div className="p-1 text-[7px] text-slate-800 bg-white leading-tight">
-                Design-engineering token preview
-              </div>
-            </div>
-
-            {/* Simulated Mini Taskbar inside preview */}
-            <div
-              className="h-3.5 w-full flex items-center justify-between px-1"
-              style={{ background: currentThemeObj.taskbarBg }}
-            >
-              <div
-                className="h-2.5 px-1 rounded-xs flex items-center text-[7px] font-bold text-white italic"
-                style={{ background: currentThemeObj.startBtnBg }}
-              >
-                Пуск
-              </div>
-              <div className="text-[6px] text-white opacity-80">14:00</div>
-            </div>
+      {/* Monitor: shows the theme under the pointer, or the selected one */}
+      <div className="flex flex-col items-center mb-3">
+        <div className="w-[17rem] max-w-full bg-[#d0d5dd] border-2 border-slate-500 rounded p-1.5 shadow-md flex flex-col items-center">
+          <div className="w-full rounded border border-slate-600 overflow-hidden">
+            <ThemePreview theme={shownTheme} wallpaper={previewWp} />
           </div>
-          {/* Monitor Stand Base */}
           <div className="w-12 h-2 bg-slate-400 mt-1 rounded-sm shadow-inner" />
+        </div>
+        <div className="mt-1.5 text-[11px] text-slate-600" aria-live="polite">
+          {hoverTheme && hoverTheme !== selectedTheme ? tr("Предпросмотр: ", "Preview: ") : tr("Выбрана: ", "Selected: ")}
+          <b className="text-slate-900">{shownThemeObj.name.split(" (")[0]}</b>
         </div>
       </div>
 
@@ -183,57 +142,58 @@ export function DisplayPropertiesDialog() {
       <div className="flex-1 flex flex-col min-h-0 mb-3 bg-white border border-slate-400 rounded p-2 overflow-y-auto">
         {activeTab === "themes" ? (
           <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wide border-b border-slate-200 pb-1">
-              Системные стили оформления (CSS Tokens):
+            <div className="text-[11px] font-bold text-slate-800 border-b border-slate-200 pb-1">
+              {tr("Тема оформления", "Theme")}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2" role="radiogroup" aria-label={tr("Тема оформления", "Theme")}>
               {themeOptions.map((opt) => {
                 const isSelected = selectedTheme === opt.id;
+                const isCurrent = theme === opt.id;
                 return (
-                  <div
+                  <button
                     key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
                     onClick={() => {
                       xpSound.click();
                       setSelectedTheme(opt.id);
                     }}
-                    className={`p-2.5 rounded border transition text-left cursor-pointer flex flex-col justify-between ${
+                    onMouseEnter={() => setHoverTheme(opt.id)}
+                    onMouseLeave={() => setHoverTheme(null)}
+                    onFocus={() => setHoverTheme(opt.id)}
+                    onBlur={() => setHoverTheme(null)}
+                    className={`p-2 rounded border transition text-left flex flex-col gap-2 ${
                       isSelected
                         ? "border-[#0055ea] bg-blue-50/80 ring-1 ring-[#0055ea]"
                         : "border-slate-200 hover:border-slate-400 hover:bg-slate-50"
                     }`}
                     style={{ cursor: xpCursors.pointer }}
                   >
-                    <div>
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className="font-bold text-slate-900 text-xs">{opt.name}</span>
-                        {isSelected && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold">
-                            Активна
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-slate-600 leading-snug mb-2">{opt.description}</div>
+                    <div className={`rounded overflow-hidden border ${isSelected ? "border-[#0055ea]" : "border-slate-300"}`}>
+                      <ThemePreview theme={opt.id} wallpaper={previewWp} detail={false} />
                     </div>
-                    {/* Swatch chips */}
-                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-200/60">
-                      <span className="text-[9px] text-slate-400 font-mono">Токены:</span>
-                      <span
-                        className="w-4 h-3 rounded-xs border border-black/20 shadow-xs inline-block"
-                        style={{ background: opt.titlebarBg }}
-                        title="Titlebar"
-                      />
-                      <span
-                        className="w-4 h-3 rounded-xs border border-black/20 shadow-xs inline-block"
-                        style={{ background: opt.startBtnBg }}
-                        title="Start Button"
-                      />
-                      <span
-                        className="w-4 h-3 rounded-xs border border-black/20 shadow-xs inline-block"
-                        style={{ background: opt.taskbarBg }}
-                        title="Taskbar"
-                      />
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-slate-900 text-xs">{opt.name}</span>
+                      {isCurrent && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white font-bold whitespace-nowrap">
+                          {tr("Сейчас", "Now")}
+                        </span>
+                      )}
                     </div>
-                  </div>
+                    <div className="text-[11px] text-slate-600 leading-snug">{opt.description}</div>
+                    <div data-xp-theme={opt.id} className="flex items-center gap-1.5 pt-1 border-t border-slate-200/60 mt-auto">
+                      <span className="text-[9px] text-slate-400">{tr("Цвета:", "Colours:")}</span>
+                      {[
+                        ["var(--xp-titlebar-bg)", tr("Заголовок окна", "Title bar")],
+                        ["var(--xp-start-btn-bg)", tr("Кнопка «Пуск»", "Start button")],
+                        ["var(--xp-taskbar-bg)", tr("Панель задач", "Taskbar")],
+                        ["var(--xp-select-blue)", tr("Выделение", "Selection")],
+                      ].map(([background, title]) => (
+                        <span key={title} className="w-4 h-3 rounded-xs border border-black/20 inline-block" style={{ background }} title={title} />
+                      ))}
+                    </div>
+                  </button>
                 );
               })}
             </div>
@@ -244,13 +204,13 @@ export function DisplayPropertiesDialog() {
             <div className="bg-[#f0f4f9] border border-[#b2c8e6] rounded p-2 flex items-center justify-between text-[11px]">
               <div>
                 <div className="font-semibold text-slate-800">
-                  Режим:{" "}
+                  {tr("Режим:", "Mode:")}{" "}
                   <span className="font-normal text-blue-900">
-                    {selectedMode === "user" ? "Ручной выбор" : "По местному времени"}
+                    {selectedMode === "user" ? tr("Ручной выбор", "Manual") : tr("По местному времени", "By local time")}
                   </span>
                 </div>
                 <div className="text-[10px] text-slate-500">
-                  Утро с 6 · день с 11 · вечер с 18 · ночь с 22
+                  {tr("Утро с 6 · день с 11 · вечер с 18 · ночь с 22", "Morning from 6 · day from 11 · evening from 18 · night from 22")}
                 </div>
               </div>
               <button
@@ -260,12 +220,12 @@ export function DisplayPropertiesDialog() {
                 style={{ cursor: xpCursors.pointer }}
               >
                 <span aria-hidden="true">◷</span>
-                <span>По времени суток</span>
+                <span>{tr("По времени суток", "By time of day")}</span>
               </button>
             </div>
 
             <span className="font-bold text-slate-800 text-[11px] block mb-1">
-              Выберите рисунок рабочего стола:
+              {tr("Выберите рисунок рабочего стола:", "Choose a desktop background:")}
             </span>
             <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
               {WALLPAPERS.map((wp) => {
@@ -286,13 +246,13 @@ export function DisplayPropertiesDialog() {
                     style={{ cursor: xpCursors.pointer }}
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs truncate">{wp.name}</div>
+                      <div className="text-xs truncate">{wallpaperText(wp, locale).name}</div>
                       <div className={`text-[10px] truncate ${isSelected ? "text-blue-100" : "text-slate-500"}`}>
-                        {wp.desc}
+                        {wallpaperText(wp, locale).desc}
                       </div>
-                      {wp.region && (
+                      {wallpaperText(wp, locale).region && (
                         <div className={`text-[9px] ${isSelected ? "text-blue-200" : "text-blue-700 font-medium"}`}>
-                          Регион: {wp.region}
+                          {tr("Регион", "Region")}: {wallpaperText(wp, locale).region}
                         </div>
                       )}
                     </div>
@@ -318,7 +278,7 @@ export function DisplayPropertiesDialog() {
           className="px-4 py-1.5 bg-white hover:bg-slate-50 active:bg-slate-200 border border-slate-400 rounded text-xs shadow-xs font-semibold text-slate-900"
           style={{ cursor: xpCursors.pointer }}
         >
-          ОК
+          {tr("ОК", "OK")}
         </button>
         <button
           type="button"
@@ -326,7 +286,7 @@ export function DisplayPropertiesDialog() {
           className="px-4 py-1.5 bg-white hover:bg-slate-50 active:bg-slate-200 border border-slate-400 rounded text-xs shadow-xs text-slate-900"
           style={{ cursor: xpCursors.pointer }}
         >
-          Отмена
+          {tr("Отмена", "Cancel")}
         </button>
         <button
           type="button"
@@ -334,7 +294,7 @@ export function DisplayPropertiesDialog() {
           className="px-4 py-1.5 bg-white hover:bg-slate-50 active:bg-slate-200 border border-slate-400 rounded text-xs shadow-xs text-slate-900"
           style={{ cursor: xpCursors.pointer }}
         >
-          Применить
+          {tr("Применить", "Apply")}
         </button>
       </div>
     </div>

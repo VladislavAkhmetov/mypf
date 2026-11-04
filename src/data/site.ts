@@ -1,21 +1,18 @@
 export const site = {
   name: "Влад Ахметов",
+  nameEn: "Vlad Akhmetov",
   avatar: "/placeholders/profile.jpg",
-  handle: "@amazi",
-  email: "hello@amazi.studio",
-  telegram: "https://t.me/amazi",
+  handle: "@vladakhmetov",
+  email: "vl.akhmetov@gmail.com",
+  telegram: "https://t.me/vladakhmetov",
   instagram: null,
-  presence: {
-    ru: "в студии",
-    en: "in studio",
-  },
   role: {
-    ru: "Дизайн-инженер",
-    en: "Design Engineer",
+    ru: "Software Designer & AI Prototyper",
+    en: "Software Designer & AI Prototyper",
   },
   roleDescription: {
-    ru: "Проектирую интерфейсы и довожу их до работающих прототипов — от визуальной системы до логики взаимодействия.",
-    en: "Designing interfaces and building them into working prototypes — from visual system to interaction logic.",
+    ru: "Проектирую программы целиком и быстро довожу идеи до работающих прототипов с ИИ-агентами.",
+    en: "I design software end to end and turn ideas into working prototypes with AI agents.",
   },
   workplaceLabel: {
     ru: "место",
@@ -48,8 +45,8 @@ export const site = {
     email: { ru: "Почта", en: "Email" },
   },
   location: {
-    ru: "Москва",
-    en: "Moscow",
+    ru: "Уфа · удалённо",
+    en: "Remote",
   },
   ui: {
     back: { ru: "Назад", en: "Back" },
@@ -57,3 +54,10 @@ export const site = {
     stories: { ru: "Истории", en: "Stories" },
   },
 };
+
+/** Browser tab title and description for each language; used by the layouts and on a live language switch. */
+export function siteMeta(locale: "ru" | "en") {
+  return locale === "en"
+    ? { title: `${site.nameEn} — ${site.role.en} | Portfolio`, description: `${site.role.en}. ${site.roleDescription.en}` }
+    : { title: `${site.name} — ${site.role.ru} | Портфолио`, description: `${site.role.ru}. ${site.roleDescription.ru}` };
+}

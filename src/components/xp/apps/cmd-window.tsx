@@ -43,7 +43,7 @@ export function CmdWindow() {
         newLogs.push(
           { text: "Available commands:" },
           { text: "  dir           - List all portfolio projects" },
-          { text: "  open <name>   - Open project window (e.g. 'open kora')" },
+          { text: "  open <name>   - Open project window (e.g. 'open dombro')" },
           { text: "  whoami        - Display bio and role" },
           { text: "  contact       - Show contacts and links" },
           { text: "  clear / cls   - Clear the console" },
@@ -74,7 +74,7 @@ export function CmdWindow() {
             newLogs.push({ text: `Error: Project '${arg}' not found. Type 'dir' to list projects.` });
           }
         } else {
-          newLogs.push({ text: "Usage: open <project_name> (e.g. 'open kora')" });
+          newLogs.push({ text: "Usage: open <project_name> (e.g. 'open dombro')" });
         }
         break;
 

@@ -1,0 +1,55 @@
+/* Phone taskbar: window strip + switcher deck */
+.strip {
+  --chip: 112px;
+  flex: 1 1 0; min-width: 0; height: 100%;
+  display: flex; align-items: center; gap: 6px;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.strip::-webkit-scrollbar { display: none; }
+/* Spacers (percentages here resolve against the strip, not the taskbar) let the first and last chip reach the centre */
+.strip::before, .strip::after { content: ""; flex: 0 0 calc(50% - var(--chip) / 2 - 6px); }
+.fade {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 26px, #000 calc(100% - 26px), transparent 100%);
+}
+.chip {
+  position: relative; flex: none; width: var(--chip); height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 9px;
+  scroll-snap-align: center; scroll-snap-stop: always;
+  border: 1px solid rgba(255, 255, 255, .22); border-radius: 4px;
+  background: var(--xp-task-btn-bg); color: #fff; font-size: 12px; text-shadow: 1px 1px 1px #0c3384;
+  opacity: .62; transition: opacity .3s, transform .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.active { opacity: 1; background: var(--xp-task-btn-focused-bg); border-color: #0c2666; box-shadow: inset 1px 2px 3px rgba(0, 0, 0, .6); font-weight: 700; }
+.badge { position: absolute; top: -7px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; display: grid; place-items: center; border-radius: 9px; background: #f2a900; color: #1d1700; font-size: 10.5px; line-height: 1; box-shadow: 0 1px 3px rgba(0, 0, 0, .5); text-shadow: none; }
+
+/* Window switcher deck */
+.overlay {
+  position: fixed; left: 0; right: 0; top: 0; bottom: var(--xp-taskbar-h); z-index: 9995;
+  display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 16px 0 14px;
+  background: linear-gradient(180deg, rgba(5, 22, 66, .58), rgba(5, 22, 66, .74));
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: overlay-in .28s cubic-bezier(.2, .7, .2, 1) both;
+}
+.deck {
+  display: flex; align-items: center; gap: 10px; flex: 0 1 auto; max-height: 68%;
+  padding-inline: calc(50% - min(36vw, 160px));
+  overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+}
+.deck::-webkit-scrollbar { display: none; }
+.slot { --near: 1; flex: none; width: min(72vw, 320px); height: min(56vh, 420px); scroll-snap-align: center; scroll-snap-stop: always; transform: scale(calc(.88 + var(--near) * .12)); opacity: calc(.45 + var(--near) * .55); }
+.card { height: 100%; display: flex; flex-direction: column; border-radius: 10px; overflow: hidden; background: #ece9d8; border: 2px solid #0a3fbf; box-shadow: 0 24px 44px -18px rgba(0, 0, 0, .65); touch-action: pan-x; transition: transform .25s cubic-bezier(.2, .7, .2, 1), opacity .25s; }
+.cardActive { box-shadow: 0 0 0 3px #ffd55a, 0 24px 44px -18px rgba(0, 0, 0, .65); }
+.cardTitle { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 6px 0 10px; flex: none; color: #fff; font-size: 13px; font-weight: 700; text-shadow: 1px 1px 2px rgba(0, 18, 90, .9); background: var(--xp-titlebar-bg); }
+.cardTitle span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cardClose { width: 30px; height: 28px; display: grid; place-items: center; border-radius: 4px; border: 1px solid #fff; color: #fff; font-size: 20px; line-height: 1; text-shadow: none; background: linear-gradient(180deg, #e8795f, #c1381a 55%, #d4553a); }
+.cardBody { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 18px; text-align: center; color: #1b2a44; touch-action: pan-x; background: radial-gradient(120% 90% at 50% 0%, #fff 0%, #ece9d8 70%); -webkit-tap-highlight-color: transparent; }
+.cardBody strong { font-size: 14px; line-height: 1.3; max-width: 22ch; }
+.cardBody em { font-style: normal; font-size: 12px; color: #4a6a2a; min-height: 1.2em; }
+.desktop { align-self: center; padding: 10px 22px; border-radius: 999px; background: rgba(255, 255, 255, .92); color: #123a8f; font-size: 14px; font-weight: 700; border: 1px solid #fff; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .5); -webkit-tap-highlight-color: transparent; }
+
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .overlay { animation: none; } .chip, .card { transition: none; } }

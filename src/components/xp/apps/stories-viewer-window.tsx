@@ -8,7 +8,7 @@ import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 
 export function StoriesViewerWindow() {
-  const { t } = useLocale();
+  const { t, tr } = useLocale();
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(100);
@@ -102,20 +102,20 @@ export function StoriesViewerWindow() {
             type="button"
             onClick={handlePrev}
             className="xp-toolbar-btn px-2.5 py-1"
-            title="Предыдущий кадр"
+            title={tr("Предыдущий кадр", "Previous frame")}
             style={{ cursor: xpCursors.pointer }}
           >
             <span>◀</span>
-            <span className="hidden sm:inline">Назад</span>
+            <span className="hidden sm:inline">{tr("Назад", "Back")}</span>
           </button>
           <button
             type="button"
             onClick={handleNext}
             className="xp-toolbar-btn px-2.5 py-1"
-            title="Следующий кадр"
+            title={tr("Следующий кадр", "Next frame")}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span className="hidden sm:inline">Вперед</span>
+            <span className="hidden sm:inline">{tr("Вперед", "Forward")}</span>
             <span>▶</span>
           </button>
 
@@ -126,7 +126,7 @@ export function StoriesViewerWindow() {
             type="button"
             onClick={handleZoomIn}
             className="xp-toolbar-btn px-2 py-1"
-            title="Увеличить"
+            title={tr("Увеличить", "Zoom in")}
             style={{ cursor: xpCursors.pointer }}
           >
             🔍+
@@ -135,7 +135,7 @@ export function StoriesViewerWindow() {
             type="button"
             onClick={handleZoomOut}
             className="xp-toolbar-btn px-2 py-1"
-            title="Уменьшить"
+            title={tr("Уменьшить", "Zoom out")}
             style={{ cursor: xpCursors.pointer }}
           >
             🔍-
@@ -144,7 +144,7 @@ export function StoriesViewerWindow() {
             type="button"
             onClick={() => setZoomLevel(100)}
             className="xp-toolbar-btn px-2 py-1 text-[11px] font-mono"
-            title="Сброс масштаба"
+            title={tr("Сброс масштаба", "Reset zoom")}
             style={{ cursor: xpCursors.pointer }}
           >
             100%
@@ -157,15 +157,15 @@ export function StoriesViewerWindow() {
             type="button"
             onClick={handleRotate}
             className="xp-toolbar-btn px-2 py-1"
-            title="Повернуть по часовой стрелке"
+            title={tr("Повернуть по часовой стрелке", "Rotate clockwise")}
             style={{ cursor: xpCursors.pointer }}
           >
-            ↻ Повернуть
+            {tr("↻ Повернуть", "↻ Rotate")}
           </button>
         </div>
 
         <div className="text-[11px] text-slate-600 font-medium">
-          Кадр {currentFlatIndex + 1} из {allItems.length}
+          {tr("Кадр", "Frame")} {currentFlatIndex + 1} {tr("из", "of")} {allItems.length}
         </div>
       </div>
 
@@ -203,8 +203,8 @@ export function StoriesViewerWindow() {
 
       {/* Status bar */}
       <div className="xp-statusbar flex items-center justify-between">
-        <span>Просмотр изображений и факсов Windows // Фотоархив студии</span>
-        <span className="text-slate-600">Масштаб: {zoomLevel}%</span>
+        <span>{tr("Просмотр изображений и факсов Windows // Фотоархив студии", "Windows Picture and Fax Viewer // Studio photo archive")}</span>
+        <span className="text-slate-600">{tr("Масштаб", "Zoom")}: {zoomLevel}%</span>
       </div>
     </div>
   );

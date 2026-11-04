@@ -1,0 +1,39 @@
+<svg width="288" height="288" viewBox="0 0 288 288" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="40" y1="20" x2="248" y2="268" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE75E"/>
+      <stop offset="1" stop-color="#FFB21A"/>
+    </linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="2" fill="#7A4A00" fill-opacity="0.16"/>
+    </pattern>
+    <clipPath id="tile"><rect width="288" height="288" rx="94"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="288" height="288" fill="url(#bg)"/>
+    <rect width="288" height="288" fill="url(#dots)"/>
+    <!-- Selection box, as if the question mark was just drawn and is still selected -->
+    <rect x="70" y="40" width="148" height="206" stroke="#0D99FF" stroke-width="3"/>
+    <rect x="63" y="33" width="14" height="14" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <rect x="211" y="33" width="14" height="14" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <rect x="63" y="239" width="14" height="14" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <rect x="211" y="239" width="14" height="14" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <!-- The question mark: a single vector path -->
+    <path d="M98 112C98 76 121 56 148 56C176 56 196 76 196 101C196 126 177 136 163 147C152 156 147 165 147 182" stroke="#141414" stroke-width="31" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="147" cy="222" r="18" fill="#141414"/>
+    <!-- Bezier handles -->
+    <path d="M98 112V76M196 74V128" stroke="#0D99FF" stroke-width="3"/>
+    <circle cx="98" cy="76" r="6" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <circle cx="196" cy="74" r="6" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <circle cx="196" cy="128" r="6" fill="#fff" stroke="#0D99FF" stroke-width="3"/>
+    <rect x="90" y="104" width="16" height="16" fill="#fff" stroke="#0D99FF" stroke-width="3.5"/>
+    <rect x="188" y="93" width="16" height="16" fill="#0D99FF" stroke="#fff" stroke-width="3"/>
+    <rect x="139" y="174" width="16" height="16" fill="#fff" stroke="#0D99FF" stroke-width="3.5"/>
+    <!-- Pen tool cursor -->
+    <g transform="translate(198 168) rotate(-38)">
+      <path d="M0 0L14 34H-14Z" fill="#141414" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+      <rect x="-15" y="34" width="30" height="26" rx="5" fill="#141414" stroke="#fff" stroke-width="5"/>
+      <circle cx="0" cy="20" r="3.5" fill="#fff"/>
+    </g>
+  </g>
+</svg>

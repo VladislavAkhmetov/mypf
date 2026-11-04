@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "./help-center.module.css";
+import { useLocale } from "@/lib/i18n";
 
 // Figma auto layout, live: frame settings + per-item sizing, mirrored as CSS flexbox.
 
@@ -18,7 +19,10 @@ const ITEMS = [
 
 const css = (a: Align) => (a === "start" ? "flex-start" : a === "end" ? "flex-end" : "center");
 
+const ITEM_EN: Record<string, string> = { icon: "Icon", title: "Card title", button: "Button" };
+
 export function AutolayoutSandbox() {
+  const { tr, locale } = useLocale();
   const [direction, setDirection] = useState<Direction>("row");
   const [gap, setGap] = useState(12);
   const [padding, setPadding] = useState(16);
@@ -62,20 +66,20 @@ export function AutolayoutSandbox() {
       <div className={styles.alLayout}>
         <div className={styles.alControls}>
           <fieldset>
-            <legend>Рамка</legend>
+            <legend>{tr("Рамка", "Frame")}</legend>
             <div className={styles.segment}>
-              <button type="button" className={row ? styles.segmentOn : ""} onClick={() => setDirection("row")}>→ Горизонтально</button>
-              <button type="button" className={!row ? styles.segmentOn : ""} onClick={() => setDirection("column")}>↓ Вертикально</button>
+              <button type="button" className={row ? styles.segmentOn : ""} onClick={() => setDirection("row")}>{tr("→ Горизонтально", "→ Horizontal")}</button>
+              <button type="button" className={!row ? styles.segmentOn : ""} onClick={() => setDirection("column")}>{tr("↓ Вертикально", "↓ Vertical")}</button>
             </div>
             <label>Gap: {gap}px <input type="range" min={0} max={40} value={gap} onChange={e => setGap(Number(e.target.value))} /></label>
             <label>Padding: {padding}px <input type="range" min={0} max={40} value={padding} onChange={e => setPadding(Number(e.target.value))} /></label>
-            <div className={styles.alAlign} role="group" aria-label="Выравнивание">
+            <div className={styles.alAlign} role="group" aria-label={tr("Выравнивание", "Alignment")}>
               {ALIGN.map(y =>
                 ALIGN.map(x => (
                   <button
                     key={`${x}-${y}`}
                     type="button"
-                    aria-label={`Выравнивание ${x} ${y}`}
+                    aria-label={`${tr("Выравнивание", "Alignment")} ${x} ${y}`}
                     className={alignX === x && alignY === y ? styles.alAlignOn : ""}
                     onClick={() => {
                       setAlignX(x);
@@ -86,15 +90,15 @@ export function AutolayoutSandbox() {
               )}
             </div>
             <div className={styles.segment}>
-              <button type="button" className={frameSizing === "fixed" ? styles.segmentOn : ""} onClick={() => setFrameSizing("fixed")}>Рамка: Fixed</button>
-              <button type="button" className={frameSizing === "hug" ? styles.segmentOn : ""} onClick={() => setFrameSizing("hug")}>Рамка: Hug</button>
+              <button type="button" className={frameSizing === "fixed" ? styles.segmentOn : ""} onClick={() => setFrameSizing("fixed")}>{tr("Рамка: Fixed", "Frame: Fixed")}</button>
+              <button type="button" className={frameSizing === "hug" ? styles.segmentOn : ""} onClick={() => setFrameSizing("hug")}>{tr("Рамка: Hug", "Frame: Hug")}</button>
             </div>
           </fieldset>
           <fieldset>
-            <legend>Размер элементов</legend>
+            <legend>{tr("Размер элементов", "Item sizing")}</legend>
             {ITEMS.map(item => (
               <div key={item.id} className={styles.alItemRow}>
-                <span>{item.label}</span>
+                <span>{locale === "en" ? ITEM_EN[item.id] : item.label}</span>
                 <div className={styles.segment}>
                   {(["fixed", "hug", "fill"] as Sizing[]).map(mode => (
                     <button key={mode} type="button" className={sizing[item.id] === mode ? styles.segmentOn : ""} onClick={() => setSizing(s => ({ ...s, [item.id]: mode }))}>
@@ -125,10 +129,10 @@ export function AutolayoutSandbox() {
             ))}
           </div>
           {fillBlocked && Object.values(sizing).includes("fill") && (
-            <p className={styles.alWarning}>Fill внутри рамки с Hug: заполнять нечего, поэтому элемент ведёт себя как Hug. Так же поступает Figma.</p>
+            <p className={styles.alWarning}>{tr("Fill внутри рамки с Hug: заполнять нечего, поэтому элемент ведёт себя как Hug. Так же поступает Figma.", "Fill inside a Hug frame: there is nothing to fill, so the item behaves like Hug. Figma does the same.")}</p>
           )}
-          <pre className={styles.alCode} aria-label="То же самое в CSS">
-            <span>{"/* То же в CSS */"}</span>
+          <pre className={styles.alCode} aria-label={tr("То же самое в CSS", "The same in CSS")}>
+            <span>{tr("/* То же в CSS */", "/* Same in CSS */")}</span>
             {"\n.card {\n"}
             {cssLines.map(line => `  ${line}\n`).join("")}
             {"}"}

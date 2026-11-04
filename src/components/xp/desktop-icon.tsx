@@ -2,6 +2,8 @@
 
 import React, { useRef, useCallback } from "react";
 import { xpCursors } from "@/lib/xp/cursors";
+import { useLocale } from "@/lib/i18n";
+import { localizeTitle } from "@/lib/xp/window-titles";
 
 interface DesktopIconProps {
   id: string;
@@ -29,6 +31,8 @@ export function DesktopIcon({
   onPositionChange,
 }: DesktopIconProps) {
   const iconRef = useRef<HTMLDivElement>(null);
+  const { locale } = useLocale();
+  const label = localizeTitle(title, locale);
 
   const dragRef = useRef<{
     isDragging: boolean;
@@ -106,9 +110,9 @@ export function DesktopIcon({
         const finalY = Math.max(8, Math.min(window.innerHeight - 140, dragRef.current.initialY + dy));
         onPositionChange(id, Math.round(finalX), Math.round(finalY));
       } else {
-        // Normal click or double click detection
+        // Normal click or double click detection; a single tap opens on touch screens.
         const now = Date.now();
-        if (now - dragRef.current.lastClickTime < 350) {
+        if (e.pointerType === "touch" || now - dragRef.current.lastClickTime < 350) {
           // Double click
           onOpen(id);
         } else {
@@ -140,7 +144,7 @@ export function DesktopIcon({
         ref={iconRef}
         role="button"
         tabIndex={0}
-        aria-label={title}
+        aria-label={label}
         data-ym-goal="desktop_icon_click"
         data-ym-params={JSON.stringify({ iconId: id, title })}
         className={`xp-desktop-icon absolute ${isSelected ? "is-selected" : ""}`}
@@ -159,7 +163,7 @@ export function DesktopIcon({
         <div className="xp-desktop-icon-img flex items-center justify-center pointer-events-none">
           {icon}
         </div>
-        <div className="xp-desktop-icon-label pointer-events-none">{title}</div>
+        <div className="xp-desktop-icon-label pointer-events-none">{label}</div>
       </div>
     );
   }

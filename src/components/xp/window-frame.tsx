@@ -4,6 +4,9 @@ import React, { useRef, useCallback, useEffect } from "react";
 import { WindowItem, useWindowManager } from "./window-manager-context";
 import { xpCursors } from "@/lib/xp/cursors";
 import notesStyles from "@/components/notes/notes-window.module.css";
+import { isCompactViewport } from "@/lib/xp/viewport";
+import { useLocale } from "@/lib/i18n";
+import { localizeTitle } from "@/lib/xp/window-titles";
 
 interface WindowFrameProps {
   window: WindowItem;
@@ -20,6 +23,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
     restoreWindow,
     updateWindowBounds,
   } = useWindowManager();
+  const { locale, tr } = useLocale();
 
   const isFocused = activeWindowId === win.id;
   const frameRef = useRef<HTMLDivElement>(null);
@@ -74,7 +78,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
   const handleTitlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (win.isMaximized) return;
-      if (typeof window !== "undefined" && window.innerWidth < 768) return; // Disable dragging on mobile
+      if (isCompactViewport()) return; // Disable dragging on mobile
       if ((e.target as HTMLElement).closest(".xp-btn-ctrl")) return;
 
       focusWindow(win.id);
@@ -145,7 +149,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
   const handleResizePointerDown = useCallback(
     (dir: string, e: React.PointerEvent) => {
       if (win.isMaximized) return;
-      if (typeof window !== "undefined" && window.innerWidth < 768) return;
+      if (isCompactViewport()) return;
       e.stopPropagation();
       focusWindow(win.id);
 
@@ -267,7 +271,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
       >
         <div className="xp-titlebar-title">
           {/* Title text */}
-          <span>{win.title}</span>
+          <span>{localizeTitle(win.title, locale)}</span>
         </div>
 
         {/* Controls */}
@@ -277,7 +281,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
             className="xp-btn-ctrl xp-btn-minimize"
             data-ym-goal="window_minimize"
             data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
-            title="Свернуть"
+            title={tr("Свернуть", "Minimize")}
             onClick={() => minimizeWindow(win.id)}
             style={{ cursor: xpCursors.pointer }}
           >
@@ -290,7 +294,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
             className="xp-btn-ctrl xp-btn-maximize"
             data-ym-goal={win.isMaximized ? "window_restore" : "window_maximize"}
             data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
-            title={win.isMaximized ? "Восстановить" : "Развернуть"}
+            title={win.isMaximized ? tr("Восстановить", "Restore") : tr("Развернуть", "Maximize")}
             onClick={() => (win.isMaximized ? restoreWindow(win.id) : maximizeWindow(win.id))}
             style={{ cursor: xpCursors.pointer }}
           >
@@ -310,7 +314,7 @@ export function WindowFrame({ window: win, children }: WindowFrameProps) {
             className="xp-btn-ctrl xp-btn-close"
             data-ym-goal="window_close"
             data-ym-params={JSON.stringify({ windowId: win.id, title: win.title })}
-            title="Закрыть"
+            title={tr("Закрыть", "Close")}
             onClick={() => closeWindow(win.id)}
             style={{ cursor: xpCursors.pointer }}
           >

@@ -12,12 +12,12 @@ type ViewMode = "tiles" | "details";
 type DisciplineFilter = "all" | "type" | "systems" | "identity";
 
 export function MyDocumentsWindow() {
-  const { t, locale } = useLocale();
+  const { t, tr, locale } = useLocale();
   const { openProject } = useWindowManager();
 
   const [viewMode, setViewMode] = useState<ViewMode>("tiles");
   const [filter, setFilter] = useState<DisciplineFilter>("all");
-  const [selectedSlug, setSelectedSlug] = useState<string>(projects[0]?.slug || "kora");
+  const [selectedSlug, setSelectedSlug] = useState<string>(projects[0]?.slug || "dombro");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredProjects = useMemo(() => {
@@ -64,12 +64,12 @@ export function MyDocumentsWindow() {
     <div className="flex-1 flex flex-col bg-[#ece9d8] text-black overflow-hidden select-text text-xs">
       {/* Explorer Menu Bar */}
       <div className="xp-menu-bar">
-        <span className="xp-menu-item">Файл</span>
-        <span className="xp-menu-item">Правка</span>
-        <span className="xp-menu-item">Вид</span>
-        <span className="xp-menu-item">Избранное</span>
-        <span className="xp-menu-item">Сервис</span>
-        <span className="xp-menu-item">Справка</span>
+        <span className="xp-menu-item">{tr("Файл", "File")}</span>
+        <span className="xp-menu-item">{tr("Правка", "Edit")}</span>
+        <span className="xp-menu-item">{tr("Вид", "View")}</span>
+        <span className="xp-menu-item">{tr("Избранное", "Favorites")}</span>
+        <span className="xp-menu-item">{tr("Сервис", "Tools")}</span>
+        <span className="xp-menu-item">{tr("Справка", "Help")}</span>
       </div>
 
       {/* Explorer Toolbar: Filters, View Mode & Search */}
@@ -86,7 +86,7 @@ export function MyDocumentsWindow() {
             style={{ cursor: xpCursors.pointer }}
           >
             <span>📁</span>
-            <span>Все ({projects.length})</span>
+            <span>{tr("Все", "All")} ({projects.length})</span>
           </button>
           <button
             type="button"
@@ -98,7 +98,7 @@ export function MyDocumentsWindow() {
             style={{ cursor: xpCursors.pointer }}
           >
             <span>🔤</span>
-            <span>Шрифты & Печать</span>
+            <span>{tr("Шрифты & Печать", "Type & Print")}</span>
           </button>
           <button
             type="button"
@@ -110,7 +110,7 @@ export function MyDocumentsWindow() {
             style={{ cursor: xpCursors.pointer }}
           >
             <span>⚡</span>
-            <span>Интерфейсы & Системы</span>
+            <span>{tr("Интерфейсы & Системы", "Interfaces & Systems")}</span>
           </button>
           <button
             type="button"
@@ -122,7 +122,7 @@ export function MyDocumentsWindow() {
             style={{ cursor: xpCursors.pointer }}
           >
             <span>🏛️</span>
-            <span>Айдентика & Пространство</span>
+            <span>{tr("Айдентика & Пространство", "Identity & Space")}</span>
           </button>
         </div>
 
@@ -139,9 +139,9 @@ export function MyDocumentsWindow() {
                 viewMode === "tiles" ? "bg-blue-600 text-white shadow-xs" : "text-slate-700 hover:bg-slate-200"
               }`}
               style={{ cursor: xpCursors.pointer }}
-              title="Режим плитки"
+              title={tr("Режим плитки", "Tiles view")}
             >
-              Плитка
+              {tr("Плитка", "Tiles")}
             </button>
             <button
               type="button"
@@ -153,9 +153,9 @@ export function MyDocumentsWindow() {
                 viewMode === "details" ? "bg-blue-600 text-white shadow-xs" : "text-slate-700 hover:bg-slate-200"
               }`}
               style={{ cursor: xpCursors.pointer }}
-              title="Таблица с деталями"
+              title={tr("Таблица с деталями", "Details table")}
             >
-              Таблица
+              {tr("Таблица", "Table")}
             </button>
           </div>
         </div>
@@ -164,7 +164,7 @@ export function MyDocumentsWindow() {
       {/* Address & Filter Bar */}
       <div className="xp-address-bar flex items-center justify-between gap-2">
         <div className="flex items-center gap-1 flex-1 min-w-0">
-          <span className="xp-address-label">Адрес</span>
+          <span className="xp-address-label">{tr("Адрес", "Address")}</span>
           <div className="xp-address-input-wrap flex-1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#eab308">
               <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
@@ -177,12 +177,12 @@ export function MyDocumentsWindow() {
 
         {/* Quick Search */}
         <div className="flex items-center gap-1">
-          <span className="text-slate-500 text-[11px]">Поиск:</span>
+          <span className="text-slate-500 text-[11px]">{tr("Поиск:", "Search:")}</span>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Фильтр..."
+            placeholder={tr("Фильтр...", "Filter...")}
             className="px-2 py-0.5 bg-white border border-slate-400 rounded text-xs text-slate-900 w-28 sm:w-36 outline-none focus:border-blue-600"
           />
         </div>
@@ -195,7 +195,7 @@ export function MyDocumentsWindow() {
           {/* Group: Folder Tasks */}
           <div className="bg-white/90 border border-[#7ba2e7] rounded shadow-xs overflow-hidden">
             <div className="bg-gradient-to-r from-[#215dc6] to-[#3a7fe8] text-white px-2.5 py-1 font-bold flex items-center justify-between">
-              <span>Задачи каталога</span>
+              <span>{tr("Задачи каталога", "Folder tasks")}</span>
               <span className="text-[10px]">▲</span>
             </div>
             <div className="p-2 space-y-1 text-slate-800">
@@ -206,10 +206,10 @@ export function MyDocumentsWindow() {
                 style={{ cursor: xpCursors.pointer }}
               >
                 <span>📂</span>
-                <span className="truncate">Открыть «{selectedProject.title}»</span>
+                <span className="truncate">{tr("Открыть", "Open")} «{selectedProject.title}»</span>
               </button>
               <div className="text-[10px] text-slate-500 px-1">
-                Двойной клик по строке или карточке открывает детальное досье проекта.
+                {tr("Двойной клик по строке или карточке открывает детальное досье проекта.", "Double-click a row or a card to open the project file.")}
               </div>
             </div>
           </div>
@@ -218,7 +218,7 @@ export function MyDocumentsWindow() {
           {selectedProject && (
             <div className="bg-white/90 border border-[#7ba2e7] rounded shadow-xs overflow-hidden">
               <div className="bg-gradient-to-r from-[#215dc6] to-[#3a7fe8] text-white px-2.5 py-1 font-bold flex items-center justify-between">
-                <span>Досье проекта</span>
+                <span>{tr("Досье проекта", "Project file")}</span>
                 <span className="text-[10px]">ℹ️</span>
               </div>
               <div className="p-2.5 space-y-2 text-slate-800">
@@ -238,11 +238,11 @@ export function MyDocumentsWindow() {
 
                 <div className="pt-1 border-t border-slate-200 text-[10px] text-slate-500 space-y-0.5">
                   <div>
-                    <strong>Мотив: </strong>
+                    <strong>{tr("Мотив: ", "Motif: ")}</strong>
                     <span className="font-mono">{selectedProject.motif}</span>
                   </div>
                   <div>
-                    <strong>Теги: </strong>
+                    <strong>{tr("Теги: ", "Tags: ")}</strong>
                     <span>{selectedProject.tags[locale].join(", ")}</span>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export function MyDocumentsWindow() {
                   className="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-center shadow-xs transition"
                   style={{ cursor: xpCursors.pointer }}
                 >
-                  Изучить решение →
+                  {tr("Изучить решение →", "Explore the solution →")}
                 </button>
               </div>
             </div>
@@ -265,7 +265,7 @@ export function MyDocumentsWindow() {
           {filteredProjects.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-slate-500 gap-2">
               <span className="text-2xl">🔍</span>
-              <span className="font-semibold">Ничего не найдено по запросу</span>
+              <span className="font-semibold">{tr("Ничего не найдено по запросу", "Nothing found for")}</span>
               <button
                 type="button"
                 onClick={() => {
@@ -274,7 +274,7 @@ export function MyDocumentsWindow() {
                 }}
                 className="text-blue-700 underline text-xs"
               >
-                Сбросить фильтры
+                {tr("Сбросить фильтры", "Reset filters")}
               </button>
             </div>
           ) : viewMode === "tiles" ? (
@@ -293,7 +293,7 @@ export function MyDocumentsWindow() {
                         : "bg-slate-50/70 border-slate-200 hover:border-blue-300 hover:bg-white"
                     }`}
                     style={{ cursor: xpCursors.pointer }}
-                    title="Двойной клик для открытия"
+                    title={tr("Двойной клик для открытия", "Double-click to open")}
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
@@ -333,7 +333,7 @@ export function MyDocumentsWindow() {
                         }}
                         className="font-bold text-blue-800 hover:underline flex items-center gap-0.5"
                       >
-                        <span>Открыть</span>
+                        <span>{tr("Открыть", "Open")}</span>
                         <span>→</span>
                       </button>
                     </div>
@@ -347,11 +347,11 @@ export function MyDocumentsWindow() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100 border-b border-slate-300 text-slate-600 font-bold text-[11px]">
-                    <th className="py-2 px-3">Название проекта</th>
-                    <th className="py-2 px-3">Год</th>
-                    <th className="py-2 px-3">Назначение / Задача</th>
-                    <th className="py-2 px-3">Категории</th>
-                    <th className="py-2 px-3">Стиль / Мотив</th>
+                    <th className="py-2 px-3">{tr("Название проекта", "Project")}</th>
+                    <th className="py-2 px-3">{tr("Год", "Year")}</th>
+                    <th className="py-2 px-3">{tr("Назначение / Задача", "Purpose / Task")}</th>
+                    <th className="py-2 px-3">{tr("Категории", "Categories")}</th>
+                    <th className="py-2 px-3">{tr("Стиль / Мотив", "Style / Motif")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -390,10 +390,10 @@ export function MyDocumentsWindow() {
       {/* Status Bar */}
       <div className="xp-statusbar flex items-center justify-between">
         <span>
-          {filteredProjects.length} из {projects.length} объектов
+          {filteredProjects.length} {tr("из", "of")} {projects.length} {tr("объектов", "objects")}
         </span>
         <span className="text-slate-600">
-          Выбран: <strong>{selectedProject?.title}</strong> ({selectedProject?.year})
+          {tr("Выбран:", "Selected:")} <strong>{selectedProject?.title}</strong> ({selectedProject?.year})
         </span>
       </div>
     </div>

@@ -12,8 +12,8 @@ import {
   drawCard,
   findHint,
   getNextAutoFinishMove,
-  getRankNameRu,
-  getSuitNameRu,
+  getRankName,
+  getSuitName,
   moveFoundationToTableau,
   moveTableauToFoundation,
   moveTableauToTableau,
@@ -25,6 +25,7 @@ import { gameSound } from "@/lib/xp/games/game-sound";
 import { DeckMonogram, SuitPip } from "./card-assets";
 import { CardBack, SolitaireCard } from "./solitaire-card";
 import styles from "./solitaire.module.css";
+import { useLocale } from "@/lib/i18n";
 
 interface SelectedCardInfo {
   source: "waste" | "tableau" | "foundation";
@@ -94,6 +95,7 @@ export function SolitaireBoard({
   elapsedSeconds,
   onOpenLeaderboard,
 }: SolitaireBoardProps) {
+  const { tr, locale } = useLocale();
   const [selection, setSelection] = useState<{ info: SelectedCardInfo; state: SolitaireState } | null>(null);
   const selected = selection?.state === state ? selection.info : null;
   const setSelected = (info: SelectedCardInfo | null) => setSelection(info ? { info, state } : null);
@@ -244,7 +246,7 @@ export function SolitaireBoard({
       if (apply(next)) return;
     }
 
-    setMessage("Эта карта сюда не подходит");
+    setMessage(tr("Эта карта сюда не подходит", "This card does not fit here"));
     if (messageTimer.current) clearTimeout(messageTimer.current);
     messageTimer.current = setTimeout(() => setMessage(null), 1800);
   };
@@ -252,7 +254,7 @@ export function SolitaireBoard({
   const requestHint = () => {
     const found = findHint(state);
     setHint(found);
-    setMessage(found?.description ?? "Очевидных ходов нет — проверьте запас");
+    setMessage(found ? (locale === "en" ? found.descriptionEn : found.description) : tr("Очевидных ходов нет — проверьте запас", "No obvious moves — check the stock"));
     if (messageTimer.current) clearTimeout(messageTimer.current);
     messageTimer.current = setTimeout(() => setMessage(null), 4200);
   };
@@ -320,28 +322,28 @@ export function SolitaireBoard({
         <div className={styles.brand}>
           <DeckMonogram className={styles.mark} />
           <span>
-            <b className={styles.display}>Косынка</b>
-            <small>Klondike · одна колода</small>
+            <b className={styles.display}>{tr("Косынка", "Solitaire")}</b>
+            <small>{tr("Klondike · одна колода", "Klondike · one deck")}</small>
           </span>
         </div>
         <div className={styles.stats}>
-          <span><small>Ходы</small><b className={styles.display}>{state.moveCount}</b></span>
-          <span><small>Время</small><b className={styles.display}>{formatTime(elapsedSeconds)}</b></span>
+          <span><small>{tr("Ходы", "Moves")}</small><b className={styles.display}>{state.moveCount}</b></span>
+          <span><small>{tr("Время", "Time")}</small><b className={styles.display}>{formatTime(elapsedSeconds)}</b></span>
         </div>
       </header>
 
       <main className={styles.table}>
-        <section className={styles.topRow} aria-label="Запас, сброс и основания">
+        <section className={styles.topRow} aria-label={tr("Запас, сброс и основания", "Stock, waste and foundations")}>
           <div className={styles.stockGroup}>
-            <button className={`${styles.pile} ${styles.stock}`} onClick={handleStock} aria-label={`Запас: ${state.stock.length} карт`}>
-              {state.stock.length ? <><CardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95" /><path d="M19 3v5h-5" /></svg><small>Заново</small></span>}
+            <button className={`${styles.pile} ${styles.stock}`} onClick={handleStock} aria-label={`${tr("Запас", "Stock")}: ${state.stock.length} ${tr("карт", "cards")}`}>
+              {state.stock.length ? <><CardBack /><em>{state.stock.length}</em></> : <span className={styles.recycle}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95" /><path d="M19 3v5h-5" /></svg><small>{tr("Заново", "Restart")}</small></span>}
             </button>
             <div className={styles.waste}>
               {state.waste.length ? (
-                <button aria-label={`Сброс: ${getRankNameRu(state.waste.at(-1)!.rank)}, ${getSuitNameRu(state.waste.at(-1)!.suit)}`} onClick={selectWaste} onDoubleClick={() => doubleClick(state.waste.at(-1)!)} onPointerDown={(event) => startDrag(event, { source: "waste", card: state.waste.at(-1)!, cards: [state.waste.at(-1)!] })}>
+                <button aria-label={`${tr("Сброс", "Waste")}: ${getRankName(state.waste.at(-1)!.rank, locale)}, ${getSuitName(state.waste.at(-1)!.suit, locale)}`} onClick={selectWaste} onDoubleClick={() => doubleClick(state.waste.at(-1)!)} onPointerDown={(event) => startDrag(event, { source: "waste", card: state.waste.at(-1)!, cards: [state.waste.at(-1)!] })}>
                   <SolitaireCard card={state.waste.at(-1)!} isSelected={selected?.source === "waste"} isHinted={hint?.sourceType === "waste"} />
                 </button>
-              ) : <div className={`${styles.pile} ${styles.emptyPile}`}><span>Сброс</span></div>}
+              ) : <div className={`${styles.pile} ${styles.emptyPile}`}><span>{tr("Сброс", "Waste")}</span></div>}
             </div>
           </div>
 
@@ -355,16 +357,16 @@ export function SolitaireBoard({
                   className={`${styles.foundation} ${hint?.targetType === "foundation" && hint.targetIndex === index ? styles.hinted : ""}`}
                   onClick={() => selectFoundation(index)}
                   onPointerDown={(event) => card && startDrag(event, { source: "foundation", foundationIndex: index, card, cards: [card] })}
-                  aria-label={`Основание ${index + 1}`}
+                  aria-label={`${tr("Основание", "Foundation")} ${index + 1}`}
                 >
-                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} /> : <><SuitPip suit={suit} color="currentColor" /><small>Туз</small></>}
+                  {card ? <SolitaireCard card={card} isSelected={selected?.source === "foundation" && selected.foundationIndex === index} /> : <><SuitPip suit={suit} color="currentColor" /><small>{tr("Туз", "Ace")}</small></>}
                 </button>
               );
             })}
           </div>
         </section>
 
-        <section className={styles.tableau} aria-label="Игровые колонки">
+        <section className={styles.tableau} aria-label={tr("Игровые колонки", "Tableau columns")}>
           {state.tableau.map((column, columnIndex) => {
             const targetHint = hint?.targetType === "tableau" && hint.targetIndex === columnIndex;
             return (
@@ -374,10 +376,10 @@ export function SolitaireBoard({
                 data-tableau-col={columnIndex}
                 className={`${styles.column} ${targetHint ? styles.hinted : ""}`}
                 onClick={() => selectTableau(columnIndex)}
-                aria-label={`Колонка ${columnIndex + 1}`}
+                aria-label={`${tr("Колонка", "Column")} ${columnIndex + 1}`}
                 style={{ marginBottom: stackOffset(column.slice(0, -1)) }}
               >
-                {!column.length && <button className={styles.kingSlot} aria-label={`Пустая колонка ${columnIndex + 1}: положить короля`}><b className={styles.display}>K</b><small>Король</small></button>}
+                {!column.length && <button className={styles.kingSlot} aria-label={`${tr("Пустая колонка", "Empty column")} ${columnIndex + 1}: ${tr("положить короля", "place a King")}`}><b className={styles.display}>K</b><small>{tr("Король", "King")}</small></button>}
                 {column.map((card, cardIndex) => {
                   const top = stackOffset(column.slice(0, cardIndex));
                   const chosen = selected?.source === "tableau" && selected.columnIndex === columnIndex && selected.cardIndex !== undefined && cardIndex >= selected.cardIndex;
@@ -386,7 +388,7 @@ export function SolitaireBoard({
                     <button
                       key={card.id}
                       disabled={!card.isFaceUp}
-                      aria-label={card.isFaceUp ? `${getRankNameRu(card.rank)}, ${getSuitNameRu(card.suit)}` : "Закрытая карта"}
+                      aria-label={card.isFaceUp ? `${getRankName(card.rank, locale)}, ${getSuitName(card.suit, locale)}` : tr("Закрытая карта", "Face-down card")}
                       className={styles.cardPosition}
                       style={{ top, zIndex: cardIndex + 1 }}
                       onClick={(event) => { event.stopPropagation(); selectTableau(columnIndex, cardIndex); }}
@@ -402,7 +404,7 @@ export function SolitaireBoard({
           })}
         </section>
       </main>
-      <p className={styles.instructions}>Чередуйте цвета и раскладывайте по убыванию · двойной клик отправляет карту в основание</p>
+      <p className={styles.instructions}>{tr("Чередуйте цвета и раскладывайте по убыванию · двойной клик отправляет карту в основание", "Alternate colours and build down · double-click sends a card to a foundation")}</p>
 
       <AnimatePresence>
         {message && <motion.div role="status" className={styles.toast} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>{message}</motion.div>}
@@ -416,14 +418,14 @@ export function SolitaireBoard({
 
       <footer className={styles.toolbar}>
         <div>
-          <button aria-label="Новая игра" className={styles.primaryButton} onClick={onNewGame} data-ym-goal="solitaire_new_game"><ToolbarIcon name="new" /><span>Новая игра</span></button>
-          <button aria-label="Отменить" onClick={() => { clearSelection(); setIsAutoFinishing(false); onUndo(); }} disabled={!canUndo} data-ym-goal="solitaire_undo"><ToolbarIcon name="undo" /><span>Отменить</span></button>
-          <button aria-label="Подсказка" onClick={requestHint} data-ym-goal="solitaire_hint"><ToolbarIcon name="hint" /><span>Подсказка</span></button>
+          <button aria-label={tr("Новая игра", "New game")} className={styles.primaryButton} onClick={onNewGame} data-ym-goal="solitaire_new_game"><ToolbarIcon name="new" /><span>{tr("Новая игра", "New game")}</span></button>
+          <button aria-label={tr("Отменить", "Undo")} onClick={() => { clearSelection(); setIsAutoFinishing(false); onUndo(); }} disabled={!canUndo} data-ym-goal="solitaire_undo"><ToolbarIcon name="undo" /><span>{tr("Отменить", "Undo")}</span></button>
+          <button aria-label={tr("Подсказка", "Hint")} onClick={requestHint} data-ym-goal="solitaire_hint"><ToolbarIcon name="hint" /><span>{tr("Подсказка", "Hint")}</span></button>
         </div>
         <div>
-          {eligibleForAutoFinish && <button aria-label="Собрать" className={styles.finishButton} onClick={() => setIsAutoFinishing(true)} disabled={isAutoFinishing} data-ym-goal="solitaire_auto_finish"><ToolbarIcon name="finish" /><span>{isAutoFinishing ? "Завершаем" : "Собрать"}</span></button>}
-          <button aria-label="Коллекция" onClick={onOpenDeckGallery} data-ym-goal="solitaire_deck_gallery"><ToolbarIcon name="gallery" /><span>Карты</span></button>
-          {onOpenLeaderboard && <button aria-label="Рекорды" onClick={onOpenLeaderboard} data-ym-goal="solitaire_leaderboard_open"><ToolbarIcon name="trophy" /><span>Рекорды</span></button>}
+          {eligibleForAutoFinish && <button aria-label={tr("Собрать", "Auto-finish")} className={styles.finishButton} onClick={() => setIsAutoFinishing(true)} disabled={isAutoFinishing} data-ym-goal="solitaire_auto_finish"><ToolbarIcon name="finish" /><span>{isAutoFinishing ? tr("Завершаем", "Finishing") : tr("Собрать", "Auto-finish")}</span></button>}
+          <button aria-label={tr("Коллекция", "Collection")} onClick={onOpenDeckGallery} data-ym-goal="solitaire_deck_gallery"><ToolbarIcon name="gallery" /><span>{tr("Карты", "Cards")}</span></button>
+          {onOpenLeaderboard && <button aria-label={tr("Рекорды", "Records")} onClick={onOpenLeaderboard} data-ym-goal="solitaire_leaderboard_open"><ToolbarIcon name="trophy" /><span>{tr("Рекорды", "Records")}</span></button>}
         </div>
       </footer>
     </div>

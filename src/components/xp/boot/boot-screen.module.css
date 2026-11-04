@@ -1,0 +1,140 @@
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40000;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 46%, rgba(40, 70, 160, 0.22), transparent 70%),
+    #000;
+  color: #fff;
+  user-select: none;
+  cursor: progress;
+  transition: opacity 450ms ease, visibility 0s linear 450ms;
+}
+
+.fade {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fade .center {
+  transform: scale(1.03);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  transition: transform 450ms ease;
+  animation: rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.flag {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 0 18px rgba(80, 140, 255, 0.35));
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.name {
+  font-family: var(--font-manrope), Tahoma, sans-serif;
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* The orange superscript nods to the "xp" in the original boot logo. */
+.sup {
+  margin-left: 4px;
+  font-size: 0.5em;
+  font-style: italic;
+  font-weight: 800;
+  vertical-align: super;
+  color: #ff8a1f;
+  text-shadow: 0 0 14px rgba(255, 138, 31, 0.45);
+}
+
+.role {
+  font-family: var(--font-onest), Tahoma, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* Classic XP progress bar: a rounded track with three blue blocks sliding through it. */
+.track {
+  position: relative;
+  width: 168px;
+  height: 20px;
+  padding: 2px;
+  overflow: hidden;
+  border: 2px solid #b8b8b8;
+  border-radius: 6px;
+  background: #000;
+}
+
+.blocks {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  display: flex;
+  gap: 3px;
+  animation: slide 1.25s linear infinite;
+}
+
+.blocks i {
+  width: 9px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #a9c3ff 0%, #3a6cf4 45%, #1d3fbf 100%);
+  box-shadow: 0 0 6px rgba(70, 120, 255, 0.7);
+}
+
+.footer {
+  position: absolute;
+  inset: auto 28px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-onest), Tahoma, sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.brand {
+  font-family: var(--font-manrope), Tahoma, sans-serif;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@keyframes slide {
+  from { transform: translateX(-36px); }
+  to { transform: translateX(172px); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .center { transition: none; animation: none; }
+  .blocks { animation: none; left: 60px; }
+}

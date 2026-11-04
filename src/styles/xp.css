@@ -710,12 +710,108 @@
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+/* Language bar: the XP "RU/EN" tile in the tray, its menu and the first-visit balloon */
 .xp-tray-lang {
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
+  background: var(--xp-blue-primary);
+  color: #fff;
   font-size: 10px;
-  padding: 1px 4px;
-  border-radius: 2px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  cursor: inherit;
 }
+.xp-tray-lang:hover { filter: brightness(1.15); }
+.xp-tray-lang[aria-expanded="true"] { box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45); }
+.xp-tray-lang:focus-visible { outline: 1px dotted #fff; outline-offset: 2px; }
+
+.xp-lang-menu {
+  position: fixed;
+  z-index: 16000;
+  min-width: 168px;
+  padding: 3px;
+  background: #fff;
+  border: 1px solid #7a9eb5;
+  box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.4);
+  font-family: var(--xp-font);
+  font-size: 11px;
+  animation: xp-balloon-pop 0.14s ease-out;
+}
+.xp-lang-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  background: none;
+  color: #000;
+  text-align: left;
+}
+.xp-lang-item:hover,
+.xp-lang-item:focus-visible { background: var(--xp-select-blue); color: #fff; outline: none; }
+.xp-lang-check { width: 12px; text-align: center; font-weight: 700; }
+.xp-lang-tile {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--xp-blue-primary);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+}
+.xp-lang-hint {
+  margin-top: 3px;
+  padding: 4px 8px 2px 23px;
+  border-top: 1px solid #e3e3e3;
+  color: #7a7a7a;
+  font-size: 10px;
+}
+
+.xp-lang-balloon {
+  position: fixed;
+  z-index: 16000;
+  width: min(280px, calc(100vw - 16px));
+  padding: 8px 12px 10px;
+  background: #ffffe1;
+  border: 1px solid #000;
+  border-radius: 6px;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.35);
+  font-family: var(--xp-font);
+  font-size: 11px;
+  animation: xp-balloon-pop 0.25s ease-out;
+}
+/* tail pointing down at the language tile */
+.xp-lang-balloon::after {
+  content: "";
+  position: absolute;
+  right: var(--tail, 16px);
+  bottom: -8px;
+  width: 14px;
+  height: 14px;
+  background: #ffffe1;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  transform: rotate(45deg) translate(-3px, -3px);
+}
+.xp-lang-switch {
+  margin-top: 8px;
+  padding: 3px 10px;
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fff 0%, #ecebe6 86%, #d6d0c5 100%);
+  color: #000;
+  font-size: 11px;
+}
+.xp-lang-switch:hover { box-shadow: inset 0 0 0 1px #f8b636; }
 
 .xp-tray-clock {
   color: #ffffff;
@@ -988,7 +1084,7 @@ button.xp-btn-ctrl:focus-visible {
 }
 
 /* Mobile responsive window adaptions */
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-height: 520px) and (pointer: coarse) {
   .xp-window {
     inset: 0 !important;
     width: 100vw !important;
@@ -1001,6 +1097,12 @@ button.xp-btn-ctrl:focus-visible {
     border-right: none !important;
     border-top: none !important;
   }
+}
+
+/* Touch screens: bigger window controls and hit areas */
+@media (pointer: coarse) {
+  .xp-btn-ctrl { width: 32px; height: 30px; }
+  .xp-window-controls { gap: 6px; }
 }
 
 /* Clean document printing */

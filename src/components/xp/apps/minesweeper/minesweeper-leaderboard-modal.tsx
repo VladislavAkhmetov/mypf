@@ -9,6 +9,7 @@ import {
 } from "@/lib/xp/games/leaderboards";
 import { spriteUrl } from "./pixel-art";
 import styles from "./minesweeper.module.css";
+import { useLocale } from "@/lib/i18n";
 
 interface MinesweeperLeaderboardModalProps {
   isOpen: boolean;
@@ -17,12 +18,14 @@ interface MinesweeperLeaderboardModalProps {
   onClose: () => void;
 }
 
-const DIFFICULTIES: Array<{ id: DifficultyLevel; label: string }> = [
-  { id: "sprint", label: "Спринт" },
-  { id: "beginner", label: "Новичок" },
-  { id: "intermediate", label: "Любитель" },
-  { id: "expert", label: "Эксперт" },
+const difficultiesFor = (tr: Tr): Array<{ id: DifficultyLevel; label: string }> => [
+  { id: "sprint", label: tr("Спринт", "Sprint") },
+  { id: "beginner", label: tr("Новичок", "Beginner") },
+  { id: "intermediate", label: tr("Любитель", "Intermediate") },
+  { id: "expert", label: tr("Эксперт", "Expert") },
 ];
+
+type Tr = (ru: string, en: string) => string;
 
 function formatTime(seconds: number) {
   const m = Math.floor(seconds / 60);
@@ -36,6 +39,7 @@ export function MinesweeperLeaderboardModal({
   highlightRecordId,
   onClose,
 }: MinesweeperLeaderboardModalProps) {
+  const { tr } = useLocale();
   const [activeDiff, setActiveDiff] = useState<DifficultyLevel>(initialDifficulty);
   const [records, setRecords] = useState<MinesweeperRecord[]>(() =>
     getMinesweeperLeaderboard(initialDifficulty)
@@ -55,15 +59,15 @@ export function MinesweeperLeaderboardModal({
 
   return (
     <div className={styles.resultBackdrop}>
-      <section className={`${styles.result} ${styles.leaderboard}`} role="dialog" aria-label="Таблица рекордов">
+      <section className={`${styles.result} ${styles.leaderboard}`} role="dialog" aria-label={tr("Таблица рекордов", "Best times")}>
         <header className={styles.leaderboardHead}>
           <span className={styles.icon} style={{ backgroundImage: spriteUrl("trophy") }} aria-hidden="true" />
-          <h3>Рекорды</h3>
-          <button type="button" onClick={onClose} aria-label="Закрыть таблицу рекордов">×</button>
+          <h3>{tr("Рекорды", "Records")}</h3>
+          <button type="button" onClick={onClose} aria-label={tr("Закрыть таблицу рекордов", "Close best times")}>×</button>
         </header>
 
-        <nav className={styles.difficulty} aria-label="Уровень">
-          {DIFFICULTIES.map((d) => (
+        <nav className={styles.difficulty} aria-label={tr("Уровень", "Level")}>
+          {difficultiesFor(tr).map((d) => (
             <button
               key={d.id}
               type="button"
@@ -81,9 +85,9 @@ export function MinesweeperLeaderboardModal({
             <thead>
               <tr>
                 <th>#</th>
-                <th>Игрок</th>
-                <th>Время</th>
-                <th>Дата</th>
+                <th>{tr("Игрок", "Player")}</th>
+                <th>{tr("Время", "Time")}</th>
+                <th>{tr("Дата", "Date")}</th>
               </tr>
             </thead>
             <tbody>
@@ -92,7 +96,7 @@ export function MinesweeperLeaderboardModal({
                   <td className={idx < 3 ? styles[`place${idx + 1}` as "place1"] : ""}>{idx + 1}</td>
                   <td>
                     {rec.name}
-                    {rec.isUser && <em> (вы)</em>}
+                    {rec.isUser && <em> {tr("(вы)", "(you)")}</em>}
                   </td>
                   <td>{formatTime(rec.seconds)}</td>
                   <td>{rec.date}</td>
@@ -103,8 +107,8 @@ export function MinesweeperLeaderboardModal({
         </div>
 
         <div className={styles.resultActions}>
-          <button type="button" onClick={onClose}>Закрыть</button>
-          <button type="button" onClick={handleReset}>Сбросить</button>
+          <button type="button" onClick={onClose}>{tr("Закрыть", "Close")}</button>
+          <button type="button" onClick={handleReset}>{tr("Сбросить", "Reset")}</button>
         </div>
       </section>
     </div>

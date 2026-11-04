@@ -11,6 +11,7 @@ import {
   addMinesweeperScore,
   getSavedPlayerName,
 } from "@/lib/xp/games/leaderboards";
+import { useLocale } from "@/lib/i18n";
 
 interface MinesweeperResultsProps {
   status: GameStatus;
@@ -37,6 +38,7 @@ export function MinesweeperResults({
   onRestart,
   onOpenLeaderboard,
 }: MinesweeperResultsProps) {
+  const { tr } = useLocale();
   const [dismissed, setDismissed] = useState(false);
   const [playerName, setPlayerName] = useState(() => getSavedPlayerName());
   const [savedRecordId, setSavedRecordId] = useState<string | null>(null);
@@ -62,24 +64,24 @@ export function MinesweeperResults({
         transition={{ duration: 0.16, ease: "linear" }}
       >
         <ResultIcon won={won} />
-        <h3>{won ? "Поле очищено" : "Бабах!"}</h3>
-        <p>{won ? `Уровень «${config.name}» пройден, все мины обойдены.` : "Под травой оказалась мина. Поле можно рассмотреть и попробовать снова."}</p>
+        <h3>{won ? tr("Поле очищено", "Field cleared") : tr("Бабах!", "Boom!")}</h3>
+        <p>{won ? tr(`Уровень «${config.name}» пройден, все мины обойдены.`, `${config.nameEn} cleared, every mine avoided.`) : tr("Под травой оказалась мина. Поле можно рассмотреть и попробовать снова.", "There was a mine under the grass. Look over the field and try again.")}</p>
         <div className={styles.resultStats}>
-          <span><small>Время</small><b>{formatTime(elapsedSeconds)}</b></span>
-          <span><small>Рекорд</small><b>{highScore === null ? "—" : formatTime(highScore)}</b></span>
+          <span><small>{tr("Время", "Time")}</small><b>{formatTime(elapsedSeconds)}</b></span>
+          <span><small>{tr("Рекорд", "Record")}</small><b>{highScore === null ? "—" : formatTime(highScore)}</b></span>
         </div>
 
         {isEligible && !savedRecordId && (
           <div className={styles.recordForm}>
-            <span>Новый рекорд! Ваше имя:</span>
+            <span>{tr("Новый рекорд! Ваше имя:", "New record! Your name:")}</span>
             <div>
               <input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 maxLength={18}
-                placeholder="Имя"
-                aria-label="Имя для таблицы рекордов"
+                placeholder={tr("Имя", "Name")}
+                aria-label={tr("Имя для таблицы рекордов", "Name for best times")}
               />
               <button type="button" onClick={handleSaveScore}>OK</button>
             </div>
@@ -87,9 +89,9 @@ export function MinesweeperResults({
         )}
 
         <div className={styles.resultActions}>
-          <button onClick={onRestart}>Сыграть ещё раз</button>
-          <button onClick={() => onOpenLeaderboard(savedRecordId || undefined)}>Рекорды</button>
-          <button onClick={() => setDismissed(true)}>Посмотреть поле</button>
+          <button onClick={onRestart}>{tr("Сыграть ещё раз", "Play again")}</button>
+          <button onClick={() => onOpenLeaderboard(savedRecordId || undefined)}>{tr("Рекорды", "Records")}</button>
+          <button onClick={() => setDismissed(true)}>{tr("Посмотреть поле", "View the field")}</button>
         </div>
       </motion.section>
     </motion.div>

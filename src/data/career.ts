@@ -1,33 +1,48 @@
-/** Draft content for layout approval, not a verified employment history. */
-export const careerMilestones = [
+import type { Bi } from "./dombro";
+
+export type CareerLogoKind = "spark" | "ochkarik" | "hygear" | "tsekh";
+
+/** Each stage: where, which role, and what I did there (not what the company does). */
+export const careerMilestones: Array<{ year: Bi; company: Bi; role: Bi; description: Bi; logo: CareerLogoKind; current?: boolean }> = [
   {
-    year: "2011",
-    company: "Первые проекты",
-    description: "Первые задачи в графическом дизайне. Поиск своего подхода через типографику, композицию и много практики.",
-    mark: "01",
+    year: { ru: "2011–2019", en: "2011–2019" },
+    company: { ru: "Маркетинг", en: "Marketing" },
+    role: { ru: "Графический и веб-дизайнер", en: "Graphic & web designer" },
+    description: {
+      ru: "Рекламные кампании, полиграфия, сайты и лендинги.",
+      en: "Ad campaigns, print, websites and landing pages.",
+    },
+    logo: "spark",
   },
   {
-    year: "2015",
-    company: "Очкарик",
-    description: "Работа с визуальным языком бренда: от отдельных материалов до цельного опыта в разных точках контакта.",
-    mark: "О",
+    year: { ru: "2020–2022", en: "2020–2022" },
+    company: { ru: "Очкарик", en: "Ochkarik" },
+    role: { ru: "Коммуникационный дизайнер", en: "Communication designer" },
+    description: {
+      ru: "Рекламные кампании, оформление салонов и цифровые каналы сети.",
+      en: "Ad campaigns, in-store design and the chain's digital channels.",
+    },
+    logo: "ochkarik",
   },
   {
-    year: "2019",
-    company: "Дизайн-студия",
-    description: "Больше масштаба и разных задач. Айдентика, цифровые продукты и системы, которые помогают командам говорить на одном языке.",
-    mark: "D",
+    year: { ru: "2022–2023", en: "2022–2023" },
+    company: { ru: "Hygear Fit", en: "Hygear Fit" },
+    role: { ru: "Коммуникационный и веб-дизайнер", en: "Communication & web designer" },
+    description: {
+      ru: "Сайт, рекламные кампании и материалы для запуска умных тренажёров.",
+      en: "Website, ad campaigns and launch materials for smart fitness gear.",
+    },
+    logo: "hygear",
   },
   {
-    year: "2023",
-    company: "Продуктовая команда",
-    description: "Фокус на интерфейсах и пользовательском опыте. От первых гипотез и прототипов до деталей готового продукта.",
-    mark: "+",
+    year: { ru: "2023 — н. в.", en: "2023 — now" },
+    company: { ru: "Цех", en: "Tsekh" },
+    role: { ru: "Коммуникационный дизайнер", en: "Communication designer" },
+    description: {
+      ru: "Коммуникации для клиентов студии и рабочие прототипы с ИИ-агентами.",
+      en: "Communications for studio clients and working prototypes with AI agents.",
+    },
+    logo: "tsekh",
+    current: true,
   },
-  {
-    year: "Сейчас",
-    company: "Свои проекты",
-    description: "Соединяю дизайн и код. Экспериментирую с новыми идеями, создаю сервисы и инструменты для других дизайнеров.",
-    mark: "↗",
-  },
-] as const;
+];

@@ -9,6 +9,7 @@ import { InternetExplorerIcon } from "../xp-icons";
 import { PortfolioLanding } from "@/components/portfolio/portfolio-landing";
 import { PortfolioDetail } from "@/components/portfolio/portfolio-detail";
 import styles from "./portfolio-browser-window.module.css";
+import { useLocale } from "@/lib/i18n";
 
 interface PortfolioBrowserWindowProps {
   initialProjectSlug?: string;
@@ -32,6 +33,7 @@ function readPositions(): Record<string, number> {
 }
 
 export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFound }: PortfolioBrowserWindowProps) {
+  const { tr } = useLocale();
   const [search, setSearch] = useState(() => parseNavigationParams(window.location.search).target === "portfolio" ? window.location.search : "");
   useEffect(() => subscribeToNavigation(() => {
     if (parseNavigationParams(window.location.search).target === "portfolio") setSearch(window.location.search);
@@ -83,10 +85,10 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
   return (
     <div className={styles.browserContainer}>
       <div className={styles.toolbar}>
-        <button type="button" onClick={back} disabled={!detail} data-ym-goal="portfolio_back_to_catalog" className={styles.backBtn} aria-label="Назад к каталогу" title="Назад к каталогу">
-          <span aria-hidden="true">←</span><span>Назад</span>
+        <button type="button" onClick={back} disabled={!detail} data-ym-goal="portfolio_back_to_catalog" className={styles.backBtn} aria-label={tr("Назад к каталогу", "Back to catalog")} title={tr("Назад к каталогу", "Back to catalog")}>
+          <span aria-hidden="true">←</span><span>{tr("Назад", "Back")}</span>
         </button>
-        <div className={styles.addressBar} title="Текущий адрес">
+        <div className={styles.addressBar} title={tr("Текущий адрес", "Current address")}>
           <InternetExplorerIcon className="w-3.5 h-3.5 flex-shrink-0" />
           <span className={styles.addressText}>{address}</span>
         </div>

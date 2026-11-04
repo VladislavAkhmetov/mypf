@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import { site } from "@/data/site";
-import { toolsList } from "@/data/tools";
+import { figmaPlugins } from "@/data/figma-plugins";
 import { useLocale } from "@/lib/i18n";
 import { PORTFOLIO_DIRECTIONS, type FocusDirection } from "@/lib/xp/navigation";
 import styles from "./portfolio-landing.module.css";
@@ -20,22 +20,20 @@ interface PortfolioLandingProps {
   notFound?: boolean;
 }
 
-const intro = "Создаю визуальные системы и интерфейсы. Соединяю дизайн и код, чтобы идеи становились работающими вещами.";
-const toolPresentation: Record<string, { visual: string; title: string; caption: string }> = {
-  "figma-auto-kern": { visual: "/images/tools/auto-kern.svg", title: "Auto-Bézier Kern", caption: "Кернинг без ручных правок" },
-  "ai-vector-slicer": { visual: "/images/tools/vector-slicer.svg", title: "Vector Slicer", caption: "Кривые точно по направляющим" },
-  "oklch-harmonizer": { visual: "/images/tools/palette.svg", title: "Oklch Palette", caption: "Цвет с правильным контрастом" },
-  "specimen-blueprint": { visual: "/images/tools/specimen.svg", title: "Type Specimen", caption: "Сетка для шрифтовых каталогов" },
+const intro = {
+  ru: "Создаю визуальные системы и интерфейсы. Соединяю дизайн и код, чтобы идеи становились работающими вещами.",
+  en: "I build visual systems and interfaces, bringing design and code together so ideas become working things.",
 };
 
 function scrollBehavior(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
 }
 
-export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChange, onOpenProject, onOpenTool, notFound }: PortfolioLandingProps) {
-  const { t, locale } = useLocale();
+export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChange, onOpenProject, notFound }: PortfolioLandingProps) {
+  const { t, tr, locale } = useLocale();
   const introRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const [openPlugin, setOpenPlugin] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(Math.min(1, projects.length - 1));
   const activeIndexRef = useRef(activeIndex);
   const drag = useRef({ active: false, start: 0, left: 0, distance: 0 });
@@ -133,18 +131,18 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
 
   return (
     <div className={styles.landing}>
-      <section className={styles.about} aria-label="Обо мне">
+      <section className={styles.about} aria-label={tr("Обо мне", "About me")}>
         <div ref={introRef} className={styles.intro}>
-          <h1>Влад Ахметов<span className={styles.nameDot}>.</span></h1>
-          <p className={styles.introText}>{intro.split(" ").map((word, index) => (
+          <h1>{tr(site.name, site.nameEn)}<span className={styles.nameDot}>.</span></h1>
+          <p className={styles.introText}>{t(intro).split(" ").map((word, index) => (
             <span key={index}>{index === 5 && <span className={styles.orangeObject} aria-hidden="true" />}<span data-word>{word}</span>{" "}</span>
           ))}</p>
         </div>
       </section>
-      <section className={styles.works} aria-label="Проекты">
-        {focus && <div className={styles.focusNotice}>{PORTFOLIO_DIRECTIONS[focus].title}<button type="button" onClick={() => onFocusChange(null)}>Все проекты ↗</button></div>}
-        {notFound && <p className={styles.notice} role="alert">Проект не найден. Здесь можно посмотреть другие работы.</p>}
-        <div ref={sliderRef} className={styles.carousel} role="region" aria-roledescription="карусель" aria-label="Лента проектов" tabIndex={0}
+      <section className={styles.works} aria-label={tr("Проекты", "Projects")}>
+        {focus && <div className={styles.focusNotice}>{t(PORTFOLIO_DIRECTIONS[focus].title)}<button type="button" onClick={() => onFocusChange(null)}>{tr("Все проекты ↗", "All projects ↗")}</button></div>}
+        {notFound && <p className={styles.notice} role="alert">{tr("Проект не найден. Здесь можно посмотреть другие работы.", "Project not found. Here are other works.")}</p>}
+        <div ref={sliderRef} className={styles.carousel} role="region" aria-roledescription={tr("карусель", "carousel")} aria-label={tr("Лента проектов", "Projects")} tabIndex={0}
           onKeyDown={event => {
             if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
             event.preventDefault();
@@ -175,7 +173,7 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
         >
           {projects.map((project, index) => (
             <article key={project.slug} className={styles.projectCard} data-project-card data-active={index === activeIndex}>
-              <button type="button" className={styles.projectButton} aria-label={`Открыть кейс ${project.title}`} onClick={() => onOpenProject(project.slug)} onFocus={event => { if (event.currentTarget.matches(":focus-visible")) goToCard(index); }}>
+              <button type="button" className={styles.projectButton} aria-label={`${tr("Открыть кейс", "Open case")} ${project.title}`} onClick={() => onOpenProject(project.slug)} onFocus={event => { if (event.currentTarget.matches(":focus-visible")) goToCard(index); }}>
                 <Image src={project.cover} alt="" fill sizes="(max-width: 640px) 75vw, 390px" className={styles.cover} unoptimized draggable={false} />
                 <span className={styles.cardTop}><span>{String(index + 1).padStart(2, "0")}</span><span>{project.year}</span></span>
                 <span className={styles.projectCaption}><span className={styles.projectCategory}>{project.tags[locale].slice(0, 2).join(" / ")}</span><span className={styles.projectTitle}>{project.title}</span><span className={styles.projectDescription}>{t(project.kicker)}</span></span>
@@ -186,35 +184,43 @@ export function PortfolioLanding({ projects, focus, scrollContainer, onFocusChan
         </div>
         <div className={styles.carouselBottom}>
           <div className={styles.carouselControls}>
-            <button type="button" aria-label="Предыдущие проекты" disabled={activeIndex <= 0} onClick={() => goToCard(activeIndex - 1)}>←</button>
-            <button type="button" aria-label="Следующие проекты" disabled={activeIndex >= projects.length - 1} onClick={() => goToCard(activeIndex + 1)}>→</button>
+            <button type="button" aria-label={tr("Предыдущие проекты", "Previous projects")} disabled={activeIndex <= 0} onClick={() => goToCard(activeIndex - 1)}>←</button>
+            <button type="button" aria-label={tr("Следующие проекты", "Next projects")} disabled={activeIndex >= projects.length - 1} onClick={() => goToCard(activeIndex + 1)}>→</button>
           </div>
           <span className={styles.counter} aria-live="polite" aria-atomic="true">{String(activeIndex + 1).padStart(2, "0")} <span>/ {String(projects.length).padStart(2, "0")}</span></span>
         </div>
       </section>
       <CareerTimeline scrollContainer={scrollContainer} />
       <section className={styles.tools} aria-labelledby="portfolio-tools-title">
-        <h2 id="portfolio-tools-title">Меньше рутины.<br />Больше <span>дизайна.</span></h2>
-        <div className={styles.toolsGrid}>
-          <button type="button" className={styles.toolCard} style={{ "--tool-visual": "url(/images/tools/printforge.svg)" } as CSSProperties} onClick={() => onOpenProject("printforge")} aria-label="Подробнее о PrintForge">
-            <span className={styles.toolVisual} aria-hidden="true" />
-            <span className={styles.toolTag}>Figma · Плагин</span>
-            <span className={styles.toolTitle}>PrintForge</span><span className={styles.toolTagline}>Из Figma — в печать</span><span className={styles.toolArrow} aria-hidden="true">↗</span>
-          </button>
-          {toolsList.map(tool => (
-            <button type="button" key={tool.id} className={styles.toolCard} style={{ "--tool-visual": `url(${toolPresentation[tool.id]?.visual ?? ""})` } as CSSProperties} aria-label={`Подробнее о ${tool.title}`} onClick={() => onOpenTool(tool.slug)}>
-              <span className={styles.toolVisual} aria-hidden="true" />
-              <span className={styles.toolTag}>{tool.platformLabel}</span>
-              <span className={styles.toolTitle}>{toolPresentation[tool.id]?.title ?? tool.title}</span>
-              <span className={styles.toolTagline}>{toolPresentation[tool.id]?.caption ?? tool.tagline}</span>
-              <span className={styles.toolArrow} aria-hidden="true">↗</span>
-            </button>
-          ))}
+        <h2 id="portfolio-tools-title">{tr("Меньше рутины.", "Less routine.")}<br />{tr("Больше", "More")} <span>{tr("дизайна.", "design.")}</span></h2>
+        <div className={styles.plugins}>
+          <div className={styles.pluginsHead}><span>{tr("Мои плагины", "My plugins")}</span><span>Figma Community</span></div>
+          <ul className={styles.pluginList}>
+            {figmaPlugins.map(plugin => {
+              const open = openPlugin === plugin.id;
+              return (
+                <li key={plugin.id} className={styles.pluginItem} data-open={open}>
+                  <button type="button" className={styles.pluginRow} aria-expanded={open} aria-controls={`plugin-${plugin.id}`} onClick={() => setOpenPlugin(open ? null : plugin.id)}>
+                    <span className={styles.pluginName}>{plugin.name}</span>
+                    <span className={styles.pluginCaption}>{t(plugin.caption)}</span>
+                    <span className={styles.pluginArrow} aria-hidden="true">+</span>
+                  </button>
+                  <div id={`plugin-${plugin.id}`} className={styles.pluginPanel} role="region" aria-label={plugin.name} inert={!open}>
+                    <div className={styles.pluginPanelInner}>
+                      <div><h3>{tr("Боль", "Pain")}</h3><p>{t(plugin.pain)}</p></div>
+                      <div><h3>{tr("Решение", "Solution")}</h3><p>{t(plugin.solution)}</p></div>
+                      <a className={styles.pluginLink} href={plugin.url} target="_blank" rel="noopener noreferrer">{tr("Открыть в Figma Community", "Open in Figma Community")} <span aria-hidden="true">↗</span></a>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
       <footer className={styles.contact}>
-        <div><span className={styles.contactLabel}>Есть интересная задача?</span><a className={styles.contactTitle} href={site.telegram} target="_blank" rel="noreferrer">Давайте обсудим <span aria-hidden="true">↗</span></a></div>
-        <div className={styles.contactBottom}><span>© {site.name} · {new Date().getFullYear()}</span><a href={`mailto:${site.email}`}>{site.email}</a><button type="button" onClick={() => scrollContainer.current?.scrollTo({ top: 0, behavior: scrollBehavior() })}>Наверх ↑</button></div>
+        <div><span className={styles.contactLabel}>{tr("Есть интересная задача?", "Have an interesting project?")}</span><a className={styles.contactTitle} href={site.telegram} target="_blank" rel="noreferrer">{tr("Давайте обсудим", "Let's talk")} <span aria-hidden="true">↗</span></a></div>
+        <div className={styles.contactBottom}><span>© {tr(site.name, site.nameEn)} · {new Date().getFullYear()}</span><a href={`mailto:${site.email}`}>{site.email}</a><button type="button" onClick={() => scrollContainer.current?.scrollTo({ top: 0, behavior: scrollBehavior() })}>{tr("Наверх ↑", "Back to top ↑")}</button></div>
       </footer>
     </div>
   );

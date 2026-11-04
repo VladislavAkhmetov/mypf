@@ -1,5 +1,6 @@
 "use client";
 
+import { hiddenApps } from "@/lib/xp/hidden-apps";
 import React, { useState } from "react";
 import Image from "next/image";
 import { site } from "@/data/site";
@@ -37,7 +38,7 @@ interface StartMenuProps {
 }
 
 export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
-  const { t } = useLocale();
+  const { t, tr } = useLocale();
   const { openWindow, openProject, openPortfolio, openNotes, openProfile } = useWindowManager();
   const [showAllPrograms, setShowAllPrograms] = useState(false);
 
@@ -83,8 +84,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <InternetExplorerIcon className="w-8 h-8 flex-shrink-0" />
             <div>
-              <div className="xp-start-item-title">Портфолио</div>
-              <div className="xp-start-subtext">Кейсы и интерактивные прототипы</div>
+              <div className="xp-start-item-title">{tr("Портфолио", "Portfolio")}</div>
+              <div className="xp-start-subtext">{tr("Кейсы и интерактивные прототипы", "Case studies and interactive prototypes")}</div>
             </div>
           </div>
 
@@ -104,7 +105,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               ✉️
             </div>
             <div>
-              <div className="xp-start-item-title">Электронная почта</div>
+              <div className="xp-start-item-title">{tr("Электронная почта", "Email")}</div>
               <div className="xp-start-subtext">{site.email}</div>
             </div>
           </a>
@@ -112,6 +113,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           <div className="h-[1px] bg-slate-200 my-1 mx-2" />
 
           {/* Windows Media Player */}
+          {!hiddenApps.includes("media-player") && (
           <div
             onClick={() => {
               xpSound.click();
@@ -133,8 +135,9 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <WindowsMediaPlayerIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Визуализатор волн</span>
+            <span className="font-semibold text-xs">{tr("Визуализатор волн", "Wave visualizer")}</span>
           </div>
+          )}
 
           {/* Notepad */}
           <div
@@ -158,7 +161,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <NotepadIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Блокнот</span>
+            <span className="font-semibold text-xs">{tr("Блокнот", "Notepad")}</span>
           </div>
 
           {/* Command Prompt */}
@@ -183,7 +186,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <CmdIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Командная строка</span>
+            <span className="font-semibold text-xs">{tr("Командная строка", "Command Prompt")}</span>
           </div>
 
           {/* Tools */}
@@ -208,7 +211,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <ToolsIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Инструменты и скрипты</span>
+            <span className="font-semibold text-xs">{tr("Инструменты и скрипты", "Tools and scripts")}</span>
           </div>
 
           {/* About / Word */}
@@ -224,7 +227,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <WordDocIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Обо мне (Word)</span>
+            <span className="font-semibold text-xs">{tr("Обо мне (Word)", "About me (Word)")}</span>
           </div>
 
           {/* Paint Studio */}
@@ -265,7 +268,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <StoriesIcon className="w-7 h-7 flex-shrink-0" />
-            <span className="font-semibold text-xs">Журнал</span>
+            <span className="font-semibold text-xs">{tr("Журнал", "Journal")}</span>
           </div>
 
           {/* For Employers / HR & Leads */}
@@ -291,8 +294,8 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <PdfIcon className="w-7 h-7 flex-shrink-0" />
             <div>
-              <div className="xp-start-item-title text-blue-950 font-bold">Для работодателей / HR</div>
-              <div className="xp-start-subtext text-blue-800">Резюме, специализация, стек</div>
+              <div className="xp-start-item-title text-blue-950 font-bold">{tr("Для работодателей / HR", "For employers / HR")}</div>
+              <div className="xp-start-subtext text-blue-800">{tr("Резюме, специализация, стек", "Resume, focus, stack")}</div>
             </div>
           </div>
 
@@ -306,7 +309,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               className="w-full flex items-center justify-between p-2 rounded hover:bg-[#316ac5] hover:text-white font-bold text-xs text-slate-900"
               style={{ cursor: xpCursors.pointer }}
             >
-              <span className="text-slate-900 group-hover:text-white">Все программы</span>
+              <span className="text-slate-900 group-hover:text-white">{tr("Все программы", "All Programs")}</span>
               <span className="text-emerald-600 font-bold">►</span>
             </button>
           </div>
@@ -319,7 +322,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             onMouseLeave={() => setShowAllPrograms(false)}
           >
             <div className="text-[11px] text-slate-900 font-bold uppercase mb-2 px-1 border-b border-slate-200 pb-1">
-              Проекты портфолио:
+              {tr("Проекты портфолио:", "Portfolio projects:")}
             </div>
             {projects.map((p) => (
               <div
@@ -340,7 +343,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             ))}
 
             <div className="text-[11px] text-slate-900 font-bold uppercase mt-3 mb-2 px-1 border-b border-slate-200 pb-1">
-              Игры и лаборатория:
+              {tr("Игры и лаборатория:", "Games and lab:")}
             </div>
             <div
               onClick={() => {
@@ -363,7 +366,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               style={{ cursor: xpCursors.pointer }}
             >
               <SolitaireIcon className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Косынка Atelier</span>
+              <span className="truncate">{tr("Косынка Atelier", "Solitaire Atelier")}</span>
             </div>
 
             <div
@@ -386,7 +389,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
               style={{ cursor: xpCursors.pointer }}
             >
               <MinesweeperIcon className="w-5 h-5 flex-shrink-0" />
-              <span className="truncate">Сапёр Pulse</span>
+              <span className="truncate">{tr("Сапёр Pulse", "Minesweeper Pulse")}</span>
             </div>
           </div>
         )}
@@ -414,9 +417,10 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <MyDocumentsIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="font-bold text-xs">Мои документы</span>
+            <span className="font-bold text-xs">{tr("Мои документы", "My Documents")}</span>
           </div>
 
+          {!hiddenApps.includes("my-computer") && (
           <div
             onClick={() => {
               xpSound.click();
@@ -438,8 +442,9 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <MyComputerIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="font-bold text-xs">Мой компьютер</span>
+            <span className="font-bold text-xs">{tr("Мой компьютер", "My Computer")}</span>
           </div>
+          )}
 
           <div
             onClick={() => {
@@ -462,9 +467,10 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <ToolsIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="font-bold text-xs">Инструменты</span>
+            <span className="font-bold text-xs">{tr("Инструменты", "Tools")}</span>
           </div>
 
+          {!hiddenApps.includes("help") && (
           <div
             onClick={() => {
               xpSound.click();
@@ -486,8 +492,9 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <HelpCenterIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="font-bold text-xs">Справка и поддержка</span>
+            <span className="font-bold text-xs">{tr("Справка и поддержка", "Help and Support")}</span>
           </div>
+          )}
 
           <div
             onClick={() => {
@@ -508,7 +515,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <WordDocIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="font-bold text-xs">Документы (Word)</span>
+            <span className="font-bold text-xs">{tr("Документы (Word)", "Documents (Word)")}</span>
           </div>
 
           <div className="h-[1px] bg-[#9bbfe8] my-1 mx-2" />
@@ -534,7 +541,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <ControlPanelIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="text-xs">Оформление и темы</span>
+            <span className="text-xs">{tr("Оформление и темы", "Appearance and Themes")}</span>
           </div>
 
           <a
@@ -546,7 +553,7 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <TelegramIcon className="w-6 h-6 flex-shrink-0" />
-            <span className="text-xs font-semibold">Telegram @amazi</span>
+            <span className="text-xs font-semibold">Telegram {site.handle}</span>
           </a>
 
           <div className="h-[1px] bg-[#9bbfe8] my-1 mx-2" />
@@ -571,30 +578,13 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             style={{ cursor: xpCursors.pointer }}
           >
             <span className="text-base">⚙️</span>
-            <span className="text-xs">Выполнить...</span>
+            <span className="text-xs">{tr("Выполнить...", "Run...")}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer (Log Off / Turn Off) */}
+      {/* Footer: turn off */}
       <div className="xp-start-footer">
-        <button
-          type="button"
-          onClick={() => {
-            xpSound.click();
-            onClose();
-            onTurnOffClick();
-          }}
-          data-ym-goal="start_menu_logoff"
-          className="xp-start-footer-btn"
-          style={{ cursor: xpCursors.pointer }}
-        >
-          <div className="w-5 h-5 rounded bg-amber-500 border border-white/50 grid place-items-center text-white text-xs font-bold shadow-sm">
-            🔑
-          </div>
-          <span>Выход из системы</span>
-        </button>
-
         <button
           type="button"
           onClick={() => {
@@ -606,10 +596,10 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           className="xp-start-footer-btn font-bold"
           style={{ cursor: xpCursors.pointer }}
         >
-          <div className="w-5 h-5 rounded bg-red-600 border border-white/50 grid place-items-center text-white text-xs font-bold shadow-sm">
-            ⏻
+          <div className="w-5 h-5 rounded bg-red-600 border border-white/50 grid place-items-center text-white shadow-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" aria-hidden="true"><path d="M12 3v8.5" /><path d="M6.6 6.9a8 8 0 1 0 10.8 0" /></svg>
           </div>
-          <span>Выключение</span>
+          <span>{tr("Выключение", "Turn Off Computer")}</span>
         </button>
       </div>
     </div>

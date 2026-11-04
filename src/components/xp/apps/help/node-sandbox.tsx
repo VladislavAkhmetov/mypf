@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./help-center.module.css";
+import { useLocale } from "@/lib/i18n";
 
 // A tiny real node editor: image source → colour → blur → posterize → output.
 // Every node renders its own preview, so you can see where the data changes.
@@ -53,7 +54,12 @@ function makeCanvas() {
   return canvas;
 }
 
+const NODE_EN: Record<NodeKind, string> = { source: "Source", color: "Color", blur: "Blur", posterize: "Posterize", output: "Output" };
+const SOURCE_EN = ["Hills", "Tulips"];
+
 export function NodeSandbox() {
+  const { tr, locale } = useLocale();
+  const nodeTitle = (node: GraphNode) => (locale === "en" ? NODE_EN[node.id] : node.title);
   const [nodes, setNodes] = useState(INITIAL_NODES);
   const [edges, setEdges] = useState(INITIAL_EDGES);
   const [params, setParams] = useState(INITIAL_PARAMS);
@@ -226,21 +232,21 @@ export function NodeSandbox() {
     switch (id) {
       case "source":
         return (
-          <select value={params.source} onChange={e => setParams(p => ({ ...p, source: Number(e.target.value) }))} aria-label="Картинка">
-            {SOURCES.map((s, i) => <option key={s.src} value={i}>{s.label}</option>)}
+          <select value={params.source} onChange={e => setParams(p => ({ ...p, source: Number(e.target.value) }))} aria-label={tr("Картинка", "Image")}>
+            {SOURCES.map((s, i) => <option key={s.src} value={i}>{locale === "en" ? SOURCE_EN[i] : s.label}</option>)}
           </select>
         );
       case "color":
         return (
           <>
-            <label>Тон <input type="range" min={-180} max={180} value={params.hue} onChange={e => setParams(p => ({ ...p, hue: Number(e.target.value) }))} /></label>
-            <label>Насыщ. <input type="range" min={0} max={250} value={params.saturation} onChange={e => setParams(p => ({ ...p, saturation: Number(e.target.value) }))} /></label>
+            <label>{tr("Тон", "Hue")} <input type="range" min={-180} max={180} value={params.hue} onChange={e => setParams(p => ({ ...p, hue: Number(e.target.value) }))} /></label>
+            <label>{tr("Насыщ.", "Sat.")} <input type="range" min={0} max={250} value={params.saturation} onChange={e => setParams(p => ({ ...p, saturation: Number(e.target.value) }))} /></label>
           </>
         );
       case "blur":
-        return <label>Радиус <input type="range" min={0} max={6} step={0.5} value={params.blur} onChange={e => setParams(p => ({ ...p, blur: Number(e.target.value) }))} /></label>;
+        return <label>{tr("Радиус", "Radius")} <input type="range" min={0} max={6} step={0.5} value={params.blur} onChange={e => setParams(p => ({ ...p, blur: Number(e.target.value) }))} /></label>;
       case "posterize":
-        return <label>Уровни <input type="range" min={2} max={8} value={params.levels} onChange={e => setParams(p => ({ ...p, levels: Number(e.target.value) }))} /></label>;
+        return <label>{tr("Уровни", "Levels")} <input type="range" min={2} max={8} value={params.levels} onChange={e => setParams(p => ({ ...p, levels: Number(e.target.value) }))} /></label>;
       default:
         return null;
     }
@@ -256,7 +262,7 @@ export function NodeSandbox() {
                 <g key={to} className={contributing.has(to) && contributing.has(from) ? styles.wireActive : styles.wireIdle}>
                   <path d={curve(portOut(from), portIn(to))} />
                   <path className={styles.wireHit} d={curve(portOut(from), portIn(to))} onClick={() => disconnect(to)}>
-                    <title>Щёлкните, чтобы отсоединить</title>
+                    <title>{tr("Щёлкните, чтобы отсоединить", "Click to disconnect")}</title>
                   </path>
                 </g>
               ) : null,
@@ -272,7 +278,7 @@ export function NodeSandbox() {
                 style={{ left: node.x, top: node.y, width: widthOf(node.id) }}
               >
                 <div className={styles.nodeHeader} onPointerDown={event => startNodeDrag(event, node.id)}>
-                  {node.title}
+                  {nodeTitle(node)}
                 </div>
                 <canvas
                   ref={el => {
@@ -283,7 +289,7 @@ export function NodeSandbox() {
                   className={styles.nodePreview}
                 />
                 <div className={styles.nodeParams}>{param(node.id)}</div>
-                {!active && node.id !== "output" && <div className={styles.nodeNote}>не влияет на вывод</div>}
+                {!active && node.id !== "output" && <div className={styles.nodeNote}>{tr("не влияет на вывод", "does not affect output")}</div>}
                 {node.id !== "source" && (
                   <button
                     type="button"
@@ -291,7 +297,7 @@ export function NodeSandbox() {
                     className={`${styles.port} ${styles.portIn} ${edges[node.id] ? styles.portLinked : ""}`}
                     style={{ top: PORT_Y - 6 }}
                     onClick={() => edges[node.id] && disconnect(node.id)}
-                    aria-label={`Вход ноды «${node.title}»`}
+                    aria-label={`${tr("Вход ноды", "Input of")} «${nodeTitle(node)}»`}
                   />
                 )}
                 {node.id !== "output" && (
@@ -303,7 +309,7 @@ export function NodeSandbox() {
                       event.preventDefault();
                       setWire({ from: node.id, ...toLocal(event.clientX, event.clientY) });
                     }}
-                    aria-label={`Выход ноды «${node.title}» — потяните к входу другой ноды`}
+                    aria-label={`${tr("Выход ноды", "Output of")} «${nodeTitle(node)}» — ${tr("потяните к входу другой ноды", "drag to another node's input")}`}
                   />
                 )}
               </div>
@@ -312,7 +318,7 @@ export function NodeSandbox() {
         </div>
       </div>
       <div className={styles.sandboxBar}>
-        <span>Тяните от правой точки ноды к левой точке другой. Щелчок по проводу — отсоединить.</span>
+        <span>{tr("Тяните от правой точки ноды к левой точке другой. Щелчок по проводу — отсоединить.", "Drag from a node's right dot to another node's left dot. Click a wire to disconnect it.")}</span>
         <button
           type="button"
           className={styles.xpButton}
@@ -322,7 +328,7 @@ export function NodeSandbox() {
             setParams(INITIAL_PARAMS);
           }}
         >
-          Сбросить схему
+          {tr("Сбросить схему", "Reset graph")}
         </button>
       </div>
     </div>

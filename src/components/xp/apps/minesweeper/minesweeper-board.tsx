@@ -8,6 +8,7 @@ import { EffectsCanvas, EffectsCanvasHandle } from "./effects-canvas";
 import { MeadowCell, type CellEdges } from "./meadow-cell";
 import { ART, fringeTexture, grassTexture, hedgeTexture, soilTexture, spriteUrl } from "./pixel-art";
 import styles from "./minesweeper.module.css";
+import { useLocale } from "@/lib/i18n";
 
 interface MinesweeperBoardProps {
   state: GameState;
@@ -31,6 +32,7 @@ export function MinesweeperBoard({
   allowQuestionMarks = false,
   effectsMode = "full",
 }: MinesweeperBoardProps) {
+  const { tr } = useLocale();
   const [touchMode, setTouchMode] = useState<"reveal" | "flag">("reveal");
   const [zoomScale, setZoomScale] = useState(1);
   const [prevDifficulty, setPrevDifficulty] = useState(state.difficulty);
@@ -196,13 +198,13 @@ export function MinesweeperBoard({
 
   return (
     <div className={styles.board} style={{ "--px": `${pixel}px` } as React.CSSProperties}>
-      <div className={styles.progress} title={`Поле очищено на ${progress}%`} aria-hidden="true">
+      <div className={styles.progress} title={`${tr("Поле очищено на", "Field cleared")} ${progress}%`} aria-hidden="true">
         <i style={{ width: `${progress}%` }} />
       </div>
       {isLargeBoard && (
         <div className={styles.zoomBar}>
           <span>
-            {cols}×{rows} {hasOverflow ? "· листайте поле" : "· масштаб"}
+            {cols}×{rows} {hasOverflow ? tr("· листайте поле", "· scroll the field") : tr("· масштаб", "· zoom")}
           </span>
           <div className={styles.zoomButtons}>
             {ZOOM_STEPS.map(scale => (
@@ -233,7 +235,7 @@ export function MinesweeperBoard({
             className={styles.grid}
             style={{ gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`, "--cell": `${cellSize}px` } as React.CSSProperties}
             role="grid"
-            aria-label={`Поле сапёра ${cols} на ${rows}`}
+            aria-label={`${tr("Поле сапёра", "Minesweeper field")} ${cols} × ${rows}`}
           >
             {state.grid.flatMap((row, rowIndex) =>
               row.map((cell, colIndex) => {
@@ -263,20 +265,20 @@ export function MinesweeperBoard({
       </motion.div>
 
       <footer className={styles.controlDock}>
-        <div className={styles.modeSwitch} role="group" aria-label="Режим касания">
+        <div className={styles.modeSwitch} role="group" aria-label={tr("Режим касания", "Touch mode")}>
           <button className={touchMode === "reveal" ? styles.modeActive : ""} onClick={() => selectMode("reveal")} aria-pressed={touchMode === "reveal"}>
             <span className={styles.icon} style={{ backgroundImage: spriteUrl("shovel") }} aria-hidden="true" />
-            <span>Копать</span>
+            <span>{tr("Копать", "Dig")}</span>
           </button>
           <button className={touchMode === "flag" ? styles.modeActive : ""} onClick={() => selectMode("flag")} aria-pressed={touchMode === "flag"}>
             <span className={styles.icon} style={{ backgroundImage: spriteUrl("flag") }} aria-hidden="true" />
-            <span>Флаг</span>
+            <span>{tr("Флаг", "Flag")}</span>
           </button>
         </div>
         <span className={styles.hint}>
-          ЛКМ копать · ПКМ флаг
+          {tr("ЛКМ копать · ПКМ флаг", "Left click dig · right click flag")}
           <br />
-          Цифра: открыть соседей
+          {tr("Цифра: открыть соседей", "Number: open neighbours")}
         </span>
       </footer>
     </div>

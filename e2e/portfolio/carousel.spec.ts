@@ -10,7 +10,7 @@ test.describe("Portfolio landing", () => {
     const portfolio = page.locator("#window-portfolio");
     const slider = portfolio.getByRole("region", { name: "Лента проектов" });
     const active = portfolio.locator('[data-project-card][data-active="true"]');
-    await expect(active).toContainText("Kora");
+    await expect(active).toContainText("dombro");
     const widths = await slider.locator("[data-project-card]").evaluateAll(cards =>
       cards.slice(0, 3).map(card => card.getBoundingClientRect().width)
     );
@@ -22,13 +22,13 @@ test.describe("Portfolio landing", () => {
     await page.mouse.wheel(0, 80);
     await expect.poll(() => slider.evaluate(el => el.scrollLeft)).toBeGreaterThan(initial);
     await page.mouse.wheel(0, 260);
-    await expect(active).toContainText("Signalatlas");
+    await expect(active).toContainText("Таскер");
     await portfolio.getByRole("button", { name: "Следующие проекты" }).click();
-    await expect(active).toContainText("Noclip");
+    await expect(active).toContainText("kroomi");
     await portfolio.getByRole("button", { name: "Предыдущие проекты" }).click();
-    await expect(active).toContainText("Signalatlas");
+    await expect(active).toContainText("Таскер");
     await active.getByRole("button").click();
-    await expect(portfolio.getByRole("heading", { name: "Signalatlas", exact: true })).toBeVisible();
+    await expect(portfolio.getByRole("heading", { name: "Таскер", exact: true })).toBeVisible();
     await portfolio.getByRole("button", { name: "Назад к каталогу" }).click();
     await expect(portfolio.locator("h1")).toContainText("Влад Ахметов");
 

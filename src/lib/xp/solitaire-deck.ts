@@ -65,6 +65,17 @@ export function getSuitNameRu(suit: Suit): string {
   }
 }
 
+const RANK_EN: Partial<Record<Rank, string>> = { 1: "Ace", 11: "Jack", 12: "Queen", 13: "King" };
+const SUIT_EN: Record<Suit, string> = { spades: "Spades", hearts: "Hearts", diamonds: "Diamonds", clubs: "Clubs" };
+
+export function getRankName(rank: Rank, locale: "ru" | "en"): string {
+  return locale === "en" ? RANK_EN[rank] ?? rank.toString() : getRankNameRu(rank);
+}
+
+export function getSuitName(suit: Suit, locale: "ru" | "en"): string {
+  return locale === "en" ? SUIT_EN[suit] : getSuitNameRu(suit);
+}
+
 export function createDeck(): Card[] {
   const suits: Suit[] = ["spades", "hearts", "diamonds", "clubs"];
   const deck: Card[] = [];
@@ -348,6 +359,7 @@ export function tryAutoMoveCardToFoundation(
 // Hint engine
 export interface HintMove {
   description: string;
+  descriptionEn: string;
   sourceType: "waste" | "tableau" | "stock" | "foundation";
   sourceIndex: number;
   targetType: "foundation" | "tableau" | "stock";
@@ -364,6 +376,7 @@ export function findHint(state: SolitaireState): HintMove | null {
       if (canMoveToFoundation(topWaste, state.foundations[f])) {
         return {
           description: `Переместить ${getRankNameRu(topWaste.rank)} (${getSuitNameRu(topWaste.suit)}) из сброса в дом`,
+          descriptionEn: `Move ${getRankName(topWaste.rank, "en")} of ${SUIT_EN[topWaste.suit]} from the waste to a foundation`,
           sourceType: "waste",
           sourceIndex: 0,
           targetType: "foundation",
@@ -385,6 +398,7 @@ export function findHint(state: SolitaireState): HintMove | null {
           if (canMoveToFoundation(top, state.foundations[f])) {
             return {
               description: `Поднять ${getRankNameRu(top.rank)} (${getSuitNameRu(top.suit)}) из колонки ${c + 1} в дом`,
+              descriptionEn: `Move ${getRankName(top.rank, "en")} of ${SUIT_EN[top.suit]} from column ${c + 1} to a foundation`,
               sourceType: "tableau",
               sourceIndex: c,
               targetType: "foundation",
@@ -405,6 +419,7 @@ export function findHint(state: SolitaireState): HintMove | null {
       if (canMoveToTableau(topWaste, state.tableau[c])) {
         return {
           description: `Положить ${getRankNameRu(topWaste.rank)} из сброса на колонку ${c + 1}`,
+          descriptionEn: `Put ${getRankName(topWaste.rank, "en")} from the waste on column ${c + 1}`,
           sourceType: "waste",
           sourceIndex: 0,
           targetType: "tableau",
@@ -429,6 +444,7 @@ export function findHint(state: SolitaireState): HintMove | null {
           if (from !== to && canMoveToTableau(card, state.tableau[to])) {
             return {
               description: `Переместить ${getRankNameRu(card.rank)} в колонку ${to + 1}`,
+              descriptionEn: `Move ${getRankName(card.rank, "en")} to column ${to + 1}`,
               sourceType: "tableau",
               sourceIndex: from,
               targetType: "tableau",
@@ -446,6 +462,7 @@ export function findHint(state: SolitaireState): HintMove | null {
   if (state.stock.length > 0 || state.waste.length > 0) {
     return {
       description: "Открыть карту из колоды запаса",
+      descriptionEn: "Turn a card from the stock",
       sourceType: "stock",
       sourceIndex: 0,
       targetType: "stock",

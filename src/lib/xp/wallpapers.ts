@@ -8,6 +8,30 @@ export interface WallpaperItem {
   isColor?: boolean;
 }
 
+const WALLPAPER_EN: Record<string, { name: string; desc: string; region?: string }> = {
+  bliss: { name: "Bliss", desc: "Sonoma hills, California (Charles O'Rear, 1996)", region: "USA, North America and the global default" },
+  autumn: { name: "Autumn", desc: "Golden treetops and a quiet, nostalgic forest", region: "Russia, Belarus, Kazakhstan and the CIS" },
+  stonehenge: { name: "Stonehenge", desc: "Ancient megaliths under the misty Salisbury sky", region: "UK, Ireland and Western Europe" },
+  azul: { name: "Azul", desc: "Turquoise sea and a golden sunny beach", region: "The Mediterranean, Southern Europe and coasts" },
+  desert: { name: "Red Moon Desert", desc: "Red sand dunes and a dramatic moonscape", region: "Middle East, North Africa and Australia" },
+  crystal: { name: "Crystal", desc: "Glacier peaks, northern lights and mirror-still water", region: "Scandinavia, the Nordics and Canada" },
+};
+
+/** Name, description and region in the interface language. */
+export function wallpaperText(wp: WallpaperItem, locale: "ru" | "en") {
+  const en = locale === "en" ? WALLPAPER_EN[wp.id] : undefined;
+  const fallback: Record<string, string> = {
+    "Типографическая сетка и монохромная подложка": "A typographic grid on a monochrome base",
+    "Швейцария, Австрия и дизайн-студии": "Switzerland, Austria and design studios",
+    "Абстрактный векторный градиент Media Center": "An abstract Media Center vector gradient",
+    "Эталонный бирюзовый монохром рабочей станции": "The reference teal monochrome of a workstation",
+    "Бескомпромиссный глубокий темный фон": "An uncompromising deep dark background",
+    "Темная тема": "Dark theme",
+  };
+  const pick = (value: string | undefined) => (value && locale === "en" ? fallback[value] ?? value : value);
+  return { name: en?.name ?? wp.name, desc: en?.desc ?? pick(wp.desc) ?? "", region: en ? en.region : pick(wp.region) };
+}
+
 export const DEFAULT_WALLPAPER_SRC = "/images/bliss.jpg";
 
 export const WALLPAPERS: WallpaperItem[] = [

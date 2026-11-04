@@ -14,11 +14,15 @@ import { ResumeWindow } from "./apps/resume-window";
 import dynamic from "next/dynamic";
 import { ToolsWindow } from "./apps/tools-window";
 import { WordWindow } from "./apps/word-window";
+import { MobileGameWindow } from "./apps/mobile-game/mobile-game-window";
 import { PaintWindow } from "./apps/paint-window";
 import { HelpCenterWindow } from "./apps/help/help-center-window";
 import { PortfolioBrowserWindow } from "./apps/portfolio-browser-window";
 import { FocusDirection } from "@/lib/xp/navigation";
+import { DombroWindow } from "./apps/dombro-window";
+import { KroomiWindow } from "./apps/kroomi-window";
 import { NotesWindow } from "@/components/notes/notes-window";
+import { useLocale } from "@/lib/i18n";
 
 const SolitaireWindow = dynamic(
   () => import("./apps/solitaire-window").then((mod) => mod.SolitaireWindow),
@@ -26,7 +30,7 @@ const SolitaireWindow = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex items-center justify-center bg-[#1b4332] text-[#d8f3dc] text-xs font-sans">
-        Раскладываем пасьянс...
+        <LoadingText ru="Раскладываем пасьянс..." en="Dealing the cards..." />
       </div>
     ),
   }
@@ -38,11 +42,15 @@ const MinesweeperWindow = dynamic(
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex items-center justify-center bg-[#0B1127] text-[#57E4FF] text-xs font-mono">
-        Заряжаем игровое поле...
+        <LoadingText ru="Заряжаем игровое поле..." en="Loading the field..." />
       </div>
     ),
   }
 );
+
+function LoadingText({ ru, en }: { ru: string; en: string }) {
+  return <>{useLocale().tr(ru, en)}</>;
+}
 
 export function WindowContentRouter({ window: win }: { window: WindowItem }) {
   switch (win.type) {
@@ -61,16 +69,7 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
     case "tools":
       return <ToolsWindow />;
     case "word":
-      return (
-        <WordWindow
-          initialDocSlug={
-            (win.props?.docSlug as string) ||
-            (win.props?.initialSlug as string) ||
-            (win.props?.slug as string)
-          }
-          docSlug={win.props?.docSlug as string | undefined}
-        />
-      );
+      return <WordWindow />;
     case "minesweeper":
       return <MinesweeperWindow />;
     case "paint":
@@ -90,7 +89,14 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
     case "display-properties":
       return <DisplayPropertiesDialog />;
     case "properties":
-      return <PropertiesDialog slug={(win.props?.slug as string) || "kora"} />;
+      return <PropertiesDialog slug={(win.props?.slug as string) || "dombro"} />;
+    case "dombro":
+      return <DombroWindow />;
+    case "kroomi":
+      return <KroomiWindow />;
+    case "baltika":
+    case "designer-game":
+      return <MobileGameWindow gameId={win.type} />;
     case "resume":
       return <ResumeWindow />;
     case "help":

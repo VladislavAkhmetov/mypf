@@ -1,44 +1,25 @@
 import { toolsList } from "@/data/tools";
+import type { Bi } from "@/data/dombro";
 
 export type FocusDirection = "communication" | "engineering";
 
-export const PORTFOLIO_DIRECTIONS: Record<FocusDirection, { title: string; slugs: string[] }> = {
+export const PORTFOLIO_DIRECTIONS: Record<FocusDirection, { title: Bi; slugs: string[] }> = {
   communication: {
-    title: "Коммуникационный дизайн",
-    slugs: [
-      "altyn-solok",
-      "kora",
-      "signalatlas",
-      "afterimage",
-      "voltform",
-      "hearth",
-      "iris-gate",
-      "ledgerfold",
-      "soft-lock",
-      "pulp-index",
-    ],
+    title: { ru: "Коммуникационный дизайн", en: "Communication design" },
+    slugs: ["altyn-solok", "kroomi"],
   },
   engineering: {
-    title: "Интерфейсы и прототипы",
-    slugs: ["altyn-solok", "noclip", "dockyard", "sieve"],
+    title: { ru: "Интерфейсы и прототипы", en: "Interfaces and prototypes" },
+    slugs: ["dombro", "tasker", "kroomi", "altyn-solok"],
   },
 };
 
 export const ALL_PROJECT_SLUGS: string[] = [
   "printforge",
   "altyn-solok",
-  "kora",
-  "signalatlas",
-  "noclip",
-  "sieve",
-  "afterimage",
-  "voltform",
-  "hearth",
-  "dockyard",
-  "iris-gate",
-  "ledgerfold",
-  "soft-lock",
-  "pulp-index",
+  "dombro",
+  "tasker",
+  "kroomi",
 ];
 
 export interface ParsedNavigation {

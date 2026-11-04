@@ -2,23 +2,25 @@ import React from "react";
 import Image from "next/image";
 import type { MakingOf } from "@/data/making-of";
 import styles from "./making-of.module.css";
+import { useLocale } from "@/lib/i18n";
 
-/** "Как это сделано": the process behind a case, in the case page's own visual language. */
+/** tr("Как это сделано", "How it was made"): the process behind a case, in the case page's own visual language. */
 export function MakingOfSection({ data, onZoom }: { data: MakingOf; onZoom?: (image: { src: string; alt: string }) => void }) {
+  const { tr } = useLocale();
   return (
-    <section className={styles.section} aria-label="Как это сделано">
+    <section className={styles.section} aria-label={tr("Как это сделано", "How it was made")}>
       <div className={styles.heading}>
-        <span className={styles.eyebrow}>Процесс</span>
-        <h2>Как это сделано<span>.</span></h2>
+        <span className={styles.eyebrow}>{tr("Процесс", "Process")}</span>
+        <h2>{tr("Как это сделано", "How it was made")}<span>.</span></h2>
       </div>
 
       <div className={styles.split}>
         <div className={styles.card}>
-          <span>Проблема</span>
+          <span>{tr("Проблема", "Problem")}</span>
           <p>{data.problem}</p>
         </div>
         <div className={`${styles.card} ${styles.cardAccent}`}>
-          <span>Решение</span>
+          <span>{tr("Решение", "Solution")}</span>
           <p>{data.solution}</p>
         </div>
       </div>
@@ -32,7 +34,7 @@ export function MakingOfSection({ data, onZoom }: { data: MakingOf; onZoom?: (im
               <p>{step.text}</p>
               {step.prompt && (
                 <figure className={styles.prompt}>
-                  <figcaption>Промпт</figcaption>
+                  <figcaption>{tr("Промпт", "Prompt")}</figcaption>
                   <pre>{step.prompt}</pre>
                 </figure>
               )}
@@ -59,7 +61,7 @@ export function MakingOfSection({ data, onZoom }: { data: MakingOf; onZoom?: (im
 
       {data.lessons && data.lessons.length > 0 && (
         <div className={styles.lessons}>
-          <span>Что я вынес</span>
+          <span>{tr("Что я вынес", "What I learned")}</span>
           <ul>{data.lessons.map(item => <li key={item}>{item}</li>)}</ul>
         </div>
       )}

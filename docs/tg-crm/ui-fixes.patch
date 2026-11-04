@@ -1,0 +1,732 @@
+diff --git a/static/app.js b/static/app.js
+index e412c7b..93488af 100644
+--- a/static/app.js
++++ b/static/app.js
+@@ -57,13 +57,14 @@ function isUserOnline(user) {
+ }
+ 
+ function formatTaskDeadline(task) {
+-  if (!task.updated_at && !task.created_at) return '';
++  // An unclaimed task has no deadline: its timestamp would read as a due date.
++  if (task.status === 'available' || (!task.updated_at && !task.created_at)) return '';
+   try {
+     const date = new Date(task.updated_at || task.created_at);
+     const now = new Date();
+     const isToday = date.toDateString() === now.toDateString();
+     if (isToday) {
+-      const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
++      const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', hour12: false });
+       return `<span class="task-deadline-badge is-today">${icon('clock')}сегодня, ${time}</span>`;
+     }
+     const d = date.getDate().toString().padStart(2, '0');
+@@ -668,7 +669,8 @@ function createTaskCardHtml(task) {
+   const imagesBadge = task.images_count ? `<span class="chip-neutral badge-images" title="Количество фото: ${task.images_count}">${task.images_count} фото</span>` : '';
+   const statusBadge = statusHtml(task);
+ 
+-  const assignee = task.assigned_to_id && task.status !== 'available' ? (isMine(task) ? 'Вы' : assigneeName(task)) : 'Свободно';
++  const hasAssignee = !!task.assigned_to_id && task.status !== 'available';
++  const assignee = hasAssignee ? (isMine(task) ? 'Вы' : assigneeName(task)) : 'Не назначен';
+   const pal = getAvatarColor(assignee);
+   const initial = assignee.trim()[0] || 'U';
+   const deadlineBadge = formatTaskDeadline(task);
+@@ -690,9 +692,9 @@ function createTaskCardHtml(task) {
+         </div>
+       </div>
+       <div class="task-assignee-row" style="margin-top: 10px;">
+-        <div class="task-assignee-user" title="${escapeHtml(assigneeName(task))}">
++        <div class="task-assignee-user" title="${escapeHtml(hasAssignee ? assigneeName(task) : assignee)}">
+           <div class="user-avatar-sm" style="background: ${pal.bg}; color: ${pal.fg};">${escapeHtml(initial)}</div>
+-          <span>${isMine(task) ? 'Вы' : escapeHtml(assigneeName(task))}</span>
++          <span${hasAssignee ? '' : ' class="is-unassigned"'}>${escapeHtml(assignee)}</span>
+         </div>
+         ${deadlineBadge}
+       </div>
+@@ -995,11 +997,11 @@ async function openAction(kind, taskId) {
+   let fields = '';
+   if (kind === 'internal') {
+     fields = urlField('Ссылка на макет в Figma', task.internal_figma_url || '') +
+-      `<label class="field-label" for="action-images-count">Количество изображений в 1 задании <span class="required-star">*</span><input id="action-images-count" type="number" min="1" max="500" inputmode="numeric" value="${escapeHtml(task.images_count || '')}" placeholder="Например: 10" required><span id="action-images-count-error" class="field-error-msg hidden"></span></label>` +
++      `<label class="field-label" for="action-images-count"><span class="field-title">Количество изображений в 1 задании<span class="required-star" aria-hidden="true"> *</span></span><input id="action-images-count" type="number" min="1" max="500" inputmode="numeric" value="${escapeHtml(task.images_count || '')}" placeholder="Например: 10" required><span id="action-images-count-error" class="field-error-msg hidden"></span></label>` +
+       '<label class="field-label" for="action-notes">Комментарий<span class="field-hint">Необязательно</span><textarea id="action-notes" rows="3"></textarea></label>';
+   }
+   if (kind === 'images') {
+-    fields = `<label class="field-label" for="action-images-count">Количество изображений в 1 задании <span class="required-star">*</span><input id="action-images-count" type="number" min="1" max="500" inputmode="numeric" value="${escapeHtml(task.images_count || '')}" placeholder="Например: 10" required autofocus><span id="action-images-count-error" class="field-error-msg hidden"></span></label>`;
++    fields = `<label class="field-label" for="action-images-count"><span class="field-title">Количество изображений в 1 задании<span class="required-star" aria-hidden="true"> *</span></span><input id="action-images-count" type="number" min="1" max="500" inputmode="numeric" value="${escapeHtml(task.images_count || '')}" placeholder="Например: 10" required autofocus><span id="action-images-count-error" class="field-error-msg hidden"></span></label>`;
+   }
+   if (kind === 'client') fields = urlField('Figma заказчика', task.client_figma_url || '', false) + '<p class="muted">Ссылку можно оставить пустой, если макет уже передан.</p>';
+   if (kind === 'complete') fields = urlField('Финалы на Яндекс.Диске', task.yandex_disk_url || '');
+@@ -1046,7 +1048,7 @@ async function openAction(kind, taskId) {
+       </div>
+       ${task.status !== 'available' && currentAssigneeId ? `
+         <p class="muted" style="margin-top: 10px; font-size: 13.5px;">
+-          ⚠️ Текущий исполнитель: <b>${escapeHtml(assigneeName(task))}</b>. Задача будет переведена в статус «В работе» новому исполнителю.
++          Текущий исполнитель: <b>${escapeHtml(assigneeName(task))}</b>. Задача будет переведена в статус «В работе» новому исполнителю.
+         </p>
+         <div style="margin-top: 12px; text-align: center;">
+           <button type="button" class="btn btn-ghost btn-sm" onclick="closeModal(); openAction('return', ${task.id});" style="width: 100%;">
+@@ -1143,7 +1145,7 @@ async function submitAction(event) {
+       }
+       const errEl = $('action-images-count-error');
+       if (errEl) {
+-        errEl.textContent = '⚠️ Обязательно укажите количество карточек (от 1 до 500)';
++        errEl.textContent = 'Обязательно укажите количество карточек (от 1 до 500)';
+         errEl.classList.remove('hidden');
+       }
+       try { if (telegramSupports('6.1')) tg.HapticFeedback?.notificationOccurred('error'); } catch {}
+@@ -1224,7 +1226,7 @@ function renderBatchAnalysis(analysis, isSingle = false, singleSku = null) {
+   if (isSingle && singleSku) {
+     parts.push(`
+       <div class="batch-alert batch-alert-info">
+-        <div>🎯 Ссылка на 1 артикул: <b>${escapeHtml(singleSku)}</b> (будет создана 1 задача)</div>
++        <div>Ссылка на 1 артикул: <b>${escapeHtml(singleSku)}</b> (будет создана 1 задача)</div>
+       </div>
+     `);
+   }
+@@ -1235,9 +1237,9 @@ function renderBatchAnalysis(analysis, isSingle = false, singleSku = null) {
+ 
+   if (newCount > 0 || activeCount > 0 || completedCount > 0) {
+     const pills = [];
+-    if (newCount > 0) pills.push(`<span class="batch-stat-pill pill-new">🟢 Новых: ${newCount}</span>`);
+-    if (activeCount > 0) pills.push(`<span class="batch-stat-pill pill-active">🔴 В работе: ${activeCount}</span>`);
+-    if (completedCount > 0) pills.push(`<span class="batch-stat-pill pill-done">⚪ Были ранее: ${completedCount}</span>`);
++    if (newCount > 0) pills.push(`<span class="batch-stat-pill pill-new">Новых: ${newCount}</span>`);
++    if (activeCount > 0) pills.push(`<span class="batch-stat-pill pill-active">В работе: ${activeCount}</span>`);
++    if (completedCount > 0) pills.push(`<span class="batch-stat-pill pill-done">Были ранее: ${completedCount}</span>`);
+     parts.push(`<div class="batch-stats-bar">${pills.join('')}</div>`);
+   }
+ 
+@@ -1255,7 +1257,7 @@ function renderBatchAnalysis(analysis, isSingle = false, singleSku = null) {
+           <div>Уже в работе: ${conflictNames}${more}. Активные дубликаты будут пропущены.</div>
+         </div>
+         <button type="button" class="btn btn-secondary btn-sm btn-filter-new" onclick="filterBatchOnlyNew()">
+-          ✨ Оставить только новые (${newCount} шт.)
++          Оставить только новые (${newCount} шт.)
+         </button>
+       `);
+     } else {
+@@ -1365,6 +1367,7 @@ async function openStatsModal() {
+     const done = Number(stats.completed) || 0;
+     const percent = total ? Math.min(100, Math.round(done / total * 100)) : 0;
+     const totalImages = Number(stats.total_images) || 0;
++    const archived = Number(stats.archived) || 0;
+     $('stats-content').innerHTML = `<div class="stats-summary"><div class="stats-tile"><div class="stats-number">${total}</div><p>Всего задач</p></div><div class="stats-tile"><div class="stats-number" style="color:#7dd3fc">${totalImages}</div><p>Изображений</p></div><div class="stats-tile"><div class="stats-number" style="color:var(--accent)">${done}</div><p>Готово · ${percent}%</p></div></div><div class="progress-track" role="progressbar" aria-label="Завершённые задачи" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><div class="progress-fill" style="width:${percent}%"></div></div><div class="detail-section">${Object.entries(STAGES).map(([key, stage]) => `<div class="stats-stage"><span><i class="stage-dot" style="background:${stage.color}"></i>${stage.full}</span><b>${Number(stats[key]) || 0}</b></div>`).join('')}${archived ? `<div class="stats-stage"><span><i class="stage-dot" style="background:#64748b"></i>В архиве</span><b>${archived}</b></div>` : ''}</div>`;
+   } catch (error) { $('stats-content').innerHTML = `<p class="form-error">${escapeHtml(error.message)}</p><button class="btn btn-wide btn-secondary" onclick="openStatsModal()">Повторить</button>`; }
+ }
+@@ -1396,13 +1399,13 @@ function populateAssigneeSelects() {
+   if (!selects.length) return;
+   const designers = (state.users || []).filter(u => u.is_approved !== 0);
+   const activeMap = getActiveWorkloadMap();
+-  const optionsHtml = '<option value="">⚪ В общий пул (свободно)</option>' +
++  const optionsHtml = '<option value="">В общий пул (свободно)</option>' +
+     designers.map(u => {
+       const count = activeMap[u.telegram_id] ?? u.active_tasks_count ?? 0;
+       const countLabel = count > 0 ? `${count} в работе` : 'свободен';
+       const name = `${u.first_name || 'Участник'} ${u.last_name || ''}`.trim();
+       const userLabel = u.username ? ` (@${u.username})` : '';
+-      return `<option value="${u.telegram_id}">🎨 ${escapeHtml(name)}${escapeHtml(userLabel)} · ${countLabel}</option>`;
++      return `<option value="${u.telegram_id}">${escapeHtml(name)}${escapeHtml(userLabel)} · ${countLabel}</option>`;
+     }).join('');
+ 
+   selects.forEach(sel => {
+@@ -2147,7 +2150,7 @@ async function executeExport() {
+ 
+       closeModal();
+       if (sentToTg) {
+-        showToast('Отчет Excel отправлен вам в чат с ботом! 📄');
++        showToast('Отчет Excel отправлен вам в чат с ботом!');
+       } else {
+         showToast(`Отчет Excel сформирован (${selectedPoolsList.length} пулов)`);
+       }
+diff --git a/static/desktop.css b/static/desktop.css
+index f0a1654..2b1a9d9 100644
+--- a/static/desktop.css
++++ b/static/desktop.css
+@@ -32,7 +32,7 @@
+   --radius-md: 12px;
+   --radius-lg: 16px;
+   --radius-xl: 20px;
+-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
++  font-family: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+   font-synthesis: none;
+ }
+ 
+@@ -56,7 +56,7 @@ button, input, select, textarea {
+   color: inherit;
+ }
+ button { cursor: pointer; border: 0; }
+-button:disabled { opacity: .5; cursor: wait; }
++button:disabled { opacity: .5; cursor: not-allowed; }
+ a { color: inherit; text-decoration: none; }
+ 
+ .hidden { display: none !important; }
+@@ -509,7 +509,7 @@ a { color: inherit; text-decoration: none; }
+ .kpi-value {
+   font-size: 17px;
+   font-weight: 750;
+-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
++  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+ }
+ 
+ /* CONTENT CONTAINER */
+@@ -601,7 +601,7 @@ a { color: inherit; text-decoration: none; }
+   margin-bottom: 5px;
+ }
+ .card-sku {
+-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
++  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+   font-size: 14px;
+   font-weight: 700;
+   color: #ffffff;
+@@ -716,7 +716,7 @@ a { color: inherit; text-decoration: none; }
+   gap: 8px;
+ }
+ .drawer-sku {
+-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
++  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+   font-size: 16.5px;
+   font-weight: 750;
+   color: #ffffff;
+@@ -896,7 +896,7 @@ a { color: inherit; text-decoration: none; }
+   font-size: 12px;
+ }
+ .edit-pool-sku-code {
+-  font-family: monospace;
++  font-family: "JetBrains Mono", ui-monospace, monospace;
+   font-weight: 700;
+ }
+ 
+@@ -1073,8 +1073,10 @@ a { color: inherit; text-decoration: none; }
+   font-weight: 700;
+   color: #e2e8f0;
+   display: flex;
+-  align-items: center;
++  align-items: baseline;
+   justify-content: space-between;
++  flex-wrap: wrap;
++  gap: 4px 12px;
+ }
+ .team-load-row {
+   display: flex;
+@@ -1186,3 +1188,18 @@ a { color: inherit; text-decoration: none; }
+   from { opacity: 0; transform: translateY(6px); }
+   to { opacity: 1; transform: translateY(0); }
+ }
++
++
++/* Icons instead of emoji, stage dots, and the missing interaction states. */
++.ico { width: 13px; height: 13px; flex: none; vertical-align: -2px; }
++.stage-dot { display: inline-block; flex: none; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; }
++.kanban-col-title { display: flex; align-items: center; }
++.card-pool-name, .card-comment, .pool-nav-name { display: flex; align-items: center; gap: 6px; }
++.card-pool-name .ico, .card-comment .ico { opacity: .75; }
++.card-comment .ico { margin-top: 2px; }
++.quick-link .ico { width: 14px; height: 14px; vertical-align: 0; }
++.mobile-view-link { flex: none; }
++.btn { justify-content: center; }
++.btn:active:not(:disabled), .view-btn:active, .quick-link:active, .btn-pool-edit-mini:active { transform: translateY(1px); }
++.task-card:active, .kpi-card:active { transform: scale(.992); }
++:where(button, a, input, select, textarea, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+diff --git a/static/desktop.html b/static/desktop.html
+index 1549cc1..8d909a9 100644
+--- a/static/desktop.html
++++ b/static/desktop.html
+@@ -14,8 +14,9 @@
+       }
+     } catch(e) {}
+   </script>
+-  <link rel="stylesheet" href="/static/desktop.css?v=2.1.1">
+-  <script src="/static/desktop.js?v=2.1.1" defer></script>
++  <link rel="stylesheet" href="/static/fonts.css">
++  <link rel="stylesheet" href="/static/desktop.css?v=2.1.2">
++  <script src="/static/desktop.js?v=2.1.2" defer></script>
+ </head>
+ <body>
+ 
+@@ -71,9 +72,8 @@
+             <div class="brand-sub">Creative Studio CRM</div>
+           </div>
+         </div>
+-        <a href="/static/index.html" class="mobile-view-link" title="Перейти к компактному мобильному виду">
++        <a href="/static/index.html" class="mobile-view-link" title="Мобильный вид" aria-label="Мобильный вид">
+           <svg class="icon" style="width:13px; height:13px;"><use href="#i-mobile"/></svg>
+-          <span>Мобильный</span>
+         </a>
+       </div>
+ 
+@@ -212,31 +212,31 @@
+         </div>
+         <div class="kpi-tile" id="kpi-tile-available" onclick="filterByStage('available')">
+           <div>
+-            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-available);"></span> ⚪ Свободно</div>
++            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-available);"></span> Свободно</div>
+             <div class="kpi-value" id="kpi-available">0</div>
+           </div>
+         </div>
+         <div class="kpi-tile" id="kpi-tile-in_progress" onclick="filterByStage('in_progress')">
+           <div>
+-            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-progress);"></span> 🟡 В работе</div>
++            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-progress);"></span> В работе</div>
+             <div class="kpi-value" id="kpi-in-progress" style="color:var(--stage-progress);">0</div>
+           </div>
+         </div>
+         <div class="kpi-tile" id="kpi-tile-internal_review" onclick="filterByStage('internal_review')">
+           <div>
+-            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-internal);"></span> 🔵 Ревью лида</div>
++            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-internal);"></span> Проверка лидом</div>
+             <div class="kpi-value" id="kpi-internal" style="color:var(--stage-internal);">0</div>
+           </div>
+         </div>
+         <div class="kpi-tile" id="kpi-tile-client_review" onclick="filterByStage('client_review')">
+           <div>
+-            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-client);"></span> 🟣 У заказчика</div>
++            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-client);"></span> У заказчика</div>
+             <div class="kpi-value" id="kpi-client" style="color:var(--stage-client);">0</div>
+           </div>
+         </div>
+         <div class="kpi-tile" id="kpi-tile-completed" onclick="filterByStage('completed')">
+           <div>
+-            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-completed);"></span> ✅ Готово</div>
++            <div class="kpi-title"><span class="kpi-dot" style="background:var(--stage-completed);"></span> Готово</div>
+             <div class="kpi-value" id="kpi-completed" style="color:var(--stage-completed);">0</div>
+           </div>
+         </div>
+@@ -249,7 +249,7 @@
+         <section class="kanban-view" id="view-kanban">
+           <div class="kanban-column" data-stage="available">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-available);">⚪</span> Свободно</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-available)"></span> Свободно</div>
+               <span class="kanban-badge" id="kanban-count-available">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-available"></div>
+@@ -257,7 +257,7 @@
+ 
+           <div class="kanban-column" data-stage="in_progress">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-progress);">🟡</span> В работе</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-progress)"></span> В работе</div>
+               <span class="kanban-badge" id="kanban-count-in_progress">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-in_progress"></div>
+@@ -265,7 +265,7 @@
+ 
+           <div class="kanban-column" data-stage="internal_review">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-internal);">🔵</span> Проверка лидом</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-internal)"></span> Проверка лидом</div>
+               <span class="kanban-badge" id="kanban-count-internal_review">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-internal_review"></div>
+@@ -273,7 +273,7 @@
+ 
+           <div class="kanban-column" data-stage="client_review">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-client);">🟣</span> У заказчика</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-client)"></span> У заказчика</div>
+               <span class="kanban-badge" id="kanban-count-client_review">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-client_review"></div>
+@@ -281,7 +281,7 @@
+ 
+           <div class="kanban-column" data-stage="export_ready">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-export);">🟠</span> На экспорт</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-export)"></span> На экспорт</div>
+               <span class="kanban-badge" id="kanban-count-export_ready">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-export_ready"></div>
+@@ -289,7 +289,7 @@
+ 
+           <div class="kanban-column" data-stage="completed">
+             <div class="kanban-col-header">
+-              <div class="kanban-col-title"><span style="color:var(--stage-completed);">✅</span> Готово</div>
++              <div class="kanban-col-title"><span class="stage-dot" style="background:var(--stage-completed)"></span> Готово</div>
+               <span class="kanban-badge" id="kanban-count-completed">0</span>
+             </div>
+             <div class="kanban-cards-scroll" id="col-cards-completed"></div>
+@@ -350,7 +350,7 @@
+ 
+           <div class="drawer-body">
+             <div id="drawer-status-pill" class="status-select-pill">
+-              <span id="drawer-status-dot">⚪</span>
++              <span id="drawer-status-dot" class="stage-dot"></span>
+               <span id="drawer-status-name">Свободно</span>
+             </div>
+ 
+@@ -469,7 +469,7 @@
+         <div class="form-group">
+           <label for="batch-assignee">Назначить дизайнеру</label>
+           <select id="batch-assignee" class="form-control">
+-            <option value="">⚪ В общий пул (свободно)</option>
++            <option value="">В общий пул (свободно)</option>
+           </select>
+         </div>
+         <div id="batch-error" class="form-error hidden"></div>
+@@ -504,7 +504,7 @@
+         <textarea id="edit-pool-new-skus" class="form-control" rows="3" placeholder="Артикулы (по одному или через запятую)" style="font-family:monospace;"></textarea>
+         <label for="edit-pool-assignee" style="margin-top:6px; font-size:12px; color:var(--muted);">Назначить дизайнеру:</label>
+         <select id="edit-pool-assignee" class="form-control" style="margin-top:2px;">
+-          <option value="">⚪ В общий пул (свободно)</option>
++          <option value="">В общий пул (свободно)</option>
+         </select>
+         <div style="display:flex; gap:8px; margin-top:6px;">
+           <input id="edit-pool-source-url" class="form-control" type="url" placeholder="Ссылка на фото (необязательно)">
+@@ -550,14 +550,14 @@
+           <label class="format-option">
+             <input type="radio" name="export-format" value="excel" checked onchange="handleExportFormatChange(this.value)">
+             <span class="format-card">
+-              <span>📗</span>
++              <svg class="icon ico" aria-hidden="true"><use href="#i-file"/></svg>
+               <span class="format-info"><span class="format-title">Excel (.xlsx)</span><span class="format-desc">В чат бота и файл</span></span>
+             </span>
+           </label>
+           <label class="format-option">
+             <input type="radio" name="export-format" value="google" onchange="handleExportFormatChange(this.value)">
+             <span class="format-card">
+-              <span>📊</span>
++              <svg class="icon ico" aria-hidden="true"><use href="#i-stats"/></svg>
+               <span class="format-info"><span class="format-title">Google Таблицы</span><span class="format-desc">Apps Script Webhook</span></span>
+             </span>
+           </label>
+@@ -578,7 +578,7 @@
+         <div class="guide-box">
+           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+             <strong>Подключение Google Таблицы:</strong>
+-            <button type="button" class="btn btn-secondary btn-sm" onclick="copyGoogleScriptCode()">📋 Копировать код</button>
++            <button type="button" class="btn btn-secondary btn-sm" onclick="copyGoogleScriptCode()">Копировать код</button>
+           </div>
+           <ol class="guide-steps">
+             <li>В таблице: Расширения ➔ Apps Script.</li>
+diff --git a/static/desktop.js b/static/desktop.js
+index 2e1cdf3..9d830b9 100644
+--- a/static/desktop.js
++++ b/static/desktop.js
+@@ -3,13 +3,16 @@
+ const tg = window.Telegram?.WebApp;
+ const $ = id => document.getElementById(id);
+ 
++const ico = (name) => `<svg class="icon ico" aria-hidden="true"><use href="#i-${name}"/></svg>`;
++const stageDot = (color) => `<i class="stage-dot" style="background:${color}"></i>`;
++
+ const STAGES = {
+-  available: { label: 'Свободно', full: 'Свободные', emoji: '⚪', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' },
+-  in_progress: { label: 'В работе', full: 'В работе', emoji: '🟡', color: '#eab308', bg: 'rgba(234,179,8,0.12)' },
+-  internal_review: { label: 'Проверка', full: 'На проверке лида', emoji: '🔵', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
+-  client_review: { label: 'У клиента', full: 'У заказчика', emoji: '🟣', color: '#c084fc', bg: 'rgba(192,132,252,0.12)' },
+-  export_ready: { label: 'Экспорт', full: 'На экспорт', emoji: '🟠', color: '#fb923c', bg: 'rgba(251,146,60,0.12)' },
+-  completed: { label: 'Готово', full: 'Готово', emoji: '✅', color: '#4ade80', bg: 'rgba(74,222,128,0.12)' }
++  available: { label: 'Свободно', full: 'Свободные', color: '#94a3b8', bg: 'rgba(148,163,184,0.12)' },
++  in_progress: { label: 'В работе', full: 'В работе', color: '#eab308', bg: 'rgba(234,179,8,0.12)' },
++  internal_review: { label: 'Проверка', full: 'На проверке лида', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
++  client_review: { label: 'У клиента', full: 'У заказчика', color: '#c084fc', bg: 'rgba(192,132,252,0.12)' },
++  export_ready: { label: 'Экспорт', full: 'На экспорт', color: '#fb923c', bg: 'rgba(251,146,60,0.12)' },
++  completed: { label: 'Готово', full: 'Готово', color: '#4ade80', bg: 'rgba(74,222,128,0.12)' }
+ };
+ 
+ const ACTIONS = {
+@@ -225,7 +228,7 @@ async function loadMe() {
+     const initials = (data.user?.first_name || 'U')[0].toUpperCase();
+     $('user-avatar').textContent = initials;
+     $('user-name').textContent = data.user?.first_name || data.user?.username || 'Пользователь';
+-    $('user-role-badge').textContent = state.isAdmin ? '👑 Тимлид / Админ' : '🎨 Дизайнер';
++    $('user-role-badge').textContent = state.isAdmin ? 'Тимлид / Админ' : 'Дизайнер';
+ 
+     $('btn-top-add-pool').classList.toggle('hidden', !state.isAdmin);
+     $('btn-sidebar-add-pool').classList.toggle('hidden', !state.isAdmin);
+@@ -257,8 +260,8 @@ async function loadDesigners() {
+ 
+ function populateAssigneeSelects() {
+   const selects = [$('batch-assignee'), $('edit-pool-assignee')];
+-  const optionsHtml = '<option value="">⚪ В общий пул (свободно)</option>' +
+-    state.users.map(u => `<option value="${u.telegram_id}">🎨 ${escapeHtml(u.first_name || u.username)}</option>`).join('');
++  const optionsHtml = '<option value="">В общий пул (свободно)</option>' +
++    state.users.map(u => `<option value="${u.telegram_id}">${escapeHtml(u.first_name || u.username)}</option>`).join('');
+   selects.forEach(sel => { if (sel) sel.innerHTML = optionsHtml; });
+ }
+ 
+@@ -433,7 +436,7 @@ function updateSidebar() {
+ 
+   let html = `<div class="pool-nav-card ${state.poolFilter === 'all' ? 'active' : ''}" data-pool="all" onclick="filterByPool('all')">
+     <div class="pool-nav-title">
+-      <span class="pool-nav-name">📁 Все пулы</span>
++      <span class="pool-nav-name">${ico('folder')} Все пулы</span>
+       <span class="nav-item-count">${activeTasks.length}</span>
+     </div>
+   </div>`;
+@@ -444,7 +447,7 @@ function updateSidebar() {
+     html += `
+       <div class="pool-nav-card ${isActive ? 'active' : ''}" data-pool="${escapeHtml(poolName)}" onclick="filterByPool('${escapeHtml(poolName)}')">
+         <div class="pool-nav-title">
+-          <span class="pool-nav-name" title="${escapeHtml(poolName)}">📁 ${escapeHtml(cleanPoolTitle(poolName))}</span>
++          <span class="pool-nav-name" title="${escapeHtml(poolName)}">${ico('folder')} ${escapeHtml(cleanPoolTitle(poolName))}</span>
+           <div class="pool-nav-actions" onclick="event.stopPropagation()">
+             <span style="font-size:11px; color:#94a3b8;">${stat.total}</span>
+             ${state.isAdmin ? `<button type="button" class="btn-pool-edit-mini" onclick="openEditPoolModal('${escapeHtml(poolName)}')" title="Редактировать пул"><svg class="icon" style="width:13px; height:13px;"><use href="#i-edit"/></svg></button>` : ''}
+@@ -480,7 +483,7 @@ function renderKanban() {
+     colCards.innerHTML = inStage.map(task => {
+       const isSelected = task.id === state.selectedTaskId;
+       const initials = (task.assigned_to_name || task.assigned_to_username || '??').slice(0, 2).toUpperCase();
+-      const photosBadge = task.images_count ? `<span class="badge-photos">📷 ${task.images_count}</span>` : '';
++      const photosBadge = task.images_count ? `<span class="badge-photos">${ico('image')} ${task.images_count}</span>` : '';
+       const notes = taskNotes(task);
+       const figmaUrl = ['client_review', 'export_ready', 'completed'].includes(task.status) ? task.client_figma_url || task.internal_figma_url : task.internal_figma_url || task.client_figma_url;
+ 
+@@ -490,10 +493,10 @@ function renderKanban() {
+             <span class="card-sku">${escapeHtml(task.sku)}</span>
+             <div class="card-badges">${photosBadge}</div>
+           </div>
+-          <div class="card-pool-name">📁 ${escapeHtml(cleanPoolTitle(task.pool_name || 'Общий пул'))}</div>
++          <div class="card-pool-name">${ico('folder')} ${escapeHtml(cleanPoolTitle(task.pool_name || 'Общий пул'))}</div>
+           ${notes ? `
+             <div class="card-comment ${isRevision(task) ? 'is-revision' : ''}">
+-              <span>💬</span>
++              ${ico('comment')}
+               <span style="overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(notes)}</span>
+             </div>
+           ` : ''}
+@@ -502,12 +505,12 @@ function renderKanban() {
+               ${task.assigned_to_id ? `
+                 <span class="assignee-dot">${initials}</span>
+                 <span title="${escapeHtml(assigneeName(task))}">${isMine(task) ? 'Вы' : escapeHtml(assigneeName(task).split(' ')[0])}</span>
+-              ` : `<span style="color:#64748b; font-size:11px;">⚪ Не назначен</span>`}
++              ` : `<span style="color:#64748b; font-size:11px;">Не назначен</span>`}
+             </div>
+             <div class="card-quick-actions">
+-              ${task.source_url ? `<a class="quick-link" href="${escapeHtml(safeUrl(task.source_url))}" target="_blank" onclick="event.stopPropagation()" title="Папка фото">📁</a>` : ''}
+-              ${figmaUrl ? `<a class="quick-link" href="${escapeHtml(safeUrl(figmaUrl))}" target="_blank" onclick="event.stopPropagation()" title="Макет Figma">🎨</a>` : ''}
+-              ${task.bitrix_url ? `<a class="quick-link" href="${escapeHtml(safeUrl(task.bitrix_url))}" target="_blank" onclick="event.stopPropagation()" title="Битрикс24">⏱️</a>` : ''}
++              ${task.source_url ? `<a class="quick-link" href="${escapeHtml(safeUrl(task.source_url))}" target="_blank" onclick="event.stopPropagation()" title="Папка с фото" aria-label="Папка с фото">${ico('folder')}</a>` : ''}
++              ${figmaUrl ? `<a class="quick-link" href="${escapeHtml(safeUrl(figmaUrl))}" target="_blank" onclick="event.stopPropagation()" title="Макет в Figma" aria-label="Макет в Figma">${ico('figma')}</a>` : ''}
++              ${task.bitrix_url ? `<a class="quick-link" href="${escapeHtml(safeUrl(task.bitrix_url))}" target="_blank" onclick="event.stopPropagation()" title="Битрикс24" aria-label="Битрикс24">${ico('bitrix')}</a>` : ''}
+             </div>
+           </div>
+         </article>
+@@ -539,13 +542,13 @@ function renderListView() {
+       <div class="pool-list-block">
+         <div class="pool-list-header">
+           <div class="pool-title-main">
+-            <span>📁 ${escapeHtml(cleanPoolTitle(pName))}</span>
++            <span>${ico('folder')} ${escapeHtml(cleanPoolTitle(pName))}</span>
+             <span class="nav-item-count">${tasks.length} артикулов</span>
+           </div>
+           <div style="display:flex; gap:6px;">
+             ${state.isAdmin ? `
+-              <button class="btn btn-secondary btn-sm" onclick="openEditPoolModal('${escapeHtml(pName)}')">✏️ Настроить пул</button>
+-              <button class="btn btn-secondary btn-sm" onclick="openExportModal(['${escapeHtml(pName)}'])">📥 Экспорт</button>
++              <button class="btn btn-secondary btn-sm" onclick="openEditPoolModal('${escapeHtml(pName)}')">${ico('edit')} Настроить пул</button>
++              <button class="btn btn-secondary btn-sm" onclick="openExportModal(['${escapeHtml(pName)}'])">${ico('download')} Экспорт</button>
+             ` : ''}
+           </div>
+         </div>
+@@ -566,7 +569,7 @@ function renderListView() {
+               return `
+                 <tr onclick="selectTask(${t.id})">
+                   <td style="font-family:monospace; font-weight:700;">${escapeHtml(t.sku)}</td>
+-                  <td><span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:2px 7px; border-radius:6px; background:${conf.bg}; color:${conf.color};">${conf.emoji} ${conf.label}</span></td>
++                  <td><span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:2px 7px; border-radius:6px; background:${conf.bg}; color:${conf.color};">${stageDot(conf.color)}${conf.label}</span></td>
+                   <td>${escapeHtml(t.assigned_to_name ? (isMine(t) ? 'Вы' : assigneeName(t)) : '—')}</td>
+                   <td>${t.images_count ? `${t.images_count} шт.` : '—'}</td>
+                   <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:${isRevision(t) ? 'var(--stage-revision)' : 'inherit'};">${escapeHtml(taskNotes(t) || '—')}</td>
+@@ -625,7 +628,7 @@ function renderAnalytics() {
+       return `
+         <div>
+           <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+-            <span>${s.emoji} ${s.label}</span>
++            <span style="display:inline-flex; align-items:center;">${stageDot(s.color)}${s.label}</span>
+             <strong>${cnt} (${pct}%)</strong>
+           </div>
+           <div class="team-load-bar-wrap"><div class="team-load-bar" style="width:${pct}%; background:${s.color};"></div></div>
+@@ -664,13 +667,13 @@ function renderDrawer() {
+   const conf = STAGES[task.status] || STAGES.available;
+   $('drawer-sku').textContent = task.sku;
+   $('drawer-pool-name').textContent = cleanPoolTitle(task.pool_name || 'Общий пул');
+-  $('drawer-assignee').textContent = task.assigned_to_id ? `${assigneeName(task)}${isMine(task) ? ' · Вы' : ''}` : '⚪ Не назначен';
++  $('drawer-assignee').textContent = task.assigned_to_id ? `${assigneeName(task)}${isMine(task) ? ' · Вы' : ''}` : 'Не назначен';
+   $('drawer-images-count').textContent = task.images_count ? `${task.images_count} шт.` : 'Не указано';
+ 
+   const pill = $('drawer-status-pill');
+   pill.style.background = conf.bg;
+   pill.style.color = conf.color;
+-  $('drawer-status-dot').textContent = conf.emoji;
++  $('drawer-status-dot').style.background = conf.color;
+   $('drawer-status-name').textContent = conf.full || conf.label;
+ 
+   // Edit images button
+@@ -724,7 +727,7 @@ function renderDrawer() {
+   if (notesText) {
+     notesSec.classList.remove('hidden');
+     $('drawer-notes-text').textContent = isRevision(task) ? notesText.replace(/^Правки:\s*/, '') : notesText;
+-    $('drawer-notes-badge').textContent = isRevision(task) ? '⚠️ Правки' : 'Комментарий';
++    $('drawer-notes-badge').textContent = isRevision(task) ? 'Правки' : 'Комментарий';
+   } else {
+     notesSec.classList.add('hidden');
+   }
+@@ -755,7 +758,7 @@ function renderDrawerActions(task) {
+ 
+   if (act) {
+     if (act.url) {
+-      html += `<a class="btn btn-secondary btn-wide" href="${escapeHtml(safeUrl(act.url))}" target="_blank">📁 ${escapeHtml(act.label)}</a>`;
++      html += `<a class="btn btn-secondary btn-wide" href="${escapeHtml(safeUrl(act.url))}" target="_blank">${ico('folder')} ${escapeHtml(act.label)}</a>`;
+     } else {
+       const disabled = state.pendingTaskIds.has(task.id);
+       html += `<button class="btn btn-primary btn-wide" onclick="${act.action === 'take' ? `takeTask(${task.id})` : `openAction('${act.action}', ${task.id})`}" ${disabled ? 'disabled' : ''}>${disabled ? 'Сохраняем…' : act.label}</button>`;
+@@ -764,7 +767,7 @@ function renderDrawerActions(task) {
+ 
+   // Assign / Reassign (Admin)
+   if (!task.is_archived && state.isAdmin) {
+-    html += `<button class="btn btn-secondary btn-wide" onclick="openAction('assign', ${task.id})">👥 ${task.status === 'available' ? 'Назначить дизайнеру' : 'Переназначить задачу'}</button>`;
++    html += `<button class="btn btn-secondary btn-wide" onclick="openAction('assign', ${task.id})">${ico('team')} ${task.status === 'available' ? 'Назначить дизайнеру' : 'Переназначить задачу'}</button>`;
+   }
+ 
+   // Reject / Rework
+@@ -806,7 +809,7 @@ async function takeTask(taskId) {
+   try {
+     const data = await api('/api/tasks/take', { task_id: taskId });
+     applyTask(data.task);
+-    showToast('Задача у вас в работе! 🎨');
++    showToast('Задача у вас в работе');
+     try { if (telegramSupports('6.1')) tg.HapticFeedback?.notificationOccurred('success'); } catch {}
+   } catch (error) {
+     showToast(error.message, 'error');
+@@ -1047,7 +1050,7 @@ function renderBatchAnalysis(analysis) {
+   }
+   let msg = `Найдено артикулов: <b>${analysis.total_parsed}</b>. `;
+   if (analysis.existing_in_db?.length) {
+-    msg += `<br>⚠️ Уже есть в базе: <b>${analysis.existing_in_db.length}</b> (${analysis.existing_in_db.slice(0, 3).join(', ')}...)`;
++    msg += `<br>Уже есть в базе: <b>${analysis.existing_in_db.length}</b> (${analysis.existing_in_db.slice(0, 3).join(', ')}...)`;
+   }
+   box.innerHTML = msg;
+   box.className = 'batch-analysis ' + (analysis.existing_in_db?.length ? 'form-error' : '');
+@@ -1436,7 +1439,7 @@ async function executeExport() {
+       window.URL.revokeObjectURL(url);
+ 
+       closeModal('modal-export');
+-      showToast(sentToTg ? 'Отчет Excel отправлен вам в чат с ботом! 📄' : 'Отчет Excel скачан');
++      showToast(sentToTg ? 'Отчет Excel отправлен вам в чат с ботом' : 'Отчет Excel скачан');
+     } else {
+       const webhookUrl = $('export-google-webhook').value.trim();
+       if (!webhookUrl) throw new Error('Укажите ссылку на веб-приложение Google Apps Script');
+diff --git a/static/index.html b/static/index.html
+index 3fae6ba..b3fd38d 100644
+--- a/static/index.html
++++ b/static/index.html
+@@ -218,7 +218,7 @@
+           </label>
+           <label class="field-label" for="batch-assignee">Назначить дизайнеру<span class="field-hint">Необязательно (по умолчанию в общий пул)</span>
+             <select id="batch-assignee" class="form-select" style="margin-top: 6px;">
+-              <option value="">⚪ В общий пул (свободно)</option>
++              <option value="">В общий пул (свободно)</option>
+             </select>
+           </label>
+         </div>
+@@ -258,7 +258,7 @@
+             <span class="field-heading">Назначить дизайнеру</span>
+             <span class="field-hint">Необязательно</span>
+             <select id="edit-pool-assignee" class="form-select" style="margin-top: 4px;">
+-              <option value="">⚪ В общий пул (свободно)</option>
++              <option value="">В общий пул (свободно)</option>
+             </select>
+           </label>
+           <div class="scan-field" style="margin-top: 8px;">
+@@ -312,7 +312,7 @@
+             <label class="format-option">
+               <input type="radio" name="export-format" value="excel" checked onchange="handleExportFormatChange(this.value)">
+               <span class="format-card">
+-                <span class="format-icon">📗</span>
++                <span class="format-icon"></span>
+                 <span class="format-info">
+                   <span class="format-title">Excel (.xlsx)</span>
+                   <span class="format-desc">Файл в чат с ботом и на устройство</span>
+@@ -322,7 +322,7 @@
+             <label class="format-option">
+               <input type="radio" name="export-format" value="google" onchange="handleExportFormatChange(this.value)">
+               <span class="format-card">
+-                <span class="format-icon">📊</span>
++                <span class="format-icon"></span>
+                 <span class="format-info">
+                   <span class="format-title">Google Таблицы</span>
+                   <span class="format-desc">Через Apps Script Webhook</span>
+@@ -346,13 +346,13 @@
+           <div class="guide-box">
+             <div class="guide-header">
+               <strong>Подключение Google Таблицы (1 мин):</strong>
+-              <button type="button" class="btn btn-secondary btn-sm" onclick="copyGoogleScriptCode()">📋 Скопировать код</button>
++              <button type="button" class="btn btn-secondary btn-sm" onclick="copyGoogleScriptCode()">Скопировать код</button>
+             </div>
+             <ol class="guide-steps">
+               <li>В вашей Google Таблице откройте меню: <strong>Расширения ➔ Apps Script</strong>.</li>
+-              <li>Удалите стандартный текст (<code>function myFunction</code>), <strong>вставьте скопированный код</strong> и нажмите 💾 <strong>Сохранить</strong> (Ctrl+S).</li>
++              <li>Удалите стандартный текст (<code>function myFunction</code>), <strong>вставьте скопированный код</strong> и нажмите <strong>Сохранить</strong> (Ctrl+S).</li>
+               <li>Вверху нажмите синюю кнопку <strong>«Начать развертывание» ➔ «Новое развертывание»</strong>.</li>
+-              <li>Выберите тип: шестеренка ⚙️ ➔ <strong>«Веб-приложение»</strong>.</li>
++              <li>Выберите тип: шестеренка ➔ <strong>«Веб-приложение»</strong>.</li>
+               <li>В поле «У кого есть доступ» обязательно укажите: <strong>«Все» (Anyone)</strong>, Запуск от: <strong>«Я»</strong>.</li>
+               <li>Нажмите <strong>«Развернуть»</strong>, разрешите доступ к аккаунту, скопируйте <strong>URL веб-приложения</strong> (заканчивается на <code>/exec</code>) и вставьте в поле выше.</li>
+             </ol>
+diff --git a/static/style.css b/static/style.css
+index a02c41c..3c0ce11 100644
+--- a/static/style.css
++++ b/static/style.css
+@@ -2366,3 +2366,15 @@ input[type=search]::-webkit-search-cancel-button {
+     scroll-behavior: auto !important;
+   }
+ }
++
++
++/* Keyboard focus was invisible: show it on every real control. */
++button:focus-visible, a:focus-visible, [role="button"]:focus-visible, summary:focus-visible {
++  outline: 2px solid var(--accent);
++  outline-offset: 2px;
++}
++.is-unassigned { color: var(--muted, #8b929c); }
++
++/* The required star had no style and dropped to its own line; the primary button of a long sheet slid below the fold. */
++.required-star { color: #f87171; }
++.modal-dialog form > button[type="submit"].btn-wide { position: sticky; bottom: 0; margin-top: 14px; box-shadow: 0 0 0 10px var(--surface-sheet), 0 -16px 16px 6px var(--surface-sheet); }
+diff --git a/tests/frontend.test.cjs b/tests/frontend.test.cjs
+index 438e73f..b19487f 100644
+--- a/tests/frontend.test.cjs
++++ b/tests/frontend.test.cjs
+@@ -568,3 +568,42 @@ test('Both designer and admin can return in_progress task to pool', () => {
+ 
+ 
+ 
++
++
++test('Unclaimed card says "Не назначен" and shows no deadline clock', () => {
++  const run = app();
++  const html = run('createTaskCardHtml(state.tasks[0])');
++  assert.ok(html.includes('Не назначен'));
++  assert.ok(!html.includes('Исполнитель'));
++  assert.ok(!html.includes('task-deadline-badge'));
++  const claimed = run('createTaskCardHtml(state.tasks[1])');
++  assert.ok(!claimed.includes('Не назначен'));
++});
++
++test('Task time is shown in 24-hour format regardless of the device locale', () => {
++  const run = app();
++  const html = run("formatTaskDeadline({ status: 'in_progress', updated_at: new Date().toISOString() })");
++  assert.match(html, /сегодня, \d{2}:\d{2}</);
++  assert.doesNotMatch(html, /AM|PM/i);
++  assert.equal(run("formatTaskDeadline({ status: 'available', updated_at: new Date().toISOString() })"), '');
++});
++
++test('Statistics sheet renders even when no task is archived', async () => {
++  const run = app();
++  run(`
++    const makeEl = () => ({ innerHTML: '', textContent: '', classList: { add() {}, remove() {}, toggle() {} }, querySelector() { return makeEl(); }, focus() {}, inert: false });
++    const els = {};
++    globalThis.document.getElementById = id => (els[id] ||= makeEl());
++    globalThis.document.querySelectorAll = () => [];
++    globalThis.document.querySelector = () => makeEl();
++    globalThis.document.body = { classList: { add() {}, remove() {} } };
++    api = async () => ({ total: 3, completed: 1, total_images: 0, archived: 0, available: 2, completed_count: 1 });
++  `);
++  await run('openStatsModal()');
++  const html = run("document.getElementById('stats-content').innerHTML");
++  assert.ok(html.includes('stats-summary'));
++  assert.ok(!html.includes('form-error'));
++  run('api = async () => ({ total: 3, completed: 1, total_images: 0, archived: 2 })');
++  await run('openStatsModal()');
++  assert.ok(run("document.getElementById('stats-content').innerHTML").includes('В архиве'));
++});

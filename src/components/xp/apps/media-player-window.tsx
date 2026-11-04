@@ -4,8 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
+import { useLocale } from "@/lib/i18n";
 
 export function MediaPlayerWindow() {
+  const { tr } = useLocale();
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(14);
   const [volume, setVolume] = useState(80);
@@ -109,7 +111,7 @@ export function MediaPlayerWindow() {
         {/* Cover / Video simulation */}
         <div className="absolute inset-0 opacity-70">
           <Image
-            src="/placeholders/covers/noclip.jpg"
+            src="/placeholders/covers/kroomi.jpg"
             alt="Showreel 2026"
             fill
             className="object-cover filter contrast-125 brightness-90"
@@ -137,13 +139,13 @@ export function MediaPlayerWindow() {
                   isPlaying ? "bg-emerald-400 animate-pulse" : "bg-zinc-500"
                 }`}
               />
-              {isPlaying ? "Визуализатор частот • Атлас волн" : "Пауза"}
+              {isPlaying ? tr("Визуализатор частот • Атлас волн", "Frequency visualizer • Wave Atlas") : tr("Пауза", "Pause")}
             </div>
             <h2 className="text-base md:text-lg font-black text-white drop-shadow mt-1">
-              Влад Ахметов — Атлас волн
+              {tr("Влад Ахметов — Атлас волн", "Vlad Akhmetov — Wave Atlas")}
             </h2>
             <p className="text-xs text-sky-200 drop-shadow mt-0.5 font-medium">
-              Интерактивный Canvas 2D визуализатор спектра и гармоник
+              {tr("Интерактивный Canvas 2D визуализатор спектра и гармоник", "An interactive Canvas 2D visualizer of spectrum and harmonics")}
             </p>
           </div>
 
@@ -191,7 +193,7 @@ export function MediaPlayerWindow() {
           <button
             type="button"
             onClick={handlePlayPause}
-            title={isPlaying ? "Пауза" : "Воспроизведение"}
+            title={isPlaying ? tr("Пауза", "Pause") : tr("Воспроизведение", "Play")}
             className="w-10 h-10 rounded-full bg-gradient-to-b from-[#38bdf8] via-[#0284c7] to-[#0369a1] border-2 border-white/90 grid place-items-center hover:brightness-110 active:scale-95 shadow-md"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -210,7 +212,7 @@ export function MediaPlayerWindow() {
           <button
             type="button"
             onClick={handleStop}
-            title="Остановить"
+            title={tr("Остановить", "Stop")}
             className="w-8 h-8 rounded-full bg-gradient-to-b from-[#475569] to-[#1e293b] border border-[#64748b] grid place-items-center hover:brightness-125 active:scale-95 shadow"
             style={{ cursor: xpCursors.pointer }}
           >
@@ -227,7 +229,7 @@ export function MediaPlayerWindow() {
             onClick={() => setIsMuted(!isMuted)}
             className="text-zinc-300 hover:text-white"
             style={{ cursor: xpCursors.pointer }}
-            title={isMuted ? "Включить звук" : "Выключить звук"}
+            title={isMuted ? tr("Включить звук", "Unmute") : tr("Выключить звук", "Mute")}
           >
             {isMuted || volume === 0 ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

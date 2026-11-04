@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "journal": "node scripts/build-journal.mjs",
+    "prebuild": "node scripts/build-journal.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

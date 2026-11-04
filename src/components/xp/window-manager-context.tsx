@@ -29,7 +29,11 @@ export type WindowType =
   | "word"
   | "minesweeper"
   | "paint"
-  | "help";
+  | "help"
+  | "dombro"
+  | "kroomi"
+  | "baltika"
+  | "designer-game";
 
 export interface WindowItem {
   id: string;
@@ -106,7 +110,7 @@ function getDefaultWindows(): WindowItem[] {
   const bounds = getPrimaryWindowBounds();
 
   if (nav.target === "notes") {
-    return [{ id: "notes", type: "notes", title: "Личный журнал", iconType: "stories", ...getNotesWindowBounds(), isMinimized: false, isMaximized: false, zIndex: 100, props: { noteId: nav.noteId } }];
+    return [{ id: "notes", type: "notes", title: "Журнал", iconType: "stories", ...getNotesWindowBounds(), isMinimized: false, isMaximized: false, zIndex: 100, props: { noteId: nav.noteId } }];
   }
 
   if (nav.target === "portfolio") {
@@ -235,10 +239,21 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
           );
         }
         xpSound.open();
+        // Keep new windows (and their controls) fully inside the visible screen.
+        const availW = window.innerWidth;
+        const availH = Math.max(100, window.innerHeight - getTaskbarHeight());
+        const fitW = Math.min(win.width, availW);
+        const fitH = Math.min(win.height, availH);
+        const fitX = Math.max(0, Math.min(win.x, availW - fitW));
+        const fitY = Math.max(0, Math.min(win.y, availH - fitH));
         return [
           ...prev,
           {
             ...win,
+            x: fitX,
+            y: fitY,
+            width: fitW,
+            height: fitH,
             isMinimized: win.isMinimized ?? false,
             isMaximized: win.isMaximized ?? false,
             zIndex: topZ,
@@ -322,7 +337,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const openNotes = useCallback((options?: { noteId?: string; pushHistory?: boolean }) => {
-    openWindow({ id: "notes", type: "notes", title: "Личный журнал", iconType: "stories", ...getNotesWindowBounds(), props: { noteId: options?.noteId } });
+    openWindow({ id: "notes", type: "notes", title: "Журнал", iconType: "stories", ...getNotesWindowBounds(), props: { noteId: options?.noteId } });
     if (options?.pushHistory !== false) {
       const url = new URL(window.location.href);
       ["project", "tool", "focus", "note"].forEach(key => url.searchParams.delete(key));

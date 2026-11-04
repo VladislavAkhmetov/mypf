@@ -127,6 +127,13 @@
   color: #f0f0f0;
 }
 
+.excerpt strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
 .entry + .entry .excerpt {
   color: #a0a0a0;
   -webkit-line-clamp: 3;
@@ -161,19 +168,6 @@
   place-items: center;
   font-size: 32px;
   color: white;
-}
-
-.miniActions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 2px;
-  color: #666666;
-}
-
-.miniActionIcon {
-  display: inline-flex;
-  align-items: center;
 }
 
 .open {

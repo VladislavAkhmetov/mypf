@@ -1,5 +1,6 @@
 "use client";
 
+import { hiddenApps, hiddenDesktopOnly } from "@/lib/xp/hidden-apps";
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useWindowManager } from "./window-manager-context";
 import { WindowFrame } from "./window-frame";
@@ -14,7 +15,7 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { xpSound, tryPlayStartupOnFirstGesture } from "@/lib/xp/sound";
 import { getMinesweeperWindowBounds } from "@/lib/xp/minesweeper-game";
 import { minesweeperStore } from "@/lib/xp/games/game-session-store";
-import { getWordWindowBounds } from "@/lib/xp/navigation";
+import { getPrimaryWindowBounds, getWordWindowBounds } from "@/lib/xp/navigation";
 import { NotesWidget } from "@/components/notes/notes-widget";
 import {
   MyComputerIcon,
@@ -23,13 +24,18 @@ import {
   NotepadIcon,
   StoriesIcon,
   HelpCenterIcon,
+  DombroIcon,
+  KroomiIcon,
   SolitaireIcon,
   ToolsIcon,
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
   InternetExplorerIcon,
+  BaltikaIcon,
+  DesignerGameIcon,
 } from "./xp-icons";
+import { miniGames, getMobileGameWindowBounds } from "@/data/mini-games";
 
 interface IconDef {
   id: string;
@@ -135,6 +141,9 @@ export function Desktop() {
   // Refresh flicker state
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Icons temporarily hidden from the desktop. See src/lib/xp/hidden-apps.ts to bring them back.
+  const hiddenIconIds = useMemo(() => [...hiddenApps, ...hiddenDesktopOnly], []);
+
   // Construct focused desktop icons without cluttering with 19 files (A01, A06)
   const builtInIcons: IconDef[] = useMemo(
     () => [
@@ -174,9 +183,29 @@ export function Desktop() {
         icon: <MinesweeperIcon className="w-12 h-12" />,
       },
       {
+        id: "baltika",
+        title: miniGames.baltika.title,
+        icon: <BaltikaIcon className="w-12 h-12" />,
+      },
+      {
+        id: "designer-game",
+        title: miniGames["designer-game"].title,
+        icon: <DesignerGameIcon className="w-12 h-12" />,
+      },
+      {
         id: "tools",
         title: "Инструменты",
         icon: <ToolsIcon className="w-12 h-12" />,
+      },
+      {
+        id: "dombro",
+        title: "dombro",
+        icon: <DombroIcon className="w-12 h-12" />,
+      },
+      {
+        id: "kroomi",
+        title: "kroomi",
+        icon: <KroomiIcon className="w-12 h-12" />,
       },
       {
         id: "paint",
@@ -194,7 +223,7 @@ export function Desktop() {
 
   // Combine built-in icons with user created icons
   const allIcons: IconDef[] = useMemo(() => {
-    const visibleBuiltIn = builtInIcons.filter((i) => !deletedIconIds.includes(i.id));
+    const visibleBuiltIn = builtInIcons.filter((i) => !deletedIconIds.includes(i.id) && !hiddenIconIds.includes(i.id));
     const created: IconDef[] = customIcons.map((c) => ({
       id: c.id,
       title: c.title,
@@ -206,7 +235,7 @@ export function Desktop() {
         ),
     }));
     return [...visibleBuiltIn, ...created];
-  }, [builtInIcons, customIcons, deletedIconIds]);
+  }, [builtInIcons, customIcons, deletedIconIds, hiddenIconIds]);
 
   // Helper to compute neat grid positions
   const computeGridPositions = useCallback(
@@ -564,6 +593,37 @@ export function Desktop() {
             y: 40,
             width: 880,
             height: 600,
+          });
+          break;
+
+        case "dombro":
+          openWindow({
+            id: "dombro",
+            type: "dombro",
+            title: "dombro — браузер и спокойный дашборд",
+            iconType: "dombro",
+            ...getPrimaryWindowBounds(),
+          });
+          break;
+
+        case "baltika":
+        case "designer-game":
+          openWindow({
+            id,
+            type: id,
+            title: miniGames[id].title,
+            iconType: id,
+            ...getMobileGameWindowBounds(),
+          });
+          break;
+
+        case "kroomi":
+          openWindow({
+            id: "kroomi",
+            type: "kroomi",
+            title: "kroomi — языки с персонажем",
+            iconType: "kroomi",
+            ...getPrimaryWindowBounds(),
           });
           break;
 

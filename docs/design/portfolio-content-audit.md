@@ -11,31 +11,22 @@
 
 | Slug | Локальный файл обложки | Разрешение (px) | Статус файла | Доступные материалы кейса в коде | Внешняя ссылка (`href`) | Фактическое назначение ссылки по коду |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `kora` | `public/placeholders/covers/kora.jpg` | 900×900 | Существует (54.8 KB) | Интерактивный тайп-тестер шрифта (`KoraSpecimen`): ползунок кегля, редактируемый текст, блок метрик | `https://t.me/amazi` | Контакт автора в Telegram (в интерфейсе подписана «Смотреть», не является демо-стендом) |
-| `signalatlas` | `public/placeholders/covers/signalatlas.jpg` | 900×900 | Существует (73.4 KB) | Интерактивный селектор радиодиапазонов (`SignalatlasSpecimen`): VHF / UHF / AM, график шума | Отсутствует | — |
-| `noclip` | `public/placeholders/covers/noclip.jpg` | 900×900 | Существует (71.5 KB) | Переключатель залов пространственной ОС (`NoclipSpecimen`): симуляция syscalls | Отсутствует | — |
-| `sieve` | `public/placeholders/covers/sieve.jpg` | 900×900 | Существует (262.6 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `afterimage` | `public/placeholders/covers/afterimage.jpg` | 900×900 | Существует (92.5 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `voltform` | `public/placeholders/covers/voltform.jpg` | 900×900 | Существует (139.3 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `hearth` | `public/placeholders/covers/hearth.jpg` | 900×900 | Существует (131.7 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `dockyard` | `public/placeholders/covers/dockyard.jpg` | 900×900 | Существует (72.6 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `iris-gate` | `public/placeholders/covers/iris-gate.jpg` | 900×900 | Существует (84.7 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `ledgerfold` | `public/placeholders/covers/ledgerfold.jpg` | 900×900 | Существует (149.6 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `soft-lock` | `public/placeholders/covers/soft-lock.jpg` | 900×900 | Существует (166.5 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
-| `pulp-index` | `public/placeholders/covers/pulp-index.jpg` | 900×900 | Существует (57.3 KB) | Общий тактильный блок (`GenericSpecimen`): обложка, описание | Отсутствует | — |
+| `printforge` | `public/placeholders/covers/printforge.jpg` | 900×900 | Существует | Кейс инструмента: вкладки продукта, ролик `printforge.webm` | Локальный запуск | `http://localhost:3005` |
+| `altyn-solok` | `public/placeholders/covers/altyn-solok.jpg` | 900×900 | Существует | Галерея, полная страница сайта, ролик `altyn-solok.webm` | Живой сайт | Демо на Yandex Cloud |
+| `dombro` | `public/placeholders/covers/dombro.jpg` | 900×900 | Существует | Кейс `DombroCase`: скриншоты, лендинг в окне XP | Релизы | GitHub Releases |
+| `tasker` | `public/placeholders/covers/tasker.jpg` | 900×900 | Существует | Кейс `TaskerCase`: два ролика интерфейса (дашборд и мини-приложение), этапы артикула | Отсутствует | — |
+| `kroomi` | `public/placeholders/covers/kroomi.jpg` | 900×900 | Существует | Кейс `KroomiCase`: ролик персонажа, шесть характеров, экраны, лендинг в окне XP | Узнать о выходе | `https://t.me/amazi` |
 
 ---
 
 ## 2. Неподтверждённые сведения и требуемые материалы
 
 1. **Анализ внешних ссылок:**
-   - Единственный проект со ссылкой — `kora`. Кнопка в интерфейсе обозначена лейблом `linkLabel: "Смотреть"`, но фактически ведёт на `https://t.me/amazi` (личный Telegram-аккаунт). Эту ссылку нельзя выдавать за «Запустить интерактивный прототип» или «Открыть архив».
-   - У остальных 11 проектов внешние ссылки отсутствуют.
+   - Внешние ссылки есть у `printforge` (локальный адрес), `altyn-solok`, `dombro` и `kroomi` (Telegram). У `tasker` ссылки нет: репозиторий приватный.
 2. **Неподтверждённые биографические и контактные сведения:**
    - В `src/data/site.ts` указаны email `hello@amazi.studio`, telegram `https://t.me/amazi`, студия `Amazi, независимая практика`, локация `Москва`.
    - В резюме `src/components/xp/apps/resume-window.tsx` указаны периоды работы и компании. Эти данные в рамках текущего этапа зафиксированы как требующие личного подтверждения владельцем перед боевой публикацией.
 3. **Недостающие материалы для финального наполнения:**
-   - Реальные полноразмерные скриншоты и видеодемонстрации интерфейсов для 9 проектов с общим шаблоном (`GenericSpecimen`).
    - Подтверждённые production-ссылки на запущенные сервисы / шрифтовые файлы (WOFF2/OTF для Kora).
    - Подтверждение названий и ссылок на 2–3 плагина для Figma и скрипта Illustrator, упомянутых в концепции.
 

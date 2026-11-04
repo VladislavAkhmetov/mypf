@@ -5,25 +5,12 @@ import { useWindowManager } from "./window-manager-context";
 import { useLocale } from "@/lib/i18n";
 import { setMuted, getMuted, xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
-import {
-  WindowsFlagIcon,
-  SpeakerTrayIcon,
-  NetworkTrayIcon,
-  WindowsMediaPlayerIcon,
-  InternetExplorerIcon,
-  SolitaireIcon,
-  ToolsIcon,
-  WordDocIcon,
-  MinesweeperIcon,
-  PaintIcon,
-  PdfIcon,
-  NotepadIcon,
-  MyComputerIcon,
-  MyDocumentsIcon,
-  StoriesIcon,
-  HelpCenterIcon,
-  CmdIcon,
-} from "./xp-icons";
+import { WindowsFlagIcon, SpeakerTrayIcon, NetworkTrayIcon, WindowsMediaPlayerIcon, InternetExplorerIcon } from "./xp-icons";
+import { WindowTypeIcon } from "./window-icon";
+import { WindowStrip, WindowSwitcher } from "./mobile-taskbar";
+import { useCompactViewport } from "@/lib/xp/viewport";
+import { LanguageBar } from "./language-bar";
+import { localizeTitle } from "@/lib/xp/window-titles";
 
 interface TaskbarProps {
   isStartOpen: boolean;
@@ -32,7 +19,11 @@ interface TaskbarProps {
 
 export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
   const { windows, activeWindowId, focusWindow, minimizeWindow, minimizeAll, openWindow } = useWindowManager();
-  const { locale, setLocale } = useLocale();
+  const { locale, tr } = useLocale();
+  const compact = useCompactViewport();
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const closeSwitcher = React.useCallback(() => setSwitcherOpen(false), []);
+  const showSwitcher = switcherOpen && compact;
 
   const [timeStr, setTimeStr] = useState("");
   const [dateStr, setDateStr] = useState("");
@@ -70,11 +61,6 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
     if (!nextMuted) xpSound.click();
   };
 
-  const toggleLanguage = () => {
-    xpSound.click();
-    setLocale(locale === "ru" ? "en" : "ru");
-  };
-
   return (
     <div className="xp-taskbar" style={{ cursor: xpCursors.default }}>
       {/* Start Button */}
@@ -84,6 +70,7 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
         onClick={(e) => {
           e.stopPropagation();
           xpSound.click();
+          setSwitcherOpen(false);
           onToggleStart();
         }}
         className={`xp-start-btn ${isStartOpen ? "is-active" : ""}`}
@@ -94,13 +81,13 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
       </button>
 
       {/* Quick Launch */}
-      <div className="xp-quick-launch hidden sm:flex">
+      {!compact && <div className="xp-quick-launch hidden sm:flex">
         {/* Show Desktop */}
         <button
           type="button"
           onClick={() => minimizeAll()}
           className="xp-quick-btn"
-          title="Свернуть все окна (Показать рабочий стол)"
+          title={tr("Свернуть все окна (Показать рабочий стол)", "Minimize all windows (Show desktop)")}
           style={{ cursor: xpCursors.pointer }}
         >
           <div className="w-4 h-4 bg-sky-100 border border-sky-400 rounded-sm grid place-items-center text-[9px] shadow-sm">
@@ -153,10 +140,13 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
         >
           <WindowsMediaPlayerIcon className="w-4 h-4" />
         </button>
-      </div>
+      </div>}
+
+      {/* Phone: strip of windows with faded neighbours */}
+      {compact && <WindowStrip onOpenSwitcher={() => setSwitcherOpen(true)} />}
 
       {/* Running Windows Tabs List */}
-      <div className="xp-task-list">
+      {!compact && <div className="xp-task-list">
         {windows.map((win) => {
           const isFocused = activeWindowId === win.id && !win.isMinimized;
           return (
@@ -174,67 +164,44 @@ export function Taskbar({ isStartOpen, onToggleStart }: TaskbarProps) {
               }}
               className={`xp-task-btn ${isFocused ? "is-focused" : ""}`}
               style={{ cursor: xpCursors.pointer }}
-              title={win.title}
+              title={localizeTitle(win.title, locale)}
             >
-              <div className="w-3.5 h-3.5 flex-shrink-0">
-                {win.type === "solitaire" && <SolitaireIcon className="w-3.5 h-3.5" />}
-                {win.type === "tools" && <ToolsIcon className="w-3.5 h-3.5" />}
-                {win.type === "word" && <WordDocIcon className="w-3.5 h-3.5" />}
-                {win.type === "minesweeper" && <MinesweeperIcon className="w-3.5 h-3.5" />}
-                {win.type === "paint" && <PaintIcon className="w-3.5 h-3.5" />}
-                {win.type === "help" && <HelpCenterIcon className="w-3.5 h-3.5" />}
-                {win.type === "resume" && <PdfIcon className="w-3.5 h-3.5" />}
-                {win.type === "media-player" && <WindowsMediaPlayerIcon className="w-3.5 h-3.5" />}
-                {win.type === "portfolio" && <InternetExplorerIcon className="w-3.5 h-3.5" />}
-                {win.type === "notepad" && <NotepadIcon className="w-3.5 h-3.5" />}
-                {win.type === "my-computer" && <MyComputerIcon className="w-3.5 h-3.5" />}
-                {win.type === "my-documents" && <MyDocumentsIcon className="w-3.5 h-3.5" />}
-                {win.type === "stories" && <StoriesIcon className="w-3.5 h-3.5" />}
-                {win.type === "cmd" && <CmdIcon className="w-3.5 h-3.5" />}
-                {win.type === "display-properties" && <span>⚙️</span>}
-              </div>
-              <span className="xp-task-btn-title">{win.title}</span>
+              <div className="w-3.5 h-3.5 flex-shrink-0"><WindowTypeIcon type={win.type} className="w-3.5 h-3.5" /></div>
+              <span className="xp-task-btn-title">{localizeTitle(win.title, locale)}</span>
             </button>
           );
         })}
-      </div>
+      </div>}
 
       {/* System Tray (Notification Area) */}
       <div className="xp-tray">
-        {/* Language Switcher Button (RU / EN) */}
-        <button
-          type="button"
-          data-ym-goal="tray_toggle_language"
-          onClick={toggleLanguage}
-          className="xp-tray-btn xp-tray-lang"
-          title={`Язык: ${locale.toUpperCase()} (нажмите для переключения)`}
-          style={{ cursor: xpCursors.pointer }}
-        >
-          {locale.toUpperCase()}
-        </button>
+        {/* Language bar (RU / EN menu, Alt+Shift) */}
+        <LanguageBar />
 
         {/* Volume Icon (Toggle Mute) */}
-        <button
+        {!compact && <button
           type="button"
           data-ym-goal="tray_toggle_volume"
           onClick={toggleMute}
           className="xp-tray-btn"
-          title={muted ? "Звук выключен (нажмите для включения)" : "Громкость 100% (нажмите для выключения)"}
+          title={muted ? tr("Звук выключен (нажмите для включения)", "Sound off (click to turn on)") : tr("Громкость 100% (нажмите для выключения)", "Volume 100% (click to mute)")}
           style={{ cursor: xpCursors.pointer }}
         >
           <SpeakerTrayIcon className="w-3.5 h-3.5" muted={muted} />
-        </button>
+        </button>}
 
         {/* Network Monitor Icon */}
-        <div className="hidden sm:flex items-center opacity-85" title="Подключение по локальной сети: 100 Мбит/с">
+        {!compact && <div className="hidden sm:flex items-center opacity-85" title={tr("Подключение по локальной сети: 100 Мбит/с", "Local Area Connection: 100 Mbps")}>
           <NetworkTrayIcon className="w-4 h-4" />
-        </div>
+        </div>}
 
         {/* Clock */}
         <div className="xp-tray-clock" data-ym-goal="tray_clock_click" title={dateStr}>
           {timeStr}
         </div>
       </div>
+
+      {showSwitcher && <WindowSwitcher onClose={closeSwitcher} />}
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { xpSound } from "@/lib/xp/sound";
 
 export function ResumeWindow() {
-  const { t } = useLocale();
+  const { t, tr } = useLocale();
   const { openProject } = useWindowManager();
 
   const handlePrint = () => {
@@ -29,10 +29,10 @@ export function ResumeWindow() {
           className="xp-menu-item hover:bg-[#316ac5] hover:text-white px-2 py-0.5 rounded-sm transition"
           style={{ cursor: xpCursors.pointer }}
         >
-          Печать / Сохранить в PDF
+          {tr("Печать / Сохранить в PDF", "Print / Save as PDF")}
         </button>
-        <span className="xp-menu-item text-slate-500">Масштаб (100%)</span>
-        <span className="xp-menu-item text-slate-500">Справка</span>
+        <span className="xp-menu-item text-slate-500">{tr("Масштаб (100%)", "Zoom (100%)")}</span>
+        <span className="xp-menu-item text-slate-500">{tr("Справка", "Help")}</span>
       </div>
 
       {/* Main Document Body (A4 sheet appearance) */}
@@ -59,7 +59,7 @@ export function ResumeWindow() {
                   {t(site.role)}
                 </p>
                 <p className="text-slate-500 text-[11px] mt-0.5">
-                  Москва • Удаленно / Гибрид • Независимая практика Amazi
+                  {t(site.location)} • {t(site.workplace)}
                 </p>
               </div>
             </div>
@@ -73,7 +73,7 @@ export function ResumeWindow() {
                 className="flex-1 text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded text-[11px] shadow transition"
                 style={{ cursor: xpCursors.pointer }}
               >
-                Telegram @amazi
+                Telegram {site.handle}
               </a>
               <a
                 href={`mailto:${site.email}`}
@@ -88,7 +88,7 @@ export function ResumeWindow() {
                 className="flex-1 text-center px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded text-[11px] shadow transition"
                 style={{ cursor: xpCursors.pointer }}
               >
-                🖨️ Печать / PDF
+                {tr("🖨️ Печать / PDF", "🖨️ Print / PDF")}
               </button>
             </div>
           </div>
@@ -106,13 +106,13 @@ export function ResumeWindow() {
           {/* Section: Core Competencies */}
           <div className="space-y-3">
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-1 text-blue-900">
-              Ключевые компетенции и стек
+              {tr("Ключевые компетенции и стек", "Core skills and stack")}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px]">
               <div className="p-2.5 bg-slate-50 rounded border border-slate-200 space-y-1">
-                <div className="font-bold text-slate-900">🎨 Продуктовый и системный дизайн:</div>
+                <div className="font-bold text-slate-900">{tr("🎨 Продуктовый и системный дизайн:", "🎨 Product and systems design:")}</div>
                 <div className="text-slate-600">
-                  Figma, Design Systems, Typography (Cut & Grotesque), Spatial OS, Interaction Design, Прототипирование.
+                  {tr("Figma, Design Systems, Typography (Cut & Grotesque), Spatial OS, Interaction Design, Прототипирование.", "Figma, Design Systems, Typography (Cut & Grotesque), Spatial OS, Interaction Design, Prototyping.")}
                 </div>
               </div>
 
@@ -126,14 +126,14 @@ export function ResumeWindow() {
               <div className="p-2.5 bg-slate-50 rounded border border-slate-200 space-y-1">
                 <div className="font-bold text-slate-900">🤖 AI Interfaces & Live Loop:</div>
                 <div className="text-slate-600">
-                  Интерфейсы для AI-продуктов, бесшовные петли обратной связи (модель, код и форма в одном контуре).
+                  {tr("Интерфейсы для AI-продуктов, бесшовные петли обратной связи (модель, код и форма в одном контуре).", "Interfaces for AI products, tight feedback loops where model, code and form share one cycle.")}
                 </div>
               </div>
 
               <div className="p-2.5 bg-slate-50 rounded border border-slate-200 space-y-1">
-                <div className="font-bold text-slate-900">🏛️ Фирменный стиль & Носители:</div>
+                <div className="font-bold text-slate-900">{tr("🏛️ Фирменный стиль & Носители:", "🏛️ Brand identity & media:")}</div>
                 <div className="text-slate-600">
-                  Айдентика институций, фестивалей, арт-дирекшн, навигация, выставочные пространства.
+                  {tr("Айдентика институций, фестивалей, арт-дирекшн, навигация, выставочные пространства.", "Identity for institutions and festivals, art direction, wayfinding, exhibition spaces.")}
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export function ResumeWindow() {
           {/* Section: Flagship Projects */}
           <div className="space-y-3">
             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-1 text-blue-900">
-              Флагманские кейсы (Кликните для просмотра в окне)
+              {tr("Флагманские кейсы (Кликните для просмотра в окне)", "Flagship cases (click to open in a window)")}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -150,17 +150,17 @@ export function ResumeWindow() {
                 type="button"
                 onClick={() => {
                   xpSound.click();
-                  openProject("kora");
+                  openProject("dombro");
                 }}
                 className="flex items-center gap-2.5 p-2 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition"
                 style={{ cursor: xpCursors.pointer }}
               >
-                <div className="w-8 h-8 rounded bg-orange-100 text-orange-700 font-bold grid place-items-center text-xs">
-                  Aa
+                <div className="w-8 h-8 rounded bg-emerald-100 text-emerald-800 font-bold grid place-items-center text-xs">
+                  d.
                 </div>
                 <div>
-                  <div className="font-bold text-slate-900">Kora — Шрифт архива</div>
-                  <div className="text-[10px] text-slate-500">Гротеск с корой вместо засечек</div>
+                  <div className="font-bold text-slate-900">{tr("dombro — Спокойный браузер", "dombro — a calm browser")}</div>
+                  <div className="text-[10px] text-slate-500">{tr("Продукт, дизайн и разработка для Windows 11", "Product, design and development for Windows 11")}</div>
                 </div>
               </button>
 
@@ -168,53 +168,35 @@ export function ResumeWindow() {
                 type="button"
                 onClick={() => {
                   xpSound.click();
-                  openProject("noclip");
-                }}
-                className="flex items-center gap-2.5 p-2 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition"
-                style={{ cursor: xpCursors.pointer }}
-              >
-                <div className="w-8 h-8 rounded bg-sky-100 text-sky-700 font-bold grid place-items-center text-xs">
-                  OS
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">Noclip — Spatial OS</div>
-                  <div className="text-[10px] text-slate-500">Пространственная ОС музея</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  xpSound.click();
-                  openProject("signalatlas");
-                }}
-                className="flex items-center gap-2.5 p-2 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition"
-                style={{ cursor: xpCursors.pointer }}
-              >
-                <div className="w-8 h-8 rounded bg-emerald-100 text-emerald-700 font-bold grid place-items-center text-xs">
-                  RAD
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">Signalatlas — Карты</div>
-                  <div className="text-[10px] text-slate-500">Картография радиотишины</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  xpSound.click();
-                  openProject("sieve");
+                  openProject("tasker");
                 }}
                 className="flex items-center gap-2.5 p-2 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition"
                 style={{ cursor: xpCursors.pointer }}
               >
                 <div className="w-8 h-8 rounded bg-lime-100 text-lime-800 font-bold grid place-items-center text-xs">
-                  01
+                  {tr("Т.", "T.")}
                 </div>
                 <div>
-                  <div className="font-bold text-slate-900">Sieve — Протокол</div>
-                  <div className="text-[10px] text-slate-500">Визуальный язык и шум</div>
+                  <div className="font-bold text-slate-900">{tr("Таскер — Telegram", "Tasker — Telegram")}</div>
+                  <div className="text-[10px] text-slate-500">{tr("Приложение для студии карточек", "An app for a product-card studio")}</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  xpSound.click();
+                  openProject("kroomi");
+                }}
+                className="flex items-center gap-2.5 p-2 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-left transition"
+                style={{ cursor: xpCursors.pointer }}
+              >
+                <div className="w-8 h-8 rounded bg-violet-100 text-violet-700 font-bold grid place-items-center text-xs">
+                  k.
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900">{tr("kroomi — Язык с персонажем", "kroomi — a language with a character")}</div>
+                  <div className="text-[10px] text-slate-500">{tr("Мобильное приложение, персонажи", "Mobile app, characters")}</div>
                 </div>
               </button>
             </div>
@@ -224,15 +206,15 @@ export function ResumeWindow() {
 
       {/* Status bar */}
       <div className="xp-statusbar flex items-center justify-between">
-        <span>Резюме_Влад_Ахметов.pdf</span>
-        <span>Формат A4 (100%)</span>
+        <span>{tr("Резюме_Влад_Ахметов.pdf", "Resume_Vlad_Akhmetov.pdf")}</span>
+        <span>{tr("Формат A4 (100%)", "A4 (100%)")}</span>
         <button
           type="button"
           onClick={handlePrint}
           className="font-semibold text-blue-800 hover:underline"
           style={{ cursor: xpCursors.pointer }}
         >
-          Распечатать документ
+          {tr("Распечатать документ", "Print document")}
         </button>
       </div>
     </div>

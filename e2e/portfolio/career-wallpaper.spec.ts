@@ -58,28 +58,22 @@ test("display settings can restore time mode without theme Apply making it manua
   expect(await page.evaluate(() => localStorage.getItem("amazi-xp-wallpaper-source"))).toBe("time");
 });
 
-test("career timeline: arrows, keyboard, pause, narrow screen and reduced motion", async ({ page }, testInfo) => {
+test("career timeline: no controls, page scroll drives the rail on narrow screens, reduced motion", async ({ page }, testInfo) => {
   await page.goto("/?view=portfolio");
   const section = page.locator('section[aria-labelledby="career-title"]');
   const rail = section.getByRole("list");
   await section.scrollIntoViewIfNeeded();
-  await expect(rail.getByRole("listitem")).toHaveCount(5);
+  await expect(rail.getByRole("listitem")).toHaveCount(4);
   await expect(section).toHaveAttribute("data-visible", "true");
-  await expect(section.getByRole("button", { name: "Предыдущий этап карьеры" })).toBeDisabled();
-  await section.getByRole("button", { name: "Следующий этап карьеры" }).click();
-  await expect.poll(() => rail.evaluate(el => el.scrollLeft)).toBeGreaterThan(100);
-  await rail.focus();
-  await page.keyboard.press("End");
-  await expect(section.getByRole("button", { name: "Следующий этап карьеры" })).toBeDisabled();
-  await page.keyboard.press("Home");
-  await expect(section.getByRole("button", { name: "Предыдущий этап карьеры" })).toBeDisabled();
+  await expect(section.getByRole("button")).toHaveCount(0);
   const cube = section.locator('[class*="logoCube"]').first();
   await expect(cube).toHaveCSS("animation-play-state", "running");
-  await section.getByRole("button", { name: "Пауза лого" }).click();
-  await expect(cube).toHaveCSS("animation-play-state", "paused");
   await page.screenshot({ path: testInfo.outputPath("career-desktop.png") });
   await page.setViewportSize({ width: 390, height: 844 });
-  await section.scrollIntoViewIfNeeded();
+  await section.evaluate(el => el.scrollIntoView({ block: "end" }));
+  const before = await rail.evaluate(el => el.scrollLeft);
+  await section.evaluate(el => el.scrollIntoView({ block: "start" }));
+  await expect.poll(() => rail.evaluate(el => el.scrollLeft)).toBeGreaterThan(before + 100);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(cube).toHaveCSS("animation-name", "none");

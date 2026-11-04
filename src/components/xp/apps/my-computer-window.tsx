@@ -10,7 +10,7 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { xpSound } from "@/lib/xp/sound";
 
 export function MyComputerWindow() {
-  const { t, locale } = useLocale();
+  const { t, tr, locale } = useLocale();
   const { openWindow } = useWindowManager();
   const [activeTab, setActiveTab] = useState<"drives" | "system">("system");
 
@@ -31,7 +31,7 @@ export function MyComputerWindow() {
           }`}
           style={{ cursor: xpCursors.pointer }}
         >
-          Общие (Свойства системы)
+          {tr("Общие (Свойства системы)", "General (System Properties)")}
         </button>
         <button
           type="button"
@@ -46,7 +46,7 @@ export function MyComputerWindow() {
           }`}
           style={{ cursor: xpCursors.pointer }}
         >
-          Диски и устройства
+          {tr("Диски и устройства", "Drives and devices")}
         </button>
       </div>
 
@@ -69,14 +69,14 @@ export function MyComputerWindow() {
               <div className="font-bold text-sm text-blue-900">
                 Microsoft Windows XP Professional
               </div>
-              <div className="text-slate-600">Версия 2026 (Service Pack 3)</div>
+              <div className="text-slate-600">{tr("Версия 2026 (Service Pack 3)", "Version 2026 (Service Pack 3)")}</div>
               <div className="text-slate-500 font-mono">Amazi OS Build 2600.x86</div>
             </div>
           </div>
 
           {/* Registered to */}
           <div className="border-b border-slate-200 pb-4 space-y-1">
-            <div className="font-bold text-slate-900">Зарегистрировано на имя:</div>
+            <div className="font-bold text-slate-900">{tr("Зарегистрировано на имя:", "Registered to:")}</div>
             <div className="pl-3 font-semibold text-blue-800">{site.name}</div>
             <div className="pl-3 text-slate-600">{t(site.role)}</div>
             <div className="pl-3 text-slate-500">{site.handle} • {site.email}</div>
@@ -84,26 +84,26 @@ export function MyComputerWindow() {
 
           {/* Computer / Profile specs */}
           <div className="space-y-1.5">
-            <div className="font-bold text-slate-900">Профиль специалиста:</div>
+            <div className="font-bold text-slate-900">{tr("Профиль специалиста:", "Profile:")}</div>
             <div className="pl-3 space-y-1 text-slate-700">
               <div>
-                <span className="font-semibold">Специализация: </span>
-                <span>{t(site.role)} (дизайн-системы, веб-интерфейсы, интерактив)</span>
+                <span className="font-semibold">{tr("Специализация: ", "Focus: ")}</span>
+                <span>{t(site.role)} ({tr("дизайн-системы, веб-интерфейсы, интерактив", "design systems, web interfaces, interactive")})</span>
               </div>
               <div>
-                <span className="font-semibold">Практика: </span>
+                <span className="font-semibold">{tr("Практика: ", "Practice: ")}</span>
                 <span>{t(site.workplace)}</span>
               </div>
               <div>
-                <span className="font-semibold">Текущий фокус: </span>
+                <span className="font-semibold">{tr("Текущий фокус: ", "Now: ")}</span>
                 <span>{t(site.now)}</span>
               </div>
               <div>
-                <span className="font-semibold">Локация и формат: </span>
-                <span>{t(site.location)} • {t(site.presence)} (удаленно / проектная работа)</span>
+                <span className="font-semibold">{tr("Локация и формат: ", "Location and format: ")}</span>
+                <span>{t(site.location)}</span>
               </div>
               <div>
-                <span className="font-semibold">Ключевой стек: </span>
+                <span className="font-semibold">{tr("Ключевой стек: ", "Core stack: ")}</span>
                 <span className="text-blue-700 font-medium">
                   {site.stack.map((s) => s[locale]).join(", ")}
                 </span>
@@ -131,14 +131,14 @@ export function MyComputerWindow() {
               className="px-4 py-1.5 bg-[#ece9d8] hover:bg-[#d8e5f8] border border-slate-400 rounded text-xs font-semibold shadow-sm"
               style={{ cursor: xpCursors.pointer }}
             >
-              Открыть резюме (.txt)
+              {tr("Открыть резюме (.txt)", "Open resume (.txt)")}
             </button>
           </div>
         </div>
       ) : (
         <div className="flex-1 bg-white p-4 overflow-y-auto">
           <div className="text-xs font-bold text-slate-600 uppercase mb-3 border-b pb-1">
-            Жесткие диски и накопители
+            {tr("Жесткие диски и накопители", "Hard disk drives")}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Drive C */}
@@ -163,9 +163,9 @@ export function MyComputerWindow() {
                 💾
               </div>
               <div>
-                <div className="font-bold text-xs text-slate-900">Локальный диск (C:)</div>
+                <div className="font-bold text-xs text-slate-900">{tr("Локальный диск (C:)", "Local Disk (C:)")}</div>
                 <div className="text-[11px] text-slate-500">
-                  {projects.length} проектов портфолио
+                  {projects.length} {tr("проектов портфолио", "portfolio projects")}
                 </div>
               </div>
             </div>
@@ -192,8 +192,8 @@ export function MyComputerWindow() {
                 💿
               </div>
               <div>
-                <div className="font-bold text-xs text-slate-900">Архив историй (D:)</div>
-                <div className="text-[11px] text-slate-500">6 историй студии</div>
+                <div className="font-bold text-xs text-slate-900">{tr("Архив историй (D:)", "Story archive (D:)")}</div>
+                <div className="text-[11px] text-slate-500">{tr("6 историй студии", "6 studio stories")}</div>
               </div>
             </div>
 
@@ -209,7 +209,7 @@ export function MyComputerWindow() {
                 🌐
               </div>
               <div>
-                <div className="font-bold text-xs text-slate-900">Telegram канал (Z:)</div>
+                <div className="font-bold text-xs text-slate-900">{tr("Telegram канал (Z:)", "Telegram channel (Z:)")}</div>
                 <div className="text-[11px] text-slate-500">t.me/amazi</div>
               </div>
             </a>
@@ -219,8 +219,8 @@ export function MyComputerWindow() {
 
       {/* Status bar */}
       <div className="xp-statusbar">
-        <span>Готово</span>
-        <span>Мой компьютер</span>
+        <span>{tr("Готово", "Done")}</span>
+        <span>{tr("Мой компьютер", "My Computer")}</span>
       </div>
     </div>
   );

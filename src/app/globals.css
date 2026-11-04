@@ -30,6 +30,14 @@ button {
   border: 0;
 }
 
+@keyframes xp-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(3.5rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="xp-progress"] { animation: none !important; }
+}
+
 @keyframes word-caret {
   0%, 49% {
     opacity: 1;

@@ -5,6 +5,7 @@ import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 import { getProject } from "@/data/projects";
 import { useWindowManager } from "./window-manager-context";
+import { useLocale } from "@/lib/i18n";
 
 export interface ContextMenuState {
   x: number;
@@ -36,6 +37,7 @@ export function ContextMenu({
   onOpenIcon,
 }: ContextMenuProps) {
   const { openProject, openWindow, minimizeAll, showBalloon } = useWindowManager();
+  const { tr } = useLocale();
 
   // Close on outside click or escape
   useEffect(() => {
@@ -61,7 +63,7 @@ export function ContextMenu({
     if (project && typeof window !== "undefined") {
       const url = `${window.location.origin}/?project=${project.slug}`;
       navigator.clipboard.writeText(url);
-      showBalloon("Ссылка скопирована", `Ссылка на проект «${project.title}» скопирована в буфер обмена!`);
+      showBalloon(tr("Ссылка скопирована", "Link copied"), tr(`Ссылка на проект «${project.title}» скопирована в буфер обмена!`, `The link to “${project.title}” is in your clipboard.`));
     }
     onClose();
   };
@@ -69,7 +71,7 @@ export function ContextMenu({
   const handleShareTelegram = () => {
     if (project && typeof window !== "undefined") {
       const url = encodeURIComponent(`${window.location.origin}/?project=${project.slug}`);
-      const text = encodeURIComponent(`Проект ${project.title} — Влад Ахметов`);
+      const text = encodeURIComponent(tr(`Проект ${project.title} — Влад Ахметов`, `${project.title} — a project by Vlad Akhmetov`));
       window.open(`https://t.me/share/url?url=${url}&text=${text}`, "_blank");
     }
     onClose();
@@ -100,7 +102,7 @@ export function ContextMenu({
           {/* Submenu: Arrange Icons */}
           <div className="xp-context-item group" style={{ cursor: xpCursors.pointer }}>
             <span className="flex items-center gap-1.5">
-              <span>Упорядочить значки</span>
+              <span>{tr("Упорядочить значки", "Arrange Icons By")}</span>
             </span>
             <span className="text-[10px] ml-4 text-slate-600 group-hover:text-white">▸</span>
 
@@ -113,7 +115,7 @@ export function ContextMenu({
                 }}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>Имя (А–Я)</span>
+                <span>{tr("Имя (А–Я)", "Name (A–Z)")}</span>
               </div>
               <div
                 className="xp-context-item"
@@ -123,7 +125,7 @@ export function ContextMenu({
                 }}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>Тип (файлы/проекты)</span>
+                <span>{tr("Тип (файлы/проекты)", "Type (files/projects)")}</span>
               </div>
               <div className="xp-context-sep" />
               <div
@@ -134,7 +136,7 @@ export function ContextMenu({
                 }}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>✓ Выровнять по сетке</span>
+                <span>{tr("✓ Выровнять по сетке", "✓ Align to Grid")}</span>
               </div>
             </div>
           </div>
@@ -148,19 +150,19 @@ export function ContextMenu({
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Обновить</span>
+            <span>{tr("Обновить", "Refresh")}</span>
           </div>
 
           <div className="xp-context-sep" />
 
           <div className="xp-context-item is-disabled">
-            <span>Вставить</span>
+            <span>{tr("Вставить", "Paste")}</span>
           </div>
 
           {/* Submenu: New */}
           <div className="xp-context-item group" style={{ cursor: xpCursors.pointer }}>
             <span className="flex items-center gap-1.5">
-              <span>Создать</span>
+              <span>{tr("Создать", "New")}</span>
             </span>
             <span className="text-[10px] ml-4 text-slate-600 group-hover:text-white">▸</span>
 
@@ -173,7 +175,7 @@ export function ContextMenu({
                 }}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>📁 Папку</span>
+                <span>{tr("📁 Папку", "📁 Folder")}</span>
               </div>
               <div
                 className="xp-context-item"
@@ -183,7 +185,7 @@ export function ContextMenu({
                 }}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>📄 Текстовый документ</span>
+                <span>{tr("📄 Текстовый документ", "📄 Text Document")}</span>
               </div>
             </div>
           </div>
@@ -199,7 +201,7 @@ export function ContextMenu({
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Показать рабочий стол</span>
+            <span>{tr("Показать рабочий стол", "Show Desktop")}</span>
           </div>
 
           <div className="xp-context-sep" />
@@ -223,7 +225,7 @@ export function ContextMenu({
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Свойства</span>
+            <span>{tr("Свойства", "Properties")}</span>
           </div>
         </>
       ) : (
@@ -243,7 +245,7 @@ export function ContextMenu({
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Открыть</span>
+            <span>{tr("Открыть", "Open")}</span>
           </div>
 
           {project && (
@@ -253,7 +255,7 @@ export function ContextMenu({
                 onClick={handleCopyLink}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>Скопировать ссылку</span>
+                <span>{tr("Скопировать ссылку", "Copy link")}</span>
               </div>
 
               {project.href && (
@@ -265,7 +267,7 @@ export function ContextMenu({
                   onClick={onClose}
                   style={{ cursor: xpCursors.pointer }}
                 >
-                  <span>Смотреть онлайн ↗</span>
+                  <span>{tr("Смотреть онлайн ↗", "View online ↗")}</span>
                 </a>
               )}
 
@@ -274,7 +276,7 @@ export function ContextMenu({
                 onClick={handleShareTelegram}
                 style={{ cursor: xpCursors.pointer }}
               >
-                <span>Поделиться в Telegram</span>
+                <span>{tr("Поделиться в Telegram", "Share on Telegram")}</span>
               </div>
             </>
           )}
@@ -292,7 +294,7 @@ export function ContextMenu({
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Удалить в Корзину</span>
+            <span>{tr("Удалить в Корзину", "Move to Recycle Bin")}</span>
           </div>
 
           <div className="xp-context-sep" />
@@ -324,14 +326,14 @@ export function ContextMenu({
                   y: Math.max(30, Math.min(menu.y - 20, window.innerHeight - 450)),
                   width: 360,
                   height: 440,
-                  props: { slug: "kora" },
+                  props: { slug: "dombro" },
                 });
               }
               onClose();
             }}
             style={{ cursor: xpCursors.pointer }}
           >
-            <span>Свойства</span>
+            <span>{tr("Свойства", "Properties")}</span>
           </div>
         </>
       )}

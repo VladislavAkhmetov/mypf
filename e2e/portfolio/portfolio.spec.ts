@@ -30,7 +30,7 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     // Contains author name & role in Word
     await expect(page.locator("#window-word h1")).toHaveText("Влад Ахметов");
     await expect(page.locator("#window-word")).toContainText(
-      "Коммуникационный дизайн и интерактивные прототипы"
+      "Software Designer & AI Prototyper"
     );
 
     // No left sidebar / TOC for profile
@@ -84,7 +84,7 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
   });
 
   // Scenario 3: URL parameters matrix
-  test("3. URL parameters: ?view=profile, ?view=portfolio, ?view=portfolio&focus=..., ?project=kora, unknown values", async ({
+  test("3. URL parameters: ?view=profile, ?view=portfolio, ?view=portfolio&focus=..., ?project=dombro, unknown values", async ({
     page,
   }) => {
     // 3a. ?view=profile
@@ -106,10 +106,10 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     await expect(page.locator("#window-portfolio")).toBeVisible();
     await expect(page.locator("#window-portfolio")).toContainText("Интерфейсы и прототипы");
 
-    // 3e. ?project=kora
-    await page.goto("/?project=kora");
+    // 3e. ?project=dombro
+    await page.goto("/?project=dombro");
     await expect(page.locator("#window-portfolio")).toBeVisible();
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // 3f. unknown project ?project=nonexistent_xyz
     await page.goto("/?project=nonexistent_xyz");
@@ -127,13 +127,13 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     await page.goto("/?view=portfolio");
     await page.waitForLoadState("networkidle");
 
-    // Click on Kora card in catalog
-    const koraCard = page.locator("#window-portfolio").getByRole("button", { name: "Открыть кейс Kora" });
-    await koraCard.click();
+    // Click on dombro card in catalog
+    const dombroCard = page.locator("#window-portfolio").getByRole("button", { name: "Открыть кейс dombro" });
+    await dombroCard.click();
 
     // Case view appears
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
-    expect(page.url()).toContain("project=kora");
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
+    expect(page.url()).toContain("project=dombro");
 
     // Click "Назад" in browser toolbar
     const backBtn = page.locator("#window-portfolio").getByRole("button", { name: "Назад к каталогу" });
@@ -144,17 +144,17 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     expect(page.url()).toContain("view=portfolio");
 
     // Real browser forward
-    await page.goBack(); // returns to kora
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    await page.goBack(); // returns to dombro
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // Real browser back
     await page.goForward(); // returns to catalog
     await expect(page.locator("#window-portfolio h1")).toContainText("Влад Ахметов");
 
     // Direct link reload
-    await page.goto("/?project=kora");
+    await page.goto("/?project=dombro");
     await page.reload();
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // Clicking "Назад" after direct entry returns to portfolio catalog without leaving site
     await page.locator("#window-portfolio").getByRole("button", { name: "Назад к каталогу" }).click();
@@ -166,10 +166,10 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
-    await page.goto("/?project=kora");
+    await page.goto("/?project=dombro");
     await page.waitForLoadState("networkidle");
 
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // Minimize window
     await page.locator("#window-portfolio .xp-btn-minimize").click();
@@ -179,16 +179,16 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     const taskbarItem = page.locator(".xp-task-btn").filter({ hasText: "Портфолио" });
     await taskbarItem.click();
 
-    // Restored: still on Kora!
+    // Restored: still on dombro!
     await expect(page.locator("#window-portfolio")).toBeVisible();
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // Close window
     await page.locator("#window-portfolio .xp-btn-close").click();
     await expect(page.locator("#window-portfolio")).toHaveCount(0);
 
     // Closing cleared project from URL
-    expect(page.url()).not.toContain("project=kora");
+    expect(page.url()).not.toContain("project=dombro");
   });
 
   // Scenario 6: Viewports 1920x1080, 1366x768, 390x844, no overflow, controls accessible, viewport resize
@@ -217,9 +217,9 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     await page.waitForLoadState("networkidle");
 
     // Mobile single click directly opens project
-    const koraCard = page.locator("#window-portfolio").getByRole("button", { name: "Открыть кейс Kora" });
-    await koraCard.click();
-    await expect(page.locator("#window-portfolio h1")).toHaveText("Kora");
+    const dombroCard = page.locator("#window-portfolio").getByRole("button", { name: "Открыть кейс dombro" });
+    await dombroCard.click();
+    await expect(page.locator("#window-portfolio h1")).toHaveText("dombro");
 
     // Keyboard Tab and Enter on Back button
     await page.keyboard.press("Tab");
@@ -266,7 +266,7 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
 
     // 5. Browser on 1366x768 (case)
     await page.setViewportSize({ width: 1366, height: 768 });
-    await page.goto("/?project=kora");
+    await page.goto("/?project=dombro");
     await page.waitForLoadState("networkidle");
     await page.screenshot({
       path: path.join(QA_DIR, "browser-case-1366x768.png"),

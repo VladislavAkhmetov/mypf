@@ -14,12 +14,12 @@ test.describe("Unified portfolio detail pages", () => {
     await page.reload();
     await expect(win.locator("h1")).toHaveText("Auto-Bézier Kern");
     await win.getByRole("button", { name: /Инструмент в контексте проекта/ }).click();
-    await expect(win.locator("h1")).toHaveText("Kora");
-    await expect(page).toHaveURL(/project=kora/);
+    await expect(win.locator("h1")).toHaveText("dombro");
+    await expect(page).toHaveURL(/project=dombro/);
     await page.goBack();
     await expect(win.locator("h1")).toHaveText("Auto-Bézier Kern");
     await page.goForward();
-    await expect(win.locator("h1")).toHaveText("Kora");
+    await expect(win.locator("h1")).toHaveText("dombro");
     await page.goBack();
     await win.locator(".xp-btn-minimize").click();
     await expect(win).toHaveCount(0);
@@ -54,18 +54,12 @@ test.describe("Unified portfolio detail pages", () => {
   });
 
   test("Project interactions and Altyn gallery retain the shared style", async ({ page }) => {
-    await page.goto("/?project=kora");
+    await page.goto("/?project=dombro");
     const input = page.getByRole("textbox", { name: "Текст типографического эскиза" });
     await input.fill("Новый текст");
     await expect(input).toHaveValue("Новый текст");
     await page.getByRole("slider", { name: "Размер текста" }).fill("64");
     await expect(input).toHaveCSS("font-size", "64px");
-    await page.goto("/?project=signalatlas");
-    await page.getByRole("button", { name: "UHF", exact: true }).click();
-    await expect(page.getByRole("button", { name: "UHF", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await page.goto("/?project=noclip");
-    await page.getByRole("button", { name: "Зал 2", exact: true }).click();
-    await expect(page.getByText(/Зал оптических приборов/)).toBeVisible();
     await page.goto("/?project=altyn-solok");
     await expect(page.locator('[data-portfolio-detail] h1')).toHaveText("Алтын Солок");
     await page.getByText("Весь сайт целиком", { exact: false }).click();
@@ -84,5 +78,33 @@ test.describe("Unified portfolio detail pages", () => {
     }
     await page.goto("/?tool=missing");
     await expect(page.locator("#window-portfolio").getByRole("alert")).toBeVisible();
+  });
+  test("Tasker case plays two interface clips, can pause them and fits a narrow window", async ({ page }) => {
+    await page.goto("/?project=tasker");
+    await expect(page.locator("[data-portfolio-detail] h1")).toHaveText("Таскер");
+    const clips = page.locator("[data-portfolio-detail] video");
+    await expect(clips).toHaveCount(2);
+    await clips.first().scrollIntoViewIfNeeded();
+    await expect.poll(() => clips.first().evaluate((video: HTMLVideoElement) => !video.paused)).toBe(true);
+    const stop = page.getByRole("button", { name: "Остановить ролик" }).first();
+    await stop.click();
+    await expect(page.getByRole("button", { name: "Запустить ролик" }).first()).toBeVisible();
+    await expect.poll(() => clips.first().evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const viewport = page.locator('#window-portfolio [class*="contentViewport"]');
+    await expect.poll(() => viewport.evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+  });
+  test("kroomi case shows the character clip, six characters, screens and opens the landing window", async ({ page }) => {
+    await page.goto("/?project=kroomi");
+    await expect(page.locator("[data-portfolio-detail] h1")).toHaveText("kroomi");
+    await expect(page.locator("[data-portfolio-detail] video")).toHaveCount(1);
+    await expect(page.getByAltText("Шесть персонажей: два вида в разных цветах")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Увеличить: Паспорт персонажа/ })).toBeVisible();
+    await page.getByRole("button", { name: /Лендинг kroomi/ }).click();
+    await expect(page.locator("#window-kroomi")).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/?project=kroomi");
+    const viewport = page.locator('#window-portfolio [class*="contentViewport"]');
+    await expect.poll(() => viewport.evaluate(el => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
   });
 });

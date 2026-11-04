@@ -5,27 +5,27 @@ import { site } from "@/data/site";
 import { useLocale } from "@/lib/i18n";
 
 export function NotepadWindow() {
-  const { t, locale } = useLocale();
+  const { t, tr, locale } = useLocale();
 
   const defaultContent = `=====================================================
-ВЛАД АХМЕТОВ // VLADISLAV AKHMETOV
+${tr("ВЛАД АХМЕТОВ // VLADISLAV AKHMETOV", "VLAD AKHMETOV")}
 ${t(site.role)}
 =====================================================
 
-[ О СЕБЕ ]
+[ ${tr("О СЕБЕ", "ABOUT")} ]
 ${t(site.note)}
 
-[ СЕЙЧАС ]
+[ ${tr("СЕЙЧАС", "NOW")} ]
 ${t(site.now)}
 
-[ СТУДИЯ И МЕСТО ]
+[ ${tr("СТУДИЯ И МЕСТО", "PRACTICE AND LOCATION")} ]
 ${t(site.workplace)}
-Локация: ${t(site.location)} (${t(site.presence)})
+${tr("Локация", "Location")}: ${t(site.location)}
 
-[ СТЕК И ДИСЦИПЛИНЫ ]
+[ ${tr("СТЕК И ДИСЦИПЛИНЫ", "STACK AND DISCIPLINES")} ]
 ${site.stack.map((s) => "• " + s[locale]).join("\n")}
 
-[ КОНТАКТЫ ]
+[ ${tr("КОНТАКТЫ", "CONTACTS")} ]
 • Telegram: ${site.telegram}
 • Email:    ${site.email}
 • Handle:   ${site.handle}
@@ -35,16 +35,22 @@ Windows XP Notepad Edition (C) 2001-2026 Microsoft Corp.
 =====================================================`;
 
   const [content, setContent] = useState(defaultContent);
+  // Reload the text in the new language when the interface language changes.
+  const [shownLocale, setShownLocale] = useState(locale);
+  if (shownLocale !== locale) {
+    setShownLocale(locale);
+    setContent(defaultContent);
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-white text-black overflow-hidden select-text">
       {/* Menu bar */}
       <div className="xp-menu-bar">
-        <span className="xp-menu-item">Файл</span>
-        <span className="xp-menu-item">Правка</span>
-        <span className="xp-menu-item">Формат</span>
-        <span className="xp-menu-item">Вид</span>
-        <span className="xp-menu-item">Справка</span>
+        <span className="xp-menu-item">{tr("Файл", "File")}</span>
+        <span className="xp-menu-item">{tr("Правка", "Edit")}</span>
+        <span className="xp-menu-item">{tr("Формат", "Format")}</span>
+        <span className="xp-menu-item">{tr("Вид", "View")}</span>
+        <span className="xp-menu-item">{tr("Справка", "Help")}</span>
       </div>
 
       {/* Editor text area */}
@@ -57,7 +63,7 @@ Windows XP Notepad Edition (C) 2001-2026 Microsoft Corp.
 
       {/* Status bar */}
       <div className="xp-statusbar">
-        <span>Стр 1, Стл 1</span>
+        <span>{tr("Стр 1, Стл 1", "Ln 1, Col 1")}</span>
         <span>Windows (CRLF)</span>
         <span>UTF-8</span>
       </div>
