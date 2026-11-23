@@ -47,3 +47,16 @@ next-env.d.ts
 .figaro/
 .tmp/
 
+# python
+__pycache__/
+*.py[cod]
+
+# root temporary / raw asset files
+/Floating.fbx
+/Hip Hop Dancing.fbx
+/hf_*.png
+/Резюме_Влад_Ахметов.pdf
+
+# design qa captures
+/docs/design/qa/
+

@@ -25,13 +25,13 @@ function getAudioContext(): AudioContext | null {
 export function setMuted(muted: boolean) {
   isMuted = muted;
   if (typeof window !== "undefined") {
-    window.localStorage.setItem("amazi-xp-muted", muted ? "1" : "0");
+    window.localStorage.setItem("xp-muted", muted ? "1" : "0");
   }
 }
 
 export function getMuted(): boolean {
   if (typeof window !== "undefined") {
-    const stored = window.localStorage.getItem("amazi-xp-muted");
+    const stored = window.localStorage.getItem("xp-muted");
     if (stored !== null) return stored === "1";
     return true; // default muted
   }

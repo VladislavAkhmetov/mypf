@@ -16,12 +16,12 @@ function fixture(): SolitaireState {
 }
 
 async function stored(page: Page) {
-  return page.evaluate(() => JSON.parse(localStorage.getItem("amazi.games.solitaire.v1")!).state as SolitaireState);
+  return page.evaluate(() => JSON.parse(localStorage.getItem("xp.games.solitaire.v1")!).state as SolitaireState);
 }
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(state => {
-    if (!localStorage.getItem("amazi.games.solitaire.v1")) localStorage.setItem("amazi.games.solitaire.v1", JSON.stringify({ schemaVersion: 1, sessionId: "interaction-test", state, history: [], elapsedSeconds: 0, hasStarted: false }));
+    if (!localStorage.getItem("xp.games.solitaire.v1")) localStorage.setItem("xp.games.solitaire.v1", JSON.stringify({ schemaVersion: 1, sessionId: "interaction-test", state, history: [], elapsedSeconds: 0, hasStarted: false }));
   }, fixture());
   await page.goto("/");
   await page.locator("#window-word .xp-btn-close").click();
@@ -166,7 +166,7 @@ test("auto-finish brings victory, records score, displays modal and avoids dupli
 
   await page.evaluate(st => {
     const originalSetItem = localStorage.setItem.bind(localStorage);
-    const targetKey = "amazi.games.solitaire.v1";
+    const targetKey = "xp.games.solitaire.v1";
     const payload = JSON.stringify({
       schemaVersion: 1,
       sessionId: "winning-session",

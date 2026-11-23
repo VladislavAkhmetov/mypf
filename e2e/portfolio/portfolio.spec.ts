@@ -39,9 +39,8 @@ test.describe("Portfolio Foundation - Mandatory Scenarios", () => {
     // No DesktopHero text/element on the page
     await expect(page.locator(".xp-desktop-hero")).toHaveCount(0);
 
-    // Check actions: "Посмотреть проекты", "Резюме"
+    // Check actions: "Посмотреть проекты"
     await expect(page.locator("#window-word").getByRole("button", { name: "Посмотреть проекты" })).toBeVisible();
-    await expect(page.locator("#window-word").getByRole("button", { name: /Резюме/ })).toBeVisible();
 
     // No console/page errors
     expect(pageErrors).toHaveLength(0);

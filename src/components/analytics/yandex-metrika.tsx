@@ -6,7 +6,6 @@ import { YM_COUNTER_ID, initGlobalAnalyticsListener } from "@/lib/analytics";
 
 export function YandexMetrika() {
   const ymId = YM_COUNTER_ID;
-  const isEnabled = Boolean(ymId && ymId !== "mock");
 
   useEffect(() => {
     const cleanup = initGlobalAnalyticsListener();
@@ -15,7 +14,7 @@ export function YandexMetrika() {
 
   return (
     <>
-      {isEnabled && (
+      {ymId && (
         <>
           <Script id="yandex-metrika-init" strategy="afterInteractive">
             {`
@@ -23,13 +22,17 @@ export function YandexMetrika() {
               m[i].l=1*new Date();
               for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
               k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-              (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+              (window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=${ymId}", "ym");
 
               ym(${ymId}, "init", {
+                ssr: true,
+                webvisor: true,
                 clickmap: true,
-                trackLinks: true,
+                ecommerce: "dataLayer",
+                referrer: document.referrer,
+                url: location.href,
                 accurateTrackBounce: true,
-                webvisor: true
+                trackLinks: true
               });
             `}
           </Script>

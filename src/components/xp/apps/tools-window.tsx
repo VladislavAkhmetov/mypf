@@ -134,7 +134,7 @@ export function ToolsWindow() {
         <span className={styles.addressLabel}>{tr("Адрес", "Address")}</span>
         <div className={styles.addressField}>
           <FolderIcon />
-          <span>C:\Program Files\Amazi\{folderName}</span>
+          <span>C:\Program Files\{folderName}</span>
         </div>
         <button type="button" className={styles.goButton} onClick={() => xpSound.click()}>
           <ToolbarGlyphIcon name="forward" /> {tr("Переход", "Go")}

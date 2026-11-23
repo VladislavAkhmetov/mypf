@@ -70,7 +70,7 @@ export function MyComputerWindow() {
                 Microsoft Windows XP Professional
               </div>
               <div className="text-slate-600">{tr("Версия 2026 (Service Pack 3)", "Version 2026 (Service Pack 3)")}</div>
-              <div className="text-slate-500 font-mono">Amazi OS Build 2600.x86</div>
+              <div className="text-slate-500 font-mono">Windows XP Build 2600.x86</div>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export function MyComputerWindow() {
               className="px-4 py-1.5 bg-[#ece9d8] hover:bg-[#d8e5f8] border border-slate-400 rounded text-xs font-semibold shadow-sm"
               style={{ cursor: xpCursors.pointer }}
             >
-              {tr("Открыть резюме (.txt)", "Open resume (.txt)")}
+              {tr("Открыть профиль (.txt)", "Open profile (.txt)")}
             </button>
           </div>
         </div>
@@ -199,7 +199,7 @@ export function MyComputerWindow() {
 
             {/* Network Drive Z */}
             <a
-              href="https://t.me/amazi"
+              href={site.telegram}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 p-2.5 border border-slate-300 rounded hover:bg-blue-50 cursor-pointer transition shadow-sm"
@@ -210,7 +210,7 @@ export function MyComputerWindow() {
               </div>
               <div>
                 <div className="font-bold text-xs text-slate-900">{tr("Telegram канал (Z:)", "Telegram channel (Z:)")}</div>
-                <div className="text-[11px] text-slate-500">t.me/amazi</div>
+                <div className="text-[11px] text-slate-500">t.me/vladakhmetov</div>
               </div>
             </a>
           </div>

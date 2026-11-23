@@ -10,8 +10,7 @@ export function MakingOfSection({ data, onZoom }: { data: MakingOf; onZoom?: (im
   return (
     <section className={styles.section} aria-label={tr("Как это сделано", "How it was made")}>
       <div className={styles.heading}>
-        <span className={styles.eyebrow}>{tr("Процесс", "Process")}</span>
-        <h2>{tr("Как это сделано", "How it was made")}<span>.</span></h2>
+        <h2>{tr("Как это сделано", "How it was made")}</h2>
       </div>
 
       <div className={styles.split}>
@@ -26,9 +25,8 @@ export function MakingOfSection({ data, onZoom }: { data: MakingOf; onZoom?: (im
       </div>
 
       <ol className={styles.steps}>
-        {data.steps.map((step, index) => (
+        {data.steps.map(step => (
           <li key={step.title}>
-            <span className={styles.stepIndex}>{String(index + 1).padStart(2, "0")}</span>
             <div>
               <h3>{step.title}</h3>
               <p>{step.text}</p>

@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "node node_modules/next/dist/bin/next start -p 3100",
+    command: "npx serve -s out -l 3100",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     timeout: 120000,

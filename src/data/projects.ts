@@ -52,8 +52,8 @@ export const projects: Project[] = [
       en: "Figma prepress plugin & cloud CMYK pipeline",
     },
     body: {
-      ru: "Комплексная предпечатная подготовка макетов: автоматический расчёт припусков под обрез (BleedBox, TrimBox), калиброванная CMYK-конвертация по профилям ISO 12647 (FOGRA39, SWOP, GRACoL), аудит эффективного DPI растра и генерация плашечных каналов для ножей вырубки и биговки.",
-      en: "Full-cycle print prepress inside Figma: automated bleed margin setup (BleedBox, TrimBox), ISO 12647 CMYK color conversion (FOGRA39, SWOP, GRACoL), effective DPI asset auditing, and spot color channels for cutting and creasing dielines.",
+      ru: "Prepress-плагин и пайплайн подготовки макетов к печати в Figma: расчёт припусков, CMYK-конвертация и генерация плашечных каналов. Моя роль — продукт, дизайн и разработка.",
+      en: "Prepress Figma plugin and print prep pipeline: automated bleed margins, CMYK conversion, and spot dieline generation. My role: product, design, and development.",
     },
     tags: {
       ru: ["figma-плагин", "prepress", "cmyk", "упаковка", "software"],
@@ -76,8 +76,8 @@ export const projects: Project[] = [
       en: "Bashkir apiphytotherapy digital showcase",
     },
     body: {
-      ru: "Бортевой мёд, прополис и дикорастущие травы. Интерактивная витрина с тонкой микрофизикой и живым ритмом природы.",
-      en: "Wild-hive honey, propolis, and medicinal herbs. An interactive showcase blending organic rhythm with modern craft.",
+      ru: "Алтын Солок — инновационная компания Республики Башкортостан, создающая натуральную продукцию на основе бортевого мёда, дикорастущих трав и прополиса. Моя роль — дизайн и фронтенд.",
+      en: "Altyn Solok is an innovative company from the Republic of Bashkortostan crafting natural products from wild-hive honey, wild herbs, and propolis. My role: design and frontend.",
     },
     tags: {
       ru: ["веб-витрина", "айдентика", "e-commerce"],
@@ -100,8 +100,8 @@ export const projects: Project[] = [
       en: "A browser and a calm dashboard for Windows 11",
     },
     body: {
-      ru: "Браузер и главная страница для тех, у кого открыто слишком много вкладок. Без красных счётчиков, бесконечных лент и штрафов за перенос дел.",
-      en: "A browser and a home screen for people with too many tabs open. No red badges, no endless feeds, no penalties for rescheduling.",
+      ru: "Браузер и главная страница для тех, у кого открыто слишком много вкладок. Без красных счётчиков, бесконечных лент и штрафов за перенос дел. Моя роль — продукт, дизайн и разработка.",
+      en: "A browser and calm home screen for people with too many tabs open. No red badges, no endless feeds. My role: product, design, and development.",
     },
     tags: {
       ru: ["продукт", "интерфейс", "десктоп"],
@@ -124,8 +124,8 @@ export const projects: Project[] = [
       en: "A Telegram app for a product-card studio",
     },
     body: {
-      ru: "Дизайнеры делали карточки товаров для ритейлера электроники и делили артикулы в общем чате. Теперь артикул закрепляется за человеком одним нажатием, а этап виден всей команде.",
-      en: "Designers made product cards for an electronics retailer and split the articles in a group chat. Now an article is claimed with one tap and its stage is visible to the whole team.",
+      ru: "Telegram-приложение для распределения карточек товаров между дизайнерами студии в один клик. Артикул закрепляется за человеком, этап виден всей команде. Моя роль — продукт, дизайн и разработка.",
+      en: "A Telegram mini-app for one-tap product card task dispatch across studio designers. Claimed in one tap, visible to the whole team. My role: product, design, and development.",
     },
     tags: {
       ru: ["интерфейс", "telegram", "продукт"],
@@ -146,15 +146,15 @@ export const projects: Project[] = [
       en: "An app where a language is how you help a character",
     },
     body: {
-      ru: "Приложение для изучения иностранного языка. У персонажа свои дела: он зовёт в гости, теряет мяч, хочет есть, а помочь ему можно на языке, который вы учите.",
-      en: "An app for learning a foreign language. A character has plans of its own: it invites you over, loses a ball, gets hungry, and you help it in the language you are learning.",
+      ru: "Приложение для изучения иностранных языков через заботу о живом интерактивном персонаже. Моя роль — продукт, дизайн и разработка.",
+      en: "A language learning app built around caring for a living interactive character. My role: product, design, and development.",
     },
     tags: {
       ru: ["персонажи", "мобильное", "продукт"],
       en: ["characters", "mobile", "product"],
     },
     href: "https://t.me/vladakhmetov",
-    linkLabel: { ru: "Узнать о выходе", en: "Get notified" },
+    linkLabel: { ru: "Лендинг kroomi", en: "kroomi landing page" },
   },
 ];
 

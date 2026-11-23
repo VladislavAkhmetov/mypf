@@ -1,0 +1,1743 @@
+{
+"land_card": {
+"files": [
+{
+"f": "land_card_1.mp3",
+"rms": -23.6,
+"src": 364740
+},
+{
+"f": "land_card_2.mp3",
+"rms": -15.9,
+"src": 500283
+},
+{
+"f": "land_card_3.mp3",
+"rms": -24.5,
+"src": 346169
+},
+{
+"f": "land_card_4.mp3",
+"rms": -8.3,
+"src": 346169
+}
+],
+"credits": [
+{
+"id": 346169,
+"title": "Cardboard Box Drop.wav",
+"user": "VSokorelos",
+"lic": "cc0"
+},
+{
+"id": 364740,
+"title": "open-cardboard-box-compartment.wav",
+"user": "newagesoup",
+"lic": "cc0"
+},
+{
+"id": 500283,
+"title": "Box Falling Down",
+"user": "danlucaz",
+"lic": "cc0"
+}
+]
+},
+"land_glass": {
+"files": [
+{
+"f": "land_glass_1.mp3",
+"rms": -14.0,
+"src": 135039
+},
+{
+"f": "land_glass_2.mp3",
+"rms": -13.3,
+"src": 506913
+},
+{
+"f": "land_glass_3.mp3",
+"rms": -21.7,
+"src": 486824
+},
+{
+"f": "land_glass_4.mp3",
+"rms": -14.7,
+"src": 486824
+}
+],
+"credits": [
+{
+"id": 135039,
+"title": "Glass Bottle Clink",
+"user": "twohoursago",
+"lic": "cc0"
+},
+{
+"id": 486824,
+"title": "Ink bottle being put down.mp3",
+"user": "Cactusfruit2",
+"lic": "cc0"
+},
+{
+"id": 506913,
+"title": "Bottle_Clink.mp3",
+"user": "schoman3",
+"lic": "cc0"
+}
+]
+},
+"bike_loop": {
+"files": [
+{
+"f": "bike_loop_1.mp3",
+"rms": -12.3,
+"loop": 3,
+"src": 697379
+}
+],
+"credits": [
+{
+"id": 697379,
+"title": "Electric Scooter",
+"user": "IENBA",
+"lic": "cc0"
+}
+]
+},
+"land_metal": {
+"files": [
+{
+"f": "land_metal_1.mp3",
+"rms": -12.5,
+"src": 92622
+},
+{
+"f": "land_metal_2.mp3",
+"rms": -17.4,
+"src": 92622
+}
+],
+"credits": [
+{
+"id": 92622,
+"title": "CanBounce 2.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"land_fruit": {
+"files": [
+{
+"f": "land_fruit_1.mp3",
+"rms": -22.9,
+"src": 149418
+},
+{
+"f": "land_fruit_2.mp3",
+"rms": -18.0,
+"src": 149418
+},
+{
+"f": "land_fruit_3.mp3",
+"rms": -24.6,
+"src": 149418
+}
+],
+"credits": [
+{
+"id": 149418,
+"title": "ApplesDroppingThudinaForest.wav",
+"user": "kvgarlic",
+"lic": "cc0"
+}
+]
+},
+"land_soft": {
+"files": [
+{
+"f": "land_soft_1.mp3",
+"rms": -20.1,
+"src": 872227
+},
+{
+"f": "land_soft_2.mp3",
+"rms": -18.9,
+"src": 405705
+}
+],
+"credits": [
+{
+"id": 872227,
+"title": "Soft Impact - Pillow Hit",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 405705,
+"title": "found matress hit.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"land_wet": {
+"files": [
+{
+"f": "land_wet_1.mp3",
+"rms": -20.8,
+"src": 532140
+},
+{
+"f": "land_wet_2.mp3",
+"rms": -15.5,
+"src": 679391
+},
+{
+"f": "land_wet_3.mp3",
+"rms": -21.3,
+"src": 495118
+}
+],
+"credits": [
+{
+"id": 495118,
+"title": "Wet Splat 1.mp3",
+"user": "nebulasnails",
+"lic": "cc0"
+},
+{
+"id": 532140,
+"title": "wet_plastic_slap.wav",
+"user": "j1987",
+"lic": "cc0"
+},
+{
+"id": 679391,
+"title": "wet thwack",
+"user": "adviseme333",
+"lic": "cc0"
+}
+]
+},
+"land_jelly": {
+"files": [
+{
+"f": "land_jelly_1.mp3",
+"rms": -15.2,
+"src": 442772
+},
+{
+"f": "land_jelly_2.mp3",
+"rms": -26.9,
+"src": 433840
+},
+{
+"f": "land_jelly_3.mp3",
+"rms": -20.5,
+"src": 447930
+},
+{
+"f": "land_jelly_4.mp3",
+"rms": -21.3,
+"src": 447930
+}
+],
+"credits": [
+{
+"id": 433840,
+"title": "Slime 27.wav",
+"user": "Archos",
+"lic": "cc0"
+},
+{
+"id": 442772,
+"title": "Slime Squish",
+"user": "qubodup",
+"lic": "cc0"
+},
+{
+"id": 447930,
+"title": "Step on a slug (Splat!) 2",
+"user": "Breviceps",
+"lic": "cc0"
+}
+]
+},
+"land_squeak": {
+"files": [
+{
+"f": "land_squeak_1.mp3",
+"rms": -14.9,
+"src": 468443
+},
+{
+"f": "land_squeak_2.mp3",
+"rms": -10.2,
+"src": 468443
+},
+{
+"f": "land_squeak_3.mp3",
+"rms": -16.2,
+"src": 483922
+},
+{
+"f": "land_squeak_4.mp3",
+"rms": -15.3,
+"src": 483922
+}
+],
+"credits": [
+{
+"id": 468443,
+"title": "Squeaky Toy #1",
+"user": "Breviceps",
+"lic": "cc0"
+},
+{
+"id": 483922,
+"title": "Squeaky Toy #4",
+"user": "Breviceps",
+"lic": "cc0"
+}
+]
+},
+"land_heavy": {
+"files": [
+{
+"f": "land_heavy_1.mp3",
+"rms": -12.0,
+"src": 207824
+},
+{
+"f": "land_heavy_2.mp3",
+"rms": -17.1,
+"src": 82027
+}
+],
+"credits": [
+{
+"id": 207824,
+"title": "Thump.wav",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 82027,
+"title": "Body Fall Over.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"land_paper": {
+"files": [
+{
+"f": "land_paper_1.mp3",
+"rms": -21.0,
+"src": 521219
+},
+{
+"f": "land_paper_2.mp3",
+"rms": -25.2,
+"src": 521219
+},
+{
+"f": "land_paper_3.mp3",
+"rms": -23.9,
+"src": 521219
+},
+{
+"f": "land_paper_4.mp3",
+"rms": -24.2,
+"src": 520581
+}
+],
+"credits": [
+{
+"id": 520581,
+"title": "Plastic Sack Dropped",
+"user": "msavioti",
+"lic": "cc0"
+},
+{
+"id": 521219,
+"title": "Grocery Drop.mp3",
+"user": "shelbyshark",
+"lic": "cc0"
+}
+]
+},
+"land_egg": {
+"files": [
+{
+"f": "land_egg_1.mp3",
+"rms": -21.9,
+"src": 489547
+}
+],
+"credits": [
+{
+"id": 489547,
+"title": "Egg carton 1.m4a",
+"user": "TiidWunduniik",
+"lic": "cc0"
+}
+]
+},
+"land_click": {
+"files": [
+{
+"f": "land_click_1.mp3",
+"rms": -25.4,
+"src": 63531
+},
+{
+"f": "land_click_2.mp3",
+"rms": -26.1,
+"src": 63532
+},
+{
+"f": "land_click_3.mp3",
+"rms": -20.2,
+"src": 277652
+},
+{
+"f": "land_click_4.mp3",
+"rms": -17.0,
+"src": 277652
+}
+],
+"credits": [
+{
+"id": 63531,
+"title": "click1.wav",
+"user": "florian_reinke",
+"lic": "cc0"
+},
+{
+"id": 63532,
+"title": "click2.wav",
+"user": "florian_reinke",
+"lic": "cc0"
+},
+{
+"id": 277652,
+"title": "Button 3.mp3",
+"user": "Coral_Island_Studios",
+"lic": "cc0"
+}
+]
+},
+"land_water": {
+"files": [
+{
+"f": "land_water_1.mp3",
+"rms": -25.3,
+"src": 398032
+},
+{
+"f": "land_water_2.mp3",
+"rms": -26.5,
+"src": 393494
+},
+{
+"f": "land_water_3.mp3",
+"rms": -27.0,
+"src": 398039
+}
+],
+"credits": [
+{
+"id": 393494,
+"title": "Slosh A.wav",
+"user": "samuelcable",
+"lic": "cc0"
+},
+{
+"id": 398032,
+"title": "Splash",
+"user": "swordofkings128",
+"lic": "cc0"
+},
+{
+"id": 398039,
+"title": "water splash 2",
+"user": "swordofkings128",
+"lic": "cc0"
+}
+]
+},
+"crash_glass": {
+"files": [
+{
+"f": "crash_glass_1.mp3",
+"rms": -22.9,
+"src": 212698
+},
+{
+"f": "crash_glass_2.mp3",
+"rms": -21.3,
+"src": 212698
+},
+{
+"f": "crash_glass_3.mp3",
+"rms": -23.5,
+"src": 221528
+}
+],
+"credits": [
+{
+"id": 212698,
+"title": "Breaking a glass bottle",
+"user": "dasebr",
+"lic": "cc0"
+},
+{
+"id": 221528,
+"title": "Glass Break",
+"user": "unfa",
+"lic": "cc0"
+}
+]
+},
+"crash_egg": {
+"files": [
+{
+"f": "crash_egg_1.mp3",
+"rms": -37.6,
+"src": 336613
+},
+{
+"f": "crash_egg_2.mp3",
+"rms": -29.4,
+"src": 181913
+},
+{
+"f": "crash_egg_3.mp3",
+"rms": -18.2,
+"src": 253798
+}
+],
+"credits": [
+{
+"id": 181913,
+"title": "Jelly Fall From Egg Cup 1.wav",
+"user": "lolamadeus",
+"lic": "cc0"
+},
+{
+"id": 253798,
+"title": "egg crack sounds mixed.wav",
+"user": "Reitanna",
+"lic": "cc0"
+},
+{
+"id": 336613,
+"title": "egg - crack 01.wav",
+"user": "Anthousai",
+"lic": "cc0"
+}
+]
+},
+"crash_soft": {
+"files": [
+{
+"f": "crash_soft_1.mp3",
+"rms": -14.9,
+"src": 460876
+},
+{
+"f": "crash_soft_2.mp3",
+"rms": -21.5,
+"src": 447930
+},
+{
+"f": "crash_soft_3.mp3",
+"rms": -17.2,
+"src": 719131
+}
+],
+"credits": [
+{
+"id": 447930,
+"title": "Step on a slug (Splat!) 2",
+"user": "Breviceps",
+"lic": "cc0"
+},
+{
+"id": 460876,
+"title": "splat11.wav",
+"user": "moshang",
+"lic": "cc0"
+},
+{
+"id": 719131,
+"title": "Splat 3",
+"user": "sebastientate",
+"lic": "cc0"
+}
+]
+},
+"crash_metal": {
+"files": [
+{
+"f": "crash_metal_1.mp3",
+"rms": -19.6,
+"src": 817768
+},
+{
+"f": "crash_metal_2.mp3",
+"rms": -13.6,
+"src": 92622
+}
+],
+"credits": [
+{
+"id": 817768,
+"title": "can_falling",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 92622,
+"title": "CanBounce 2.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"crash_card": {
+"files": [
+{
+"f": "crash_card_1.mp3",
+"rms": -12.6,
+"src": 136887
+},
+{
+"f": "crash_card_2.mp3",
+"rms": -20.3,
+"src": 133978
+},
+{
+"f": "crash_card_3.mp3",
+"rms": -24.5,
+"src": 346169
+}
+],
+"credits": [
+{
+"id": 133978,
+"title": "Item Falling (Plastic).mp3",
+"user": "EchoCinematics",
+"lic": "cc0"
+},
+{
+"id": 136887,
+"title": "box of stuff falls.wav",
+"user": "animationIsaac",
+"lic": "cc0"
+},
+{
+"id": 346169,
+"title": "Cardboard Box Drop.wav",
+"user": "VSokorelos",
+"lic": "cc0"
+}
+]
+},
+"crash_heavy": {
+"files": [
+{
+"f": "crash_heavy_1.mp3",
+"rms": -20.1,
+"src": 673424
+},
+{
+"f": "crash_heavy_2.mp3",
+"rms": -12.0,
+"src": 207824
+}
+],
+"credits": [
+{
+"id": 673424,
+"title": "Falling body hits the floor",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 207824,
+"title": "Thump.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"crash_fruit": {
+"files": [
+{
+"f": "crash_fruit_1.mp3",
+"rms": -33.6,
+"src": 739188
+},
+{
+"f": "crash_fruit_2.mp3",
+"rms": -18.2,
+"src": 739188
+},
+{
+"f": "crash_fruit_3.mp3",
+"rms": -26.9,
+"src": 483932
+}
+],
+"credits": [
+{
+"id": 483932,
+"title": "Crushing a Lemon 1_5",
+"user": "Joao_Janz",
+"lic": "cc0"
+},
+{
+"id": 739188,
+"title": "watermelon rip squelch",
+"user": "MaddieCooper",
+"lic": "cc0"
+}
+]
+},
+"crash_water": {
+"files": [
+{
+"f": "crash_water_1.mp3",
+"rms": -16.9,
+"src": 442773
+},
+{
+"f": "crash_water_2.mp3",
+"rms": -25.0,
+"src": 524512
+}
+],
+"credits": [
+{
+"id": 442773,
+"title": "Big Water Splash",
+"user": "qubodup",
+"lic": "cc0"
+},
+{
+"id": 524512,
+"title": "Water Splash in Lake 02.wav",
+"user": "vero.marengere",
+"lic": "cc0"
+}
+]
+},
+"board_creak": {
+"files": [
+{
+"f": "board_creak_1.mp3",
+"rms": -21.0,
+"src": 590171
+},
+{
+"f": "board_creak_2.mp3",
+"rms": -16.7,
+"src": 452600
+},
+{
+"f": "board_creak_3.mp3",
+"rms": -11.1,
+"src": 452600
+},
+{
+"f": "board_creak_4.mp3",
+"rms": -19.5,
+"src": 506665
+}
+],
+"credits": [
+{
+"id": 452600,
+"title": "door wood kick open rattle creak.wav",
+"user": "kyles",
+"lic": "cc0"
+},
+{
+"id": 506665,
+"title": "Wood Creak Single V10",
+"user": "Rudmer_Rotteveel",
+"lic": "cc0"
+},
+{
+"id": 590171,
+"title": "Creaking in Room 8.wav",
+"user": "Greg_Surr",
+"lic": "cc0"
+}
+]
+},
+"shoe_squeak": {
+"files": [
+{
+"f": "shoe_squeak_1.mp3",
+"rms": -20.0,
+"src": 187343
+},
+{
+"f": "shoe_squeak_2.mp3",
+"rms": -11.2,
+"src": 848694
+},
+{
+"f": "shoe_squeak_3.mp3",
+"rms": -12.8,
+"src": 848694
+}
+],
+"credits": [
+{
+"id": 187343,
+"title": "Rubber Shoe Squeak.wav",
+"user": "baidonovan",
+"lic": "cc0"
+},
+{
+"id": 848694,
+"title": "SFX_Footsteps_Shoes_Normal_01",
+"user": "Al3x-K",
+"lic": "cc0"
+}
+]
+},
+"body_fall": {
+"files": [
+{
+"f": "body_fall_1.mp3",
+"rms": -19.7,
+"src": 417994
+},
+{
+"f": "body_fall_2.mp3",
+"rms": -16.7,
+"src": 346695
+}
+],
+"credits": [
+{
+"id": 417994,
+"title": "Body fall.wav",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 346695,
+"title": "Body fall_01.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"whoosh": {
+"files": [
+{
+"f": "whoosh_1.mp3",
+"rms": -14.5,
+"src": 486234
+},
+{
+"f": "whoosh_2.mp3",
+"rms": -14.4,
+"src": 486234
+},
+{
+"f": "whoosh_3.mp3",
+"rms": -18.4,
+"src": 423799
+}
+],
+"credits": [
+{
+"id": 423799,
+"title": "Little Whoosh 2",
+"user": "ch_ase",
+"lic": "cc0"
+},
+{
+"id": 486234,
+"title": "Whoosh For Whip Zoom",
+"user": "BennettFilmTeacher",
+"lic": "cc0"
+}
+]
+},
+"servo": {
+"files": [
+{
+"f": "servo_1.mp3",
+"rms": -17.9,
+"src": 740247
+}
+],
+"credits": [
+{
+"id": 740247,
+"title": "Servo 9",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"claw_release": {
+"files": [
+{
+"f": "claw_release_1.mp3",
+"rms": -18.1,
+"src": 131302
+},
+{
+"f": "claw_release_2.mp3",
+"rms": -21.6,
+"src": 131302
+},
+{
+"f": "claw_release_3.mp3",
+"rms": -18.4,
+"src": 234782
+}
+],
+"credits": [
+{
+"id": 131302,
+"title": "release_air_pffft.wav",
+"user": "reg7783",
+"lic": "cc0"
+},
+{
+"id": 234782,
+"title": "Steam/hiss",
+"user": "wubitog",
+"lic": "cc0"
+}
+]
+},
+"claw_clack": {
+"files": [
+{
+"f": "claw_clack_1.mp3",
+"rms": -20.0,
+"src": 278205
+},
+{
+"f": "claw_clack_2.mp3",
+"rms": -20.3,
+"src": 815493
+},
+{
+"f": "claw_clack_3.mp3",
+"rms": -23.8,
+"src": 448393
+}
+],
+"credits": [
+{
+"id": 278205,
+"title": "Switch Flip #1",
+"user": "IanStarGem",
+"lic": "cc0"
+},
+{
+"id": 448393,
+"title": "Satisfying Plastic Handle Unlock",
+"user": "LordForklift",
+"lic": "cc0"
+},
+{
+"id": 815493,
+"title": "Mechanical switch (latch) 02",
+"user": "xkeril",
+"lic": "cc0"
+}
+]
+},
+"bike_bell": {
+"files": [
+{
+"f": "bike_bell_1.mp3",
+"rms": -18.4,
+"src": 383631
+},
+{
+"f": "bike_bell_2.mp3",
+"rms": -19.9,
+"src": 156064
+}
+],
+"credits": [
+{
+"id": 156064,
+"title": "bicycle bell.wav",
+"user": "marcolo91",
+"lic": "cc0"
+},
+{
+"id": 383631,
+"title": "bicycle-bell_19.wav",
+"user": "newagesoup",
+"lic": "cc0"
+}
+]
+},
+"zipper": {
+"files": [
+{
+"f": "zipper_1.mp3",
+"rms": -28.6,
+"src": 388480
+},
+{
+"f": "zipper_2.mp3",
+"rms": -17.3,
+"src": 51176
+}
+],
+"credits": [
+{
+"id": 51176,
+"title": "Zipper Unzip 3 (Slow) .wav",
+"user": "RutgerMuller",
+"lic": "cc0"
+},
+{
+"id": 388480,
+"title": "Metalic Zipper Hit.wav",
+"user": "bbrocer",
+"lic": "cc0"
+}
+]
+},
+"bag_catch": {
+"files": [
+{
+"f": "bag_catch_1.mp3",
+"rms": -22.8,
+"src": 399242
+},
+{
+"f": "bag_catch_2.mp3",
+"rms": -21.7,
+"src": 399243
+},
+{
+"f": "bag_catch_3.mp3",
+"rms": -21.7,
+"src": 584442
+}
+],
+"credits": [
+{
+"id": 399242,
+"title": "hit - dropping a bag of croutons from a few inches above the kitchen counter 02.wav",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 399243,
+"title": "hit - dropping a bag of croutons from a few inches above the kitchen counter 01.wav",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 584442,
+"title": "Bag Drop Soft Surface 1",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"scanner_beep": {
+"files": [
+{
+"f": "scanner_beep_1.mp3",
+"rms": -13.6,
+"src": 144418
+},
+{
+"f": "scanner_beep_2.mp3",
+"rms": -12.6,
+"src": 202530
+}
+],
+"credits": [
+{
+"id": 144418,
+"title": "Store Scanner Beep",
+"user": "",
+"lic": "cc0"
+},
+{
+"id": 202530,
+"title": "scanner beep.wav",
+"user": "",
+"lic": "cc0"
+}
+]
+},
+"forklift": {
+"files": [
+{
+"f": "forklift_1.mp3",
+"rms": -13.9,
+"src": 197166
+}
+],
+"credits": [
+{
+"id": 197166,
+"title": "Truck Reverse Beeper.wav",
+"user": "Disasteradio",
+"lic": "cc0"
+}
+]
+},
+"ui_click": {
+"files": [
+{
+"f": "ui_click_1.mp3",
+"rms": -9.2,
+"src": 253168
+},
+{
+"f": "ui_click_2.mp3",
+"rms": -11.5,
+"src": 546974
+},
+{
+"f": "ui_click_3.mp3",
+"rms": -15.7,
+"src": 467951
+}
+],
+"credits": [
+{
+"id": 253168,
+"title": "SFX UI Button Click",
+"user": "suntemple",
+"lic": "cc0"
+},
+{
+"id": 467951,
+"title": "UI Button Click",
+"user": "benzix2",
+"lic": "cc0"
+},
+{
+"id": 546974,
+"title": "UI_Click.wav",
+"user": "finix473",
+"lic": "cc0"
+}
+]
+},
+"ui_toggle": {
+"files": [
+{
+"f": "ui_toggle_1.mp3",
+"rms": -16.3,
+"src": 584729
+},
+{
+"f": "ui_toggle_2.mp3",
+"rms": -27.5,
+"src": 457410
+}
+],
+"credits": [
+{
+"id": 457410,
+"title": "SWITCH.wav",
+"user": "EricsSoundschmiede",
+"lic": "cc0"
+},
+{
+"id": 584729,
+"title": "switch kick click wav",
+"user": "Ambiabstract",
+"lic": "cc0"
+}
+]
+},
+"stamp": {
+"files": [
+{
+"f": "stamp_1.mp3",
+"rms": -17.3,
+"src": 470710
+},
+{
+"f": "stamp_2.mp3",
+"rms": -20.9,
+"src": 362624
+}
+],
+"credits": [
+{
+"id": 362624,
+"title": "Stamp",
+"user": "kermite607",
+"lic": "cc0"
+},
+{
+"id": 470710,
+"title": "traditional stamp.wav",
+"user": "I.fekry",
+"lic": "cc0"
+}
+]
+},
+"cash": {
+"files": [
+{
+"f": "cash_1.mp3",
+"rms": -23.5,
+"src": 209578
+}
+],
+"credits": [
+{
+"id": 209578,
+"title": "Cash Register Purchase",
+"user": "Zott820",
+"lic": "cc0"
+}
+]
+},
+"alarm": {
+"files": [
+{
+"f": "alarm_1.mp3",
+"rms": -12.5,
+"src": 467882
+},
+{
+"f": "alarm_2.mp3",
+"rms": -5.9,
+"src": 670297
+}
+],
+"credits": [
+{
+"id": 467882,
+"title": "Beep warning",
+"user": "SamsterBirdies",
+"lic": "cc0"
+},
+{
+"id": 670297,
+"title": "Airplane, Seatbelt Sign Beep",
+"user": "Kinoton",
+"lic": "cc0"
+}
+]
+},
+"slide_loop": {
+"files": [
+{
+"f": "slide_loop_1.mp3",
+"rms": -24.4,
+"loop": 1.6,
+"src": 344432
+}
+],
+"credits": [
+{
+"id": 344432,
+"title": "Cardboard Box Slides and Rustling",
+"user": "GrayJoy",
+"lic": "cc0"
+}
+]
+},
+"roll_loop": {
+"files": [
+{
+"f": "roll_loop_1.mp3",
+"rms": -26.4,
+"loop": 2.4,
+"src": 407178
+}
+],
+"credits": [
+{
+"id": 407178,
+"title": "Hollow ball rolling.WAV",
+"user": "Spyboticer",
+"lic": "cc0"
+}
+]
+},
+"printer_loop": {
+"files": [
+{
+"f": "printer_loop_1.mp3",
+"rms": -19.5,
+"loop": 1.2,
+"src": 345057
+}
+],
+"credits": [
+{
+"id": 345057,
+"title": "epson receipt printer7",
+"user": "azumarill",
+"lic": "cc0"
+}
+]
+},
+"voice_syl": {
+"files": [
+{
+"f": "voice_syl_1.mp3",
+"rms": -11.1,
+"src": 389642,
+"dur": 0.23
+},
+{
+"f": "voice_syl_2.mp3",
+"rms": -11.0,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_3.mp3",
+"rms": -11.6,
+"src": 389642,
+"dur": 0.37
+},
+{
+"f": "voice_syl_4.mp3",
+"rms": -9.2,
+"src": 389642,
+"dur": 0.38
+},
+{
+"f": "voice_syl_5.mp3",
+"rms": -13.7,
+"src": 389642,
+"dur": 0.37
+},
+{
+"f": "voice_syl_6.mp3",
+"rms": -12.2,
+"src": 389642,
+"dur": 0.19
+},
+{
+"f": "voice_syl_7.mp3",
+"rms": -10.5,
+"src": 389642,
+"dur": 0.17
+},
+{
+"f": "voice_syl_8.mp3",
+"rms": -14.0,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_9.mp3",
+"rms": -13.4,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_10.mp3",
+"rms": -16.1,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_11.mp3",
+"rms": -8.6,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_12.mp3",
+"rms": -13.6,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_13.mp3",
+"rms": -19.1,
+"src": 389642,
+"dur": 0.42
+},
+{
+"f": "voice_syl_14.mp3",
+"rms": -14.8,
+"src": 389642,
+"dur": 0.41
+},
+{
+"f": "voice_syl_15.mp3",
+"rms": -12.0,
+"src": 389644,
+"dur": 0.42
+},
+{
+"f": "voice_syl_16.mp3",
+"rms": -13.8,
+"src": 389644,
+"dur": 0.42
+},
+{
+"f": "voice_syl_17.mp3",
+"rms": -12.8,
+"src": 389644,
+"dur": 0.21
+}
+],
+"credits": [
+{
+"id": 389642,
+"title": "Human_Male_Crazy Mumbles_1.wav",
+"user": "SilentStrikeZ",
+"lic": "cc0"
+},
+{
+"id": 389644,
+"title": "Human_Male_Mumble_Short_1.wav",
+"user": "SilentStrikeZ",
+"lic": "cc0"
+}
+]
+},
+"voice_emote": {
+"files": [
+{
+"f": "voice_emote_1.mp3",
+"rms": -12.8,
+"src": 790337,
+"dur": 1.2
+},
+{
+"f": "voice_emote_2.mp3",
+"rms": -16.0,
+"src": 790337,
+"dur": 1.2
+},
+{
+"f": "voice_emote_3.mp3",
+"rms": -16.6,
+"src": 790337,
+"dur": 0.76
+},
+{
+"f": "voice_emote_4.mp3",
+"rms": -13.5,
+"src": 790337,
+"dur": 1.2
+},
+{
+"f": "voice_emote_5.mp3",
+"rms": -12.6,
+"src": 790337,
+"dur": 0.82
+},
+{
+"f": "voice_emote_6.mp3",
+"rms": -19.2,
+"src": 790337,
+"dur": 1.2
+},
+{
+"f": "voice_emote_7.mp3",
+"rms": -14.2,
+"src": 712113,
+"dur": 0.35
+},
+{
+"f": "voice_emote_8.mp3",
+"rms": -15.3,
+"src": 712113,
+"dur": 0.36
+},
+{
+"f": "voice_emote_9.mp3",
+"rms": -13.6,
+"src": 712113,
+"dur": 0.36
+},
+{
+"f": "voice_emote_10.mp3",
+"rms": -14.5,
+"src": 712113,
+"dur": 0.41
+},
+{
+"f": "voice_emote_11.mp3",
+"rms": -17.6,
+"src": 712113,
+"dur": 0.52
+},
+{
+"f": "voice_emote_12.mp3",
+"rms": -16.1,
+"src": 712113,
+"dur": 0.36
+}
+],
+"credits": [
+{
+"id": 790337,
+"title": "Oooh Aaah Errr  - Male Vocal Utterances - Playful Comedic asides",
+"user": "GreasyPlastic",
+"lic": "cc0"
+},
+{
+"id": 712113,
+"title": "Cartoon-like male emotions vocal sfx",
+"user": "A_kn",
+"lic": "cc0"
+}
+]
+},
+"voice_hup": {
+"files": [
+{
+"f": "voice_hup_1.mp3",
+"rms": -14.0,
+"src": 712116,
+"dur": 0.27
+},
+{
+"f": "voice_hup_2.mp3",
+"rms": -14.4,
+"src": 712116,
+"dur": 0.31
+},
+{
+"f": "voice_hup_3.mp3",
+"rms": -15.2,
+"src": 712116,
+"dur": 0.28
+},
+{
+"f": "voice_hup_4.mp3",
+"rms": -14.4,
+"src": 712116,
+"dur": 0.38
+},
+{
+"f": "voice_hup_5.mp3",
+"rms": -16.7,
+"src": 712116,
+"dur": 0.26
+},
+{
+"f": "voice_hup_6.mp3",
+"rms": -12.9,
+"src": 712116,
+"dur": 0.54
+}
+],
+"credits": [
+{
+"id": 712116,
+"title": "Cartoon-like male attack effort vocal sfx",
+"user": "A_kn",
+"lic": "cc0"
+}
+]
+},
+"voice_yes": {
+"files": [
+{
+"f": "voice_yes_1.mp3",
+"rms": -15.4,
+"src": 712213,
+"dur": 0.63
+},
+{
+"f": "voice_yes_2.mp3",
+"rms": -15.1,
+"src": 712213,
+"dur": 0.42
+},
+{
+"f": "voice_yes_3.mp3",
+"rms": -18.9,
+"src": 712213,
+"dur": 0.38
+},
+{
+"f": "voice_yes_4.mp3",
+"rms": -16.0,
+"src": 712213,
+"dur": 0.88
+}
+],
+"credits": [
+{
+"id": 712213,
+"title": "Cartoon-like male laugh success or satisfy vocal sfx",
+"user": "A_kn",
+"lic": "cc0"
+}
+]
+},
+"voice_fall": {
+"files": [
+{
+"f": "voice_fall_1.mp3",
+"rms": -10.1,
+"src": 353086,
+"dur": 0.63
+},
+{
+"f": "voice_fall_2.mp3",
+"rms": -13.5,
+"src": 353086,
+"dur": 1.46
+}
+],
+"credits": [
+{
+"id": 353086,
+"title": "Weirdo Scream.wav",
+"user": "GreatNate98",
+"lic": "cc0"
+}
+]
+},
+"drumroll_loop": {
+"files": [
+{
+"f": "drumroll_loop_1.mp3",
+"rms": -18.8,
+"src": 52760,
+"loop": 4.0
+}
+],
+"credits": [
+{
+"id": 52760,
+"title": "drumroll_for_ceremony_long.mp3",
+"user": "Heigh-hoo",
+"lic": "cc0"
+}
+]
+},
+"drum_hit": {
+"files": [
+{
+"f": "drum_hit_1.mp3",
+"rms": -27.7,
+"src": 424927
+}
+],
+"credits": [
+{
+"id": 424927,
+"title": "Drum Roll, Please!",
+"user": "HoBoTrails",
+"lic": "cc0"
+}
+]
+},
+"applause": {
+"files": [
+{
+"f": "applause_1.mp3",
+"rms": -16.9,
+"src": 221568
+},
+{
+"f": "applause_2.mp3",
+"rms": -27.7,
+"src": 139973
+}
+],
+"credits": [
+{
+"id": 221568,
+"title": "cheering and clapping crowd 1",
+"user": "AlaskaRobotics",
+"lic": "cc0"
+},
+{
+"id": 139973,
+"title": "Crowd.Yay.Applause.25ppl.Long.wav",
+"user": "jessepash",
+"lic": "cc0"
+}
+]
+},
+"crowd_aww": {
+"files": [
+{
+"f": "crowd_aww_1.mp3",
+"rms": -17.3,
+"src": 124996
+}
+],
+"credits": [
+{
+"id": 124996,
+"title": "aww.wav",
+"user": "phmiller42",
+"lic": "cc0"
+}
+]
+},
+"roller_door": {
+"files": [
+{
+"f": "roller_door_1.mp3",
+"rms": -24.6,
+"src": 202666
+}
+],
+"credits": [
+{
+"id": 202666,
+"title": "Automatic Garage Roller Door Opening.wav",
+"user": "freesoundjon01",
+"lic": "cc0"
+}
+]
+},
+"cat_meow": {
+"files": [
+{
+"f": "cat_meow_1.mp3",
+"rms": -15.0,
+"src": 110011
+},
+{
+"f": "cat_meow_2.mp3",
+"rms": -28.6,
+"src": 412017
+}
+],
+"credits": [
+{
+"id": 110011,
+"title": "cat meow",
+"user": "tuberatanka",
+"lic": "cc0"
+},
+{
+"id": 412017,
+"title": "cat meow short",
+"user": "skymary",
+"lic": "cc0"
+}
+]
+}
+}

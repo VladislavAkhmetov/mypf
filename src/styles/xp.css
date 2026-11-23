@@ -174,7 +174,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 98px;
+  width: 102px;
   padding: 6px 4px;
   cursor: inherit;
   border-radius: 2px;
@@ -203,7 +203,7 @@
 .xp-desktop-icon-label {
   margin-top: 4px;
   font-family: var(--font-tahoma, "Tahoma", "Segoe UI", sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.25;
   color: #ffffff;
@@ -211,7 +211,7 @@
   white-space: normal;
   word-break: normal;
   overflow-wrap: normal;
-  max-width: 94px;
+  max-width: 98px;
   text-shadow: 1px 1px 2px #000, 0 0 4px #000, 1px 0 1px #000, 0 1px 1px #000;
   padding: 2px 4px;
   border-radius: 2px;
@@ -1107,19 +1107,42 @@ button.xp-btn-ctrl:focus-visible {
 
 /* Clean document printing */
 @media print {
-  body {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 14mm;
+  }
+  html, body {
     background: #ffffff !important;
     overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
   }
-  .xp-desktop,
+  .xp-desktop {
+    background: #ffffff !important;
+    background-image: none !important;
+    overflow: visible !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .xp-desktop > div[style*="background"],
+  .xp-desktop-icon,
   .xp-taskbar,
   .xp-start-menu,
   .xp-balloon,
   .xp-marquee,
-  .xp-context-menu {
+  .xp-context-menu,
+  .xp-clippy,
+  .xp-language-bar,
+  #notes-widget,
+  aside,
+  [class*="floating-language-bar"],
+  [class*="mobile-taskbar"],
+  [class*="notes-widget"],
+  .xp-window:not(#window-resume) {
     display: none !important;
   }
-  .xp-window {
+  #window-resume {
     position: static !important;
     transform: none !important;
     width: 100% !important;
@@ -1127,12 +1150,52 @@ button.xp-btn-ctrl:focus-visible {
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
-  .xp-titlebar,
-  .xp-statusbar,
-  .xp-window-controls,
-  .xp-menu-bar {
+  #window-resume,
+  #window-resume * {
+    box-sizing: border-box !important;
+  }
+  #window-resume .xp-window-body,
+  #window-resume [class*="min-h-0"] {
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #window-resume div[class*="bg-[#525659]"] {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  #window-resume .xp-titlebar,
+  #window-resume .xp-statusbar,
+  #window-resume .xp-window-controls,
+  #window-resume .xp-menu-bar,
+  #window-resume .xp-resize-handle {
     display: none !important;
+  }
+  #resume-document {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: #ffffff !important;
+    display: block !important;
   }
 }
 

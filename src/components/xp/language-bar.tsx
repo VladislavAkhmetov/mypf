@@ -5,7 +5,7 @@ import { useLocale, type Locale } from "@/lib/i18n";
 import { xpSound } from "@/lib/xp/sound";
 import { xpCursors } from "@/lib/xp/cursors";
 
-const NOTICE_KEY = "amazi-locale-notice";
+const NOTICE_KEY = "xp-locale-notice";
 
 const languages: Array<{ code: Locale; name: string }> = [
   { code: "ru", name: "Русский" },
@@ -160,6 +160,21 @@ export function LanguageBar() {
               <span lang={item.code}>{item.name}</span>
             </button>
           ))}
+          <div style={{ height: "1px", background: "#d8d4c2", margin: "3px 0" }} />
+          <button
+            type="button"
+            onClick={() => {
+              xpSound.restore();
+              window.dispatchEvent(new CustomEvent("xp-restore-lang-bar"));
+              setOpen(false);
+            }}
+            className="xp-lang-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <span className="xp-lang-check" aria-hidden="true" />
+            <span className="xp-lang-tile" style={{ background: "transparent", border: "none" }} aria-hidden="true">📌</span>
+            <span>{locale === "ru" ? "Языковая панель наверх" : "Restore Floating Bar"}</span>
+          </button>
           <div className="xp-lang-hint" aria-hidden="true">Alt+Shift</div>
         </div>
       )}

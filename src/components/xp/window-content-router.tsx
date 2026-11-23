@@ -10,10 +10,10 @@ import { StoriesViewerWindow } from "./apps/stories-viewer-window";
 import { CmdWindow } from "./apps/cmd-window";
 import { DisplayPropertiesDialog } from "./apps/display-properties-dialog";
 import { PropertiesDialog } from "./apps/properties-dialog";
-import { ResumeWindow } from "./apps/resume-window";
 import dynamic from "next/dynamic";
 import { ToolsWindow } from "./apps/tools-window";
 import { WordWindow } from "./apps/word-window";
+import { ResumeWindow } from "./apps/resume-window";
 import { MobileGameWindow } from "./apps/mobile-game/mobile-game-window";
 import { PaintWindow } from "./apps/paint-window";
 import { HelpCenterWindow } from "./apps/help/help-center-window";
@@ -70,6 +70,8 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
       return <ToolsWindow />;
     case "word":
       return <WordWindow />;
+    case "resume":
+      return <ResumeWindow />;
     case "minesweeper":
       return <MinesweeperWindow />;
     case "paint":
@@ -96,9 +98,8 @@ export function WindowContentRouter({ window: win }: { window: WindowItem }) {
       return <KroomiWindow />;
     case "baltika":
     case "designer-game":
+    case "hyper-packer":
       return <MobileGameWindow gameId={win.type} />;
-    case "resume":
-      return <ResumeWindow />;
     case "help":
       return <HelpCenterWindow initialTopicId={win.props?.topicId as string | undefined} />;
     default:

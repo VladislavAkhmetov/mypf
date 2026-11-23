@@ -2,34 +2,24 @@ import { test, expect } from "@playwright/test";
 
 test.use({ timezoneId: "Europe/Moscow", viewport: { width: 1440, height: 1050 } });
 
-test("Bliss follows the local clock, migrates geo and falls back for missing images", async ({ page }) => {
+test("Bliss is static by default and does not change with clock", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-09-22T12:00:00+03:00"));
-  await page.addInitScript(() => {
-    localStorage.setItem("amazi-xp-wallpaper-source", "geo");
-    localStorage.setItem("amazi-xp-wallpaper", "/images/wallpapers/autumn.svg");
-  });
-  let geoCalls = 0;
-  page.on("request", request => { if (request.url().includes("/api/geo")) geoCalls++; });
-  await page.route("**/images/wallpapers/bliss-*.jpg", route => route.fulfill({ path: "public/images/bliss.jpg", contentType: "image/jpeg" }));
   await page.goto("/?view=portfolio");
   const background = page.locator("[data-desktop-wallpaper]");
   await expect(background).toHaveAttribute("data-desktop-wallpaper", "/images/bliss.jpg");
-  for (const [hour, period] of [[18, "evening"], [22, "night"], [6, "morning"], [11, "day"]] as const) {
+
+  // Verify that clock and focus changes do not alter the static Bliss wallpaper
+  for (const hour of [18, 22, 6, 11, 23]) {
     await page.clock.setFixedTime(new Date(`2026-09-22T${String(hour).padStart(2, "0")}:00:00+03:00`));
     await page.evaluate(() => window.dispatchEvent(new Event("focus")));
-    await expect(background).toHaveAttribute("data-desktop-wallpaper", period === "day" ? "/images/bliss.jpg" : `/images/wallpapers/bliss-${period}.jpg`);
+    await expect(background).toHaveAttribute("data-desktop-wallpaper", "/images/bliss.jpg");
   }
-  await page.route("**/images/wallpapers/bliss-night.jpg", route => route.fulfill({ status: 404, body: "" }));
-  await page.clock.setFixedTime(new Date("2026-09-22T23:00:00+03:00"));
-  await page.reload();
-  await expect(background).toHaveAttribute("data-desktop-wallpaper", "/images/bliss.jpg");
-  expect(geoCalls).toBe(0);
 });
 
 test("manual wallpaper survives loading and clock changes", async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem("amazi-xp-wallpaper-source", "user");
-    localStorage.setItem("amazi-xp-wallpaper", "/images/wallpapers/autumn.svg");
+    localStorage.setItem("xp-wallpaper-source", "user");
+    localStorage.setItem("xp-wallpaper", "/images/wallpapers/autumn.svg");
   });
   await page.goto("/?view=portfolio");
   const background = page.locator("[data-desktop-wallpaper]");
@@ -39,23 +29,16 @@ test("manual wallpaper survives loading and clock changes", async ({ page }) => 
   await expect(background).toHaveAttribute("data-desktop-wallpaper", "/images/wallpapers/autumn.svg");
 });
 
-test("display settings can restore time mode without theme Apply making it manual", async ({ page }) => {
-  await page.clock.setFixedTime(new Date("2026-09-22T12:00:00+03:00"));
-  await page.addInitScript(() => {
-    localStorage.setItem("amazi-xp-wallpaper-source", "user");
-    localStorage.setItem("amazi-xp-wallpaper", "/images/wallpapers/autumn.svg");
-  });
+test("display settings can select wallpaper and apply", async ({ page }) => {
   await page.goto("/?view=portfolio");
   await page.locator(".xp-desktop").click({ button: "right", position: { x: 1400, y: 500 } });
   await page.getByText("Свойства", { exact: true }).click();
   const settings = page.locator("#window-display-properties");
-  await settings.getByRole("button", { name: "Фоновый рисунок (Wallpapers)" }).click();
-  await settings.getByRole("button", { name: "По времени суток" }).click();
+  await settings.getByRole("button", { name: "Фон рабочего стола" }).click();
+  await settings.getByText("Autumn (Золотая осень)").click();
   await settings.getByRole("button", { name: "Применить", exact: true }).click();
-  await expect(page.locator("[data-desktop-wallpaper]")).toHaveAttribute("data-desktop-wallpaper", "/images/bliss.jpg");
-  await settings.getByRole("button", { name: "Темы оформления (Themes)" }).click();
-  await settings.getByRole("button", { name: "Применить", exact: true }).click();
-  expect(await page.evaluate(() => localStorage.getItem("amazi-xp-wallpaper-source"))).toBe("time");
+  await expect(page.locator("[data-desktop-wallpaper]")).toHaveAttribute("data-desktop-wallpaper", "/images/wallpapers/autumn.svg");
+  expect(await page.evaluate(() => localStorage.getItem("xp-wallpaper-source"))).toBe("user");
 });
 
 test("career timeline: no controls, page scroll drives the rail on narrow screens, reduced motion", async ({ page }, testInfo) => {

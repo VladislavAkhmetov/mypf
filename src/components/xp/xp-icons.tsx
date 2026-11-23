@@ -329,3 +329,15 @@ export function HelpCenterIcon({ className = "w-8 h-8" }: { className?: string }
     />
   );
 }
+
+
+export function HyperPackerIcon({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <img
+      src="/icons/xp/hyper-packer.svg"
+      alt=""
+      className={`${className} object-contain select-none pointer-events-none`}
+      draggable={false}
+    />
+  );
+}

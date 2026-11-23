@@ -1,0 +1,148 @@
+{
+  "name": {
+    "ru": "Влад Ахметов",
+    "en": "Vlad Akhmetov"
+  },
+  "role": {
+    "ru": "Коммуникационный и веб-дизайнер · AI Prototyper",
+    "en": "Communication & Web Designer · AI Prototyper"
+  },
+  "location": {
+    "ru": "Уфа · удалённо",
+    "en": "Ufa · Remote"
+  },
+  "contacts": {
+    "telegram": {
+      "label": "Telegram",
+      "url": "https://t.me/vladakhmetov",
+      "handle": "@vladakhmetov"
+    },
+    "email": {
+      "label": "Email",
+      "url": "mailto:mail@vladakhmetov.com",
+      "address": "mail@vladakhmetov.com"
+    },
+    "portfolio": {
+      "label": "Портфолио",
+      "url": "https://vladakhmetov.com",
+      "display": "vladakhmetov.com"
+    }
+  },
+  "summary": {
+    "ru": "Проектирую веб-интерфейсы, рекламные спецпроекты и интерактивные системы. Опираюсь на базу в коммуникационном и графическом дизайне: типографику, визуальный язык, композицию и внимание к смыслу. Довожу идеи до живых работающих прототипов: модель, дизайн и форма в одном контуре.",
+    "en": "I design web interfaces, interactive advertising special projects, and digital products. Grounded in strong communication design craft: typography, visual hierarchy, composition, and clear meaning. I quickly turn ideas into live working prototypes with AI agents and code: model, form, and code in one loop."
+  },
+  "experience": [
+    {
+      "period": {
+        "ru": "2023 — настоящее время",
+        "en": "2023 — present"
+      },
+      "company": {
+        "ru": "Студия «Цех»",
+        "en": "Tsekh Studio"
+      },
+      "role": {
+        "ru": "Коммуникационный дизайнер, AI Prototyper",
+        "en": "Communication Designer, AI Prototyper"
+      },
+      "bullets": [
+        {
+          "ru": "Разработка креативных коммуникаций, веб-интерфейсов и промо-страниц для клиентов студии.",
+          "en": "Creative communications, web interfaces, and promotional pages for studio clients."
+        },
+        {
+          "ru": "Быстрое прототипирование сложных интерфейсов и интерактивных механик в связке с ИИ-агентами.",
+          "en": "Rapid prototyping of complex interfaces and interactive mechanics alongside AI agents."
+        }
+      ]
+    },
+    {
+      "period": {
+        "ru": "2022 — 2023",
+        "en": "2022 — 2023"
+      },
+      "company": {
+        "ru": "Hygear Fit",
+        "en": "Hygear Fit"
+      },
+      "role": {
+        "ru": "Коммуникационный и веб-дизайнер",
+        "en": "Communication & Web Designer"
+      },
+      "bullets": [
+        {
+          "ru": "Проектирование продуктового сайта, посадочных страниц и рекламных материалов для глобального запуска линейки умных фитнес-тренажёров.",
+          "en": "Product website design, landing pages, and launch collateral for the global release of smart fitness gear."
+        },
+        {
+          "ru": "Создание рекламных кампаний, промо-страниц и графических материалов для международного performance-маркетинга.",
+          "en": "High-converting ad campaigns, interactive promotional pages, and marketing visual assets for global audiences."
+        }
+      ]
+    },
+    {
+      "period": {
+        "ru": "2020 — 2022",
+        "en": "2020 — 2022"
+      },
+      "company": {
+        "ru": "«Очкарик» (федеральная сеть)",
+        "en": "Ochkarik (Federal Optical Chain)"
+      },
+      "role": {
+        "ru": "Коммуникационный дизайнер",
+        "en": "Communication Designer"
+      },
+      "bullets": [
+        {
+          "ru": "Федеральные рекламные кампании: digital дизайн, медийные форматы и видеоматериалы.",
+          "en": "Nationwide ad campaigns: special project landing pages, digital banners, rich media formats, and motion assets."
+        },
+        {
+          "ru": "Арт-дирекшн и оформление розничных салонов, поддержка целостного визуального стиля в цифровых и офлайн-каналах.",
+          "en": "Art direction and visual design across retail salons, maintaining consistent branding across digital and physical touchpoints."
+        }
+      ]
+    },
+    {
+      "period": {
+        "ru": "2011 — 2019",
+        "en": "2011 — 2019"
+      },
+      "company": {
+        "ru": "Маркетинг и независимые проекты",
+        "en": "Marketing & Independent Practice"
+      },
+      "role": {
+        "ru": "Графический и веб-дизайнер",
+        "en": "Graphic & Web Designer"
+      },
+      "bullets": [
+        {
+          "ru": "Комплексные рекламные кампании, айдентика брендов, многостраничные корпоративные сайты и промо-лендинги.",
+          "en": "Comprehensive advertising campaigns, brand identity systems, corporate websites, and high-impact landing pages."
+        },
+        {
+          "ru": "Полиграфия высокой сложности, упаковка, глубокий контроль допечатной подготовки (prepress) и типографика.",
+          "en": "Complex print production, packaging, rigorous prepress quality control, and advanced typography."
+        }
+      ]
+    }
+  ],
+  "projects": [],
+  "skills": {
+    "specialization": {
+      "ru": "Веб-дизайн, рекламные спецпроекты, промо-лендинги, сетки и типографика, арт-дирекшн, сторителлинг, айдентика, интерактивный дизайн.",
+      "en": "Web design, promotional special projects, landing pages, grids & typography, art direction, visual storytelling, brand identity, interactive design."
+    },
+    "tools": {
+      "ru": "Figma, Photoshop, Illustrator, After Effects.",
+      "en": "Figma, Photoshop, Illustrator, After Effects."
+    },
+    "ai": {
+      "ru": "Быстрое прототипирование интерфейсов с ИИ-агентами, статика и моушен, автоматизация дизайн-процессов.",
+      "en": "Rapid UI prototyping with AI agents, static & motion, automated design workflows."
+    }
+  }
+}

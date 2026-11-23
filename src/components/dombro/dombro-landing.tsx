@@ -11,7 +11,7 @@ import { ContinuePlate, DockPlate, plateFont, ReadingPlate, TasksPlate, TopbarPl
 import { Story } from "./story";
 
 // Large high-contrast serif for display type; has Cyrillic.
-const serif = Cormorant({ subsets: ["latin", "cyrillic"], weight: ["400", "500", "600"], style: ["normal", "italic"], display: "swap", variable: "--font-dombro-serif" });
+const serif = Cormorant({ subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-dombro-serif" });
 
 const img = (name: string) => `/images/dombro/${name}.webp`;
 

@@ -14,9 +14,9 @@ import {
 } from "@/lib/xp/minesweeper-game";
 
 // Storage Keys
-const SOLITAIRE_STORAGE_KEY = "amazi.games.solitaire.v1";
-const MINESWEEPER_STORAGE_KEY = "amazi.games.minesweeper.v1";
-const PREFERENCES_STORAGE_KEY = "amazi.games.preferences.v1";
+const SOLITAIRE_STORAGE_KEY = "xp.games.solitaire.v1";
+const MINESWEEPER_STORAGE_KEY = "xp.games.minesweeper.v1";
+const PREFERENCES_STORAGE_KEY = "xp.games.preferences.v1";
 
 // --- Preferences ---
 export interface GamePreferences {

@@ -1,7 +1,50 @@
-.clip { position: relative; overflow: hidden; border-radius: 20px; background: #0a0b0d; box-shadow: 0 34px 60px -40px rgba(20, 40, 30, .6); }
+.clip { position: relative; overflow: hidden; border-radius: 20px; background: #0a0b0d; }
+.withShadow { box-shadow: none; }
 .clip video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.toggle { position: absolute; right: 14px; bottom: 14px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%; background: rgba(10, 11, 13, .62); color: #fff; backdrop-filter: blur(10px); transition: opacity .2s, background .2s; }
-.toggle svg { width: 18px; height: 18px; fill: currentColor; }
-.toggle:hover { background: rgba(10, 11, 13, .85); }
+.controls { position: absolute; right: 14px; bottom: 14px; display: flex; gap: 8px; align-items: center; z-index: 2; transition: opacity .2s; }
+
+/* Phone mockup clip: cleanly cropped to the iPhone frame, zero black background rectangle */
+.phoneClipFrame {
+  position: relative;
+  width: min(100%, 340px);
+  max-width: 340px;
+  margin: 0 auto;
+  aspect-ratio: 642 / 1368;
+  border-radius: clamp(34px, 4.6cqw, 50px);
+  overflow: hidden;
+  background: transparent !important;
+}
+.phoneClipFrame video {
+  position: absolute;
+  top: calc(-100% * 33 / 1368);
+  left: calc(-100% * 219 / 642);
+  width: calc(100% * 1080 / 642);
+  height: calc(100% * 1440 / 1368);
+  max-width: none;
+  max-height: none;
+  display: block;
+  object-fit: fill;
+  cursor: var(--xp-cursor-pointer, pointer);
+}
+.phoneClipFrame .controls {
+  right: 14px;
+  bottom: 22px;
+}
+.phoneClipFrame .toggle {
+  width: 38px;
+  height: 38px;
+}
+.soundToggle { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px 0 12px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 20px; background: rgba(10, 11, 13, .72); color: #fff; font-size: 13px; font-weight: 500; line-height: 1; font-family: inherit; backdrop-filter: blur(10px); transition: background .2s, transform .15s, border-color .2s; cursor: var(--xp-cursor-pointer, pointer); user-select: none; }
+.soundToggle svg { width: 17px; height: 17px; flex: none; }
+.soundToggle:hover { background: rgba(10, 11, 13, .9); border-color: rgba(255, 255, 255, .35); transform: scale(1.03); }
+.soundToggle:focus-visible { outline: 2px solid #c8ee94; outline-offset: 3px; }
+.soundToggle[data-active="true"] { background: rgba(163, 91, 255, .85); border-color: rgba(255, 255, 255, .4); }
+.soundToggle[data-active="true"]:hover { background: rgba(163, 91, 255, .95); }
+.toggle { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid rgba(255, 255, 255, .22); border-radius: 50%; background: rgba(10, 11, 13, .72); color: #fff; backdrop-filter: blur(10px); transition: background .2s, transform .15s; cursor: var(--xp-cursor-pointer, pointer); }
+.toggle svg { width: 17px; height: 17px; }
+.toggle:hover { background: rgba(10, 11, 13, .9); transform: scale(1.06); }
 .toggle:focus-visible { outline: 2px solid #c8ee94; outline-offset: 3px; }
-@media (hover: hover) { .toggle { opacity: 0; } .clip:hover .toggle, .toggle:focus-visible { opacity: 1; } }
+@media (hover: hover) {
+  .controls { opacity: 0.92; }
+  .clip:hover .controls, .controls:focus-within { opacity: 1; }
+}

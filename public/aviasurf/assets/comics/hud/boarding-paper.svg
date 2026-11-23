@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="200" viewBox="0 0 360 200" preserveAspectRatio="none">
+  <defs>
+    <path id="edge" d="M7 6 24 5 40 7 57 4 75 6 92 5 109 7 128 4 145 6 163 5 181 7 199 4 218 5 237 4 254 6 272 5 289 7 307 4 325 6 351 5 354 19 352 36 355 54 353 71 355 90 353 108 355 127C340 127 340 145 355 145L353 163 355 181 352 194 334 196 315 194 298 197 280 195 263 196 246 193 228 196 209 194 192 197 174 195 155 196 136 194 119 197 100 195 82 197 65 194 47 196 29 194 8 196 5 181 7 162 5 145C20 145 20 127 5 127L7 109 4 91 7 74 5 57 7 39 4 23Z"/>
+    <clipPath id="sheet"><use href="#edge"/></clipPath>
+    <filter id="torn" x="-2%" y="-3%" width="104%" height="106%">
+      <feTurbulence type="fractalNoise" baseFrequency=".22" numOctaves="3" seed="24" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="pulp">
+      <feTurbulence type="fractalNoise" baseFrequency=".04 .055" numOctaves="4" seed="21" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".15"/></feComponentTransfer>
+    </filter>
+    <filter id="fibres">
+      <feTurbulence type="fractalNoise" baseFrequency=".7 .32" numOctaves="3" seed="9" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".17"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <g filter="url(#torn)">
+    <use href="#edge" fill="#fff4dc" stroke="#fffaf0" stroke-width="3"/>
+    <g clip-path="url(#sheet)">
+      <path d="M0 0H360V200H0Z" filter="url(#pulp)"/>
+      <path d="M0 0H360V200H0Z" filter="url(#fibres)"/>
+      <path d="m22 0 4 200" stroke="#b89b63" stroke-opacity=".09" stroke-width="1.5"/>
+      <path d="m25 0 4 200" stroke="#fffdf5" stroke-opacity=".6" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

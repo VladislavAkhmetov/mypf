@@ -7,7 +7,7 @@ import { demo } from "@/data/dombro";
 import s from "./plates.module.css";
 
 // dombro's own display face for plate titles.
-const literata = Literata({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], display: "swap", variable: "--font-dombro-plate" });
+const literata = Literata({ subsets: ["latin", "cyrillic"], display: "swap", variable: "--font-dombro-plate" });
 export const plateFont = literata.variable;
 
 type IconName = "folder" | "dots" | "layers" | "arrow" | "sun" | "calendar" | "plus" | "bulb" | "bookmark" | "list" | "grid" | "pencil" | "timer" | "headphones" | "play" | "pause" | "next" | "chevron" | "chevronRight" | "mic" | "send" | "globe" | "search" | "check";

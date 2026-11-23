@@ -27,7 +27,7 @@ type Ctx = {
 };
 
 const LocaleCtx = createContext<Ctx | null>(null);
-const KEY = "amazi-locale";
+const KEY = "xp-locale";
 
 const isLocale = (value: unknown): value is Locale => value === "ru" || value === "en";
 
@@ -50,28 +50,62 @@ export function resolveLocale(env: { pathname?: string; search: string; saved: s
   const fromUrl = new URLSearchParams(env.search).get("lang");
   if (isLocale(fromUrl)) return { locale: fromUrl, source: "url" };
   if (isLocale(env.saved)) return { locale: env.saved, source: "saved" };
+
   if (env.languages.length) return { locale: detectLocale(env.languages), source: "detected" };
   return { locale: "ru", source: "default" };
 }
 
-function readInitial(): { locale: Locale; source: LocaleSource } {
-  if (typeof window === "undefined") return { locale: "ru", source: "default" };
-  let saved: string | null = null;
-  try {
-    saved = window.localStorage.getItem(KEY);
-  } catch {
-    // Storage can be blocked (private mode, strict settings); fall back to detection.
-  }
-  const languages = navigator.languages?.length ? navigator.languages : [navigator.language].filter(Boolean);
-  return resolveLocale({ pathname: window.location.pathname, search: window.location.search, saved, languages });
-}
-
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState(readInitial);
+export function LocaleProvider({
+  initialLocale = "ru",
+  children,
+}: {
+  initialLocale?: Locale;
+  children: ReactNode;
+}) {
+  const [state, setState] = useState<{ locale: Locale; source: LocaleSource }>(() => ({
+    locale: initialLocale,
+    source: initialLocale === "en" ? "url" : "default",
+  }));
   const { locale, source } = state;
 
+  // On mount, resolve saved preferences or browser languages if client-side state differs from initial.
+  useEffect(() => {
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem(KEY);
+    } catch {
+      // Storage can be blocked (private mode, strict settings); fall back to detection.
+    }
+    const languages = navigator.languages?.length ? navigator.languages : [navigator.language].filter(Boolean);
+    const resolved = resolveLocale({
+      pathname: window.location.pathname,
+      search: window.location.search,
+      saved,
+      languages,
+    });
+    queueMicrotask(() => {
+      setState(prev => (prev.locale !== resolved.locale || prev.source !== resolved.source ? resolved : prev));
+    });
+  }, []);
+
+  // Sync state if user navigates back/forward (popstate) between /en/ and /
+  useEffect(() => {
+    const handlePopState = () => {
+      const fromUrl = new URLSearchParams(window.location.search).get("lang");
+      let targetLocale: Locale;
+      if (isLocale(fromUrl)) {
+        targetLocale = fromUrl;
+      } else {
+        targetLocale = EN_PREFIX.test(window.location.pathname) ? "en" : "ru";
+      }
+      setState(prev => (prev.locale !== targetLocale ? { locale: targetLocale, source: "url" } : prev));
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   const setLocale = useCallback((l: Locale) => {
-    setState({ locale: l, source: "saved" });
+    setState(prev => (prev.locale === l && prev.source === "saved" ? prev : { locale: l, source: "saved" }));
     try {
       window.localStorage.setItem(KEY, l);
     } catch {
@@ -79,7 +113,17 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const toggleLocale = useCallback(() => setLocale(locale === "ru" ? "en" : "ru"), [locale, setLocale]);
+  const toggleLocale = useCallback(() => {
+    setState(prev => {
+      const next: Locale = prev.locale === "ru" ? "en" : "ru";
+      try {
+        window.localStorage.setItem(KEY, next);
+      } catch {
+        /* ignore */
+      }
+      return { locale: next, source: "saved" };
+    });
+  }, []);
 
   // Keep <html lang> and the address in step with the interface: English at /en/, Russian at /.
   // The old ?lang= alias is folded into the path. replaceState keeps the open windows and history intact.
@@ -114,15 +158,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     const up = (event: KeyboardEvent) => {
       if (armed && (event.key === "Alt" || event.key === "Shift")) {
         armed = false;
-        setState(prev => {
-          const next: Locale = prev.locale === "ru" ? "en" : "ru";
-          try {
-            window.localStorage.setItem(KEY, next);
-          } catch {
-            /* ignore */
-          }
-          return { locale: next, source: "saved" };
-        });
+        toggleLocale();
       }
     };
     const reset = () => {
@@ -136,7 +172,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keyup", up);
       window.removeEventListener("blur", reset);
     };
-  }, []);
+  }, [toggleLocale]);
 
   const t = useCallback(
     <T extends { ru: string; en: string }>(v: T) => v[locale],

@@ -15,7 +15,7 @@
 | `altyn-solok` | `public/placeholders/covers/altyn-solok.jpg` | 900×900 | Существует | Галерея, полная страница сайта, ролик `altyn-solok.webm` | Живой сайт | Демо на Yandex Cloud |
 | `dombro` | `public/placeholders/covers/dombro.jpg` | 900×900 | Существует | Кейс `DombroCase`: скриншоты, лендинг в окне XP | Релизы | GitHub Releases |
 | `tasker` | `public/placeholders/covers/tasker.jpg` | 900×900 | Существует | Кейс `TaskerCase`: два ролика интерфейса (дашборд и мини-приложение), этапы артикула | Отсутствует | — |
-| `kroomi` | `public/placeholders/covers/kroomi.jpg` | 900×900 | Существует | Кейс `KroomiCase`: ролик персонажа, шесть характеров, экраны, лендинг в окне XP | Узнать о выходе | `https://t.me/amazi` |
+| `kroomi` | `public/placeholders/covers/kroomi.jpg` | 900×900 | Существует | Кейс `KroomiCase`: ролик персонажа, шесть характеров, экраны, лендинг в окне XP | Узнать о выходе | `https://t.me/vladakhmetov` |
 
 ---
 
@@ -24,7 +24,7 @@
 1. **Анализ внешних ссылок:**
    - Внешние ссылки есть у `printforge` (локальный адрес), `altyn-solok`, `dombro` и `kroomi` (Telegram). У `tasker` ссылки нет: репозиторий приватный.
 2. **Неподтверждённые биографические и контактные сведения:**
-   - В `src/data/site.ts` указаны email `hello@amazi.studio`, telegram `https://t.me/amazi`, студия `Amazi, независимая практика`, локация `Москва`.
+   - В `src/data/site.ts` указаны email `mail@vladakhmetov.com`, telegram `https://t.me/vladakhmetov`, студия `«Цех»`, локация `Уфа · удалённо`.
    - В резюме `src/components/xp/apps/resume-window.tsx` указаны периоды работы и компании. Эти данные в рамках текущего этапа зафиксированы как требующие личного подтверждения владельцем перед боевой публикацией.
 3. **Недостающие материалы для финального наполнения:**
    - Подтверждённые production-ссылки на запущенные сервисы / шрифтовые файлы (WOFF2/OTF для Kora).

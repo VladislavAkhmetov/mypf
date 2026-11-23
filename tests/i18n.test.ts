@@ -26,5 +26,7 @@ describe("language detection", () => {
     expect(localePath("/en/", "en")).toBe("/en/");
     expect(localePath("/work/dombro/", "en")).toBe("/en/work/dombro/");
     expect(localePath("/en/work/dombro/", "ru")).toBe("/work/dombro/");
+    expect(localePath("/notes", "en")).toBe("/en/notes");
+    expect(localePath("/en/notes", "ru")).toBe("/notes");
   });
 });

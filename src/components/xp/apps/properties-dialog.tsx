@@ -147,7 +147,7 @@ export function PropertiesDialog({ slug }: { slug: string }) {
           </div>
           <div>
             <span className="font-semibold text-slate-700">{tr("Автор: ", "Author: ")}</span>
-            <span>{tr("Влад Ахметов (Amazi Studio)", "Vlad Akhmetov (Amazi Studio)")}</span>
+            <span>{tr("Влад Ахметов", "Vlad Akhmetov")}</span>
           </div>
           <div className="pt-2">
             <button

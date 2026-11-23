@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "journal": "node scripts/build-journal.mjs",
+    "og": "node scripts/generate-og.mjs",
+    "favicon": "node scripts/generate-favicons.mjs",
     "prebuild": "node scripts/build-journal.mjs",
     "build": "next build",
     "start": "next start",
@@ -14,13 +16,15 @@
     "test:e2e:games": "playwright test e2e/games"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
     "gifenc": "^1.0.3",
     "matter-js": "^0.20.0",
     "motion": "^13.2.0",
     "next": "16.3.4",
     "perfect-freehand": "^1.2.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

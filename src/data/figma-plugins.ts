@@ -4,8 +4,8 @@ export interface FigmaPlugin {
   id: string;
   name: string;
   caption: Bi;
-  pain: Bi;
-  solution: Bi;
+  description: Bi;
+  features: Bi;
   url: string;
 }
 
@@ -16,56 +16,56 @@ export const figmaPlugins: FigmaPlugin[] = [
   {
     id: "printplix",
     name: "Printplix",
-    caption: { ru: "CMYK-экспорт, дилайны упаковки и префлайт", en: "CMYK export, packaging dielines and preflight" },
-    pain: {
-      ru: "Макет в Figma живёт в RGB, а типография ждёт CMYK, дилайны и чистые файлы. Подготовка к печати превращается в ручную рутину и правки после отказа препресса.",
-      en: "A Figma layout lives in RGB, while the print shop expects CMYK, dielines and clean files. Print prep turns into manual routine and fixes after prepress rejects the file.",
+    caption: { ru: "Экспорт в CMYK, TIFF и PDF, цветовые профили", en: "CMYK, TIFF, and PDF export, color profiles" },
+    description: {
+      ru: "Готовит макеты к печати прямо в Figma: переводит цвета в CMYK, генерирует развёртки коробок и проверяет файл на ошибки препресса.",
+      en: "Prepares print-ready files right in Figma: converts colors to CMYK, generates box dielines, and runs preflight checks.",
     },
-    solution: {
-      ru: "Конвертирует цвета в CMYK, помогает собрать дилайны упаковки и проверяет макет перед отправкой в печать.",
-      en: "Converts colours to CMYK, helps build packaging dielines and checks the layout before it goes to print.",
+    features: {
+      ru: "Поддержка профилей FOGRA39 и US Web Coated, контроль вылетов под обрез, проверка растра на 300 DPI и экспорт векторных штампов.",
+      en: "Supports FOGRA39 and US Web Coated profiles, checks bleeds, audits raster assets for 300 DPI, and exports vector die-cut paths.",
     },
     url: community("1571945796791441342", "printplix-cmyk-export-packaging-dielines-preflight-check"),
   },
   {
     id: "deckplix",
     name: "Deckplix",
-    caption: { ru: "Презентации в Figma без рутины", en: "Figma presentations without the routine" },
-    pain: {
-      ru: "Презентации в Figma собираются вручную: одинаковые слайды, выравнивание, бесконечное копирование блоков.",
-      en: "Presentations in Figma are assembled by hand: identical slides, alignment, endless copying of blocks.",
+    caption: { ru: "Сборка презентаций и слайдов", en: "Presentation and slide deck builder" },
+    description: {
+      ru: "Автоматизирует сборку колод: генерирует слайды нужного формата, подставляет контентные сетки и держит единый стиль презентации.",
+      en: "Automates deck assembly: generates standardized slides, inserts content grids, and keeps visual styling aligned throughout the presentation.",
     },
-    solution: {
-      ru: "Плагин берёт сборку слайдов на себя, чтобы вы занимались идеей и подачей, а не рутиной.",
-      en: "The plugin takes over slide assembly, so you can focus on the idea and the delivery instead of routine.",
+    features: {
+      ru: "Сетки в формате 16:9 и 4:3, библиотека типовых структур слайдов, готовые автолейаут-контейнеры и быстрая смена нумерации.",
+      en: "16:9 and 4:3 grid presets, library of standard slide structures, adaptive autolayout containers, and quick slide numbering.",
     },
     url: community("1583698726607655546", "deckplix"),
   },
   {
     id: "fixmaster",
     name: "Fixmaster",
-    caption: { ru: "Быстрые правки макетов в один клик", en: "One-click layout fixes" },
-    pain: {
-      ru: "Перед передачей макета всегда находятся мелкие огрехи: съехавшие отступы, лишние слои, несогласованные стили. Искать их глазами долго.",
-      en: "Before handoff there are always small flaws: shifted spacing, stray layers, inconsistent styles. Finding them by eye takes ages.",
+    caption: { ru: "Аудит и пакетная чистка макетов", en: "Layout audit and batch cleanup" },
+    description: {
+      ru: "Проверяет макеты перед передачей в разработку: находит дефекты верстки, удаляет технический мусор и нормализует слои.",
+      en: "Audits layouts before developer handoff: detects layout flaws, purges technical clutter, and normalizes layer structure.",
     },
-    solution: {
-      ru: "Находит типовые проблемы и исправляет их быстро, без ручного обхода каждого фрейма.",
-      en: "Finds common problems and fixes them fast, without going through every frame by hand.",
+    features: {
+      ru: "Поиск оторванных стилей и скрытых слоев, удаление пустых фреймов, сброс дробных координат и валидация отступов в автолейаутах.",
+      en: "Detects detached styles and hidden layers, removes empty frames, rounds subpixel coordinates, and validates autolayout paddings.",
     },
     url: community("1639529711723577723", "fixmaster"),
   },
   {
     id: "pixelpress",
     name: "Pixelpress",
-    caption: { ru: "Лёгкие изображения для макетов и экспорта", en: "Lightweight images for layouts and export" },
-    pain: {
-      ru: "Тяжёлые изображения раздувают файлы и замедляют экспорт, а оптимизировать их приходится вне Figma.",
-      en: "Heavy images bloat files and slow down export, and you have to optimise them outside Figma.",
+    caption: { ru: "Пакетное сжатие изображений", en: "Batch image compression" },
+    description: {
+      ru: "Сжимает растровые изображения прямо на холсте без выгрузки во внешние сервисы и потери привязок к компонентам.",
+      en: "Compresses raster images directly on the canvas without third-party services or breaking component overrides.",
     },
-    solution: {
-      ru: "Сжимает изображения прямо в Figma, сохраняя качество, и ускоряет работу с макетом и экспорт.",
-      en: "Compresses images right in Figma without losing quality, and speeds up working with the layout and exporting it.",
+    features: {
+      ru: "Оптимизация PNG и JPEG, настройка степени сжатия, пакетная обработка выделенных слоев и уменьшение нагрузки на оперативную память Figma.",
+      en: "PNG and JPEG optimization, customizable compression levels, batch processing of selected layers, and reduced memory pressure in Figma.",
     },
     url: community("1682411010074444640", "pixelpress"),
   },

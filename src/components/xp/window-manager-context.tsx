@@ -24,7 +24,6 @@ export type WindowType =
   | "cmd"
   | "display-properties"
   | "properties"
-  | "resume"
   | "tools"
   | "word"
   | "minesweeper"
@@ -33,7 +32,9 @@ export type WindowType =
   | "dombro"
   | "kroomi"
   | "baltika"
-  | "designer-game";
+  | "designer-game"
+  | "hyper-packer"
+  | "resume";
 
 export interface WindowItem {
   id: string;
@@ -92,6 +93,7 @@ interface WindowManagerContextType {
   }) => void;
   openNotes: (options?: { noteId?: string; pushHistory?: boolean }) => void;
   openProfile: (options?: { pushHistory?: boolean }) => void;
+  openResume: () => void;
   balloon: BalloonInfo | null;
   showBalloon: (title: string, message: string) => void;
   closeBalloon: () => void;
@@ -166,7 +168,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
 
   const [theme, setThemeState] = useState<XpTheme>(() => {
     if (typeof window !== "undefined") {
-      const saved = window.localStorage.getItem("amazi-xp-theme") as XpTheme;
+      const saved = window.localStorage.getItem("xp-theme") as XpTheme;
       if (saved && ["luna-blue", "luna-silver", "classic", "royale-noir"].includes(saved)) {
         return saved;
       }
@@ -195,7 +197,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
   const setTheme = useCallback((newTheme: XpTheme) => {
     setThemeState(newTheme);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("amazi-xp-theme", newTheme);
+      window.localStorage.setItem("xp-theme", newTheme);
       document.documentElement.setAttribute("data-xp-theme", newTheme);
     }
   }, []);
@@ -293,9 +295,9 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       url.searchParams.delete("view");
       url.searchParams.delete("focus");
       window.history.replaceState({}, "", url.toString());
-      window.sessionStorage.removeItem("amazi-portfolio-slug");
-      window.sessionStorage.removeItem("amazi-portfolio-focus");
-      window.sessionStorage.removeItem("amazi-portfolio-scroll");
+      window.sessionStorage.removeItem("portfolio-slug");
+      window.sessionStorage.removeItem("portfolio-focus");
+      window.sessionStorage.removeItem("portfolio-scroll");
     }
   }, []);
 
@@ -445,6 +447,29 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
     [openPortfolio]
   );
 
+  const openResume = useCallback(() => {
+    const isClient = typeof window !== "undefined";
+    const screenW = isClient ? window.innerWidth : 1024;
+    const screenH = isClient ? window.innerHeight : 768;
+    const taskbarH = getTaskbarHeight();
+    const availH = Math.max(100, screenH - taskbarH);
+    const width = screenW >= 1024 ? Math.min(880, Math.max(780, Math.round(screenW * 0.72))) : screenW;
+    const height = screenW >= 1024 ? Math.round(availH * 0.94) : availH;
+    const x = screenW >= 1024 ? Math.max(80, Math.round((screenW - width) / 2)) : 0;
+    const y = screenW >= 1024 ? Math.max(10, Math.round((availH - height) / 2)) : 0;
+
+    openWindow({
+      id: "resume",
+      type: "resume",
+      title: "Резюме — Влад Ахметов.pdf",
+      iconType: "pdf",
+      x,
+      y,
+      width,
+      height,
+    });
+  }, [openWindow]);
+
   // Handle browser Back/Forward (popstate)
   useEffect(() => {
     const handlePopState = () => {
@@ -523,6 +548,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       openPortfolio,
       openNotes,
       openProfile,
+      openResume,
       balloon,
       showBalloon,
       closeBalloon,
@@ -548,6 +574,7 @@ export function WindowManagerProvider({ children }: { children: React.ReactNode 
       openPortfolio,
       openNotes,
       openProfile,
+      openResume,
       balloon,
       showBalloon,
       closeBalloon,

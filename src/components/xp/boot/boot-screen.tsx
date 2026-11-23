@@ -65,7 +65,7 @@ export function BootScreen({ ready, locale }: { ready: boolean; locale: "ru" | "
       </div>
       <div className={styles.footer} aria-hidden="true">
         <span>© {new Date().getFullYear()} {name}</span>
-        <span className={styles.brand}>amazi</span>
+        <span className={styles.brand}>Microsoft</span>
       </div>
     </div>
   );

@@ -28,7 +28,7 @@ function subscribeToNavigation(onChange: () => void) {
 
 function readPositions(): Record<string, number> {
   if (typeof window === "undefined") return {};
-  try { return JSON.parse(sessionStorage.getItem("amazi-portfolio-positions") || "{}"); }
+  try { return JSON.parse(sessionStorage.getItem("portfolio-positions") || "{}"); }
   catch { return {}; }
 }
 
@@ -55,7 +55,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
     viewport.scrollTop = positions.current[routeKey] ?? 0;
     const save = () => {
       positions.current[routeKey] = viewport.scrollTop;
-      try { sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
+      try { sessionStorage.setItem("portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
     };
     viewport.addEventListener("scroll", save, { passive: true });
     return () => viewport.removeEventListener("scroll", save);
@@ -64,7 +64,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
   const navigate = (options: { projectSlug?: string; toolSlug?: string; focus?: FocusDirection | null }) => {
     xpSound.click();
     if (contentRef.current) positions.current[routeKey] = contentRef.current.scrollTop;
-    try { sessionStorage.setItem("amazi-portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
+    try { sessionStorage.setItem("portfolio-positions", JSON.stringify(positions.current)); } catch { /* Optional scroll persistence. */ }
     const query = buildNavigationQuery("portfolio", { ...options, otherParams: nav.otherParams });
     window.history.pushState({ view: "portfolio", ...options }, "", window.location.pathname + query);
     window.dispatchEvent(new Event("portfolio:navigate"));
@@ -78,6 +78,7 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
   const adjacent = currentProject ? getAdjacent(currentProject.slug) : null;
   const toolIndex = currentTool ? toolsList.indexOf(currentTool) : -1;
   const nextTool = currentTool ? toolsList[(toolIndex + 1) % toolsList.length] : null;
+  const prevTool = currentTool ? toolsList[(toolIndex - 1 + toolsList.length) % toolsList.length] : null;
   const address = currentProject ? "portfolio://projects/" + currentProject.slug
     : currentTool ? "portfolio://tools/" + currentTool.slug
     : "portfolio://catalog" + (focus ? "?focus=" + focus : "");
@@ -95,9 +96,9 @@ export function PortfolioBrowserWindow({ initialProjectSlug, initialFocus, notFo
       </div>
       <div ref={contentRef} className={styles.contentViewport}>
         {currentProject ? (
-          <PortfolioDetail key={currentProject.slug} project={currentProject} nextProject={adjacent?.next ?? catalogProjects[0]} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
+          <PortfolioDetail key={currentProject.slug} project={currentProject} prevProject={adjacent?.prev ?? null} nextProject={adjacent?.next ?? catalogProjects[0]} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
         ) : currentTool ? (
-          <PortfolioDetail key={currentTool.slug} tool={currentTool} nextTool={nextTool} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
+          <PortfolioDetail key={currentTool.slug} tool={currentTool} prevTool={prevTool} nextTool={nextTool} onBack={back} onOpenProject={openProject} onOpenTool={openTool} />
         ) : (
           <PortfolioLanding projects={displayedProjects} focus={focus} scrollContainer={contentRef} onFocusChange={newFocus => navigate({ focus: newFocus })} onOpenProject={openProject} onOpenTool={openTool} notFound={nav.projectNotFound || (!search && notFound)} />
         )}

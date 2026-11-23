@@ -10,14 +10,9 @@ import { DeckGalleryModal } from "./solitaire/deck-gallery-modal";
 import { SolitaireVictory } from "./solitaire/solitaire-victory";
 import { SolitaireLeaderboardModal } from "./solitaire/solitaire-leaderboard-modal";
 import { useWindowManager } from "../window-manager-context";
-import { Manrope, Playfair_Display } from "next/font/google";
 import { DeckDefs, DeckMonogram } from "./solitaire/card-assets";
 import styles from "./solitaire/solitaire.module.css";
 import { useLocale } from "@/lib/i18n";
-
-// Self-hosted at build time (static hosting friendly); both have Cyrillic.
-const displayFont = Playfair_Display({ subsets: ["latin", "cyrillic"], weight: ["500", "600"], style: ["normal", "italic"], variable: "--font-display", display: "swap" });
-const uiFont = Manrope({ subsets: ["latin", "cyrillic"], weight: ["500", "600", "700"], variable: "--font-ui", display: "swap" });
 
 export function SolitaireWindow() {
   const { tr } = useLocale();
@@ -44,7 +39,7 @@ export function SolitaireWindow() {
   }, [activeWindowId, isGalleryOpen, isLeaderboardOpen, session.isPaused]);
 
   return (
-    <div className={`${styles.root} ${displayFont.variable} ${uiFont.variable}`}>
+    <div className={styles.root}>
       <DeckDefs />
       {/* Active Board */}
       <SolitaireBoard

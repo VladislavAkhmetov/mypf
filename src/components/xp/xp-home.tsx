@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useLocale } from "@/lib/i18n";
 import { BootScreen } from "./boot/boot-screen";
 
 // The desktop renders on the client only; the same entry serves / and /en/.
@@ -21,7 +22,7 @@ const XPApp = dynamic(
 export function XPHome() {
   const [ready, setReady] = useState(false);
   const markReady = useCallback(() => setReady(true), []);
-  const locale = usePathname()?.startsWith("/en") ? "en" : "ru";
+  const { locale } = useLocale();
 
   return (
     <>

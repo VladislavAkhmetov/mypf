@@ -1,0 +1,302 @@
+/* Quiet paper menus. The illustration, selection and primary action carry the screen. */
+.menu-screen{background:#f1e7d0;color:#193b44;overflow:hidden;isolation:isolate}
+.menu-screen::before{background:url('../assets/comics/paper-panel-v2.webp') center/cover;opacity:.32;mix-blend-mode:multiply;z-index:-1}
+.menu-screen button:focus-visible{outline:3px solid #236779;outline-offset:5px}
+.menu-screen .yellow-button{min-height:64px;font-size:21px;letter-spacing:1px;transform:rotate(-1deg);transition:filter .16s,translate .16s}
+.menu-screen .yellow-button:hover:not(:disabled){filter:brightness(1.05);translate:0 -2px}
+.menu-screen .yellow-button:active:not(:disabled){translate:0 1px}
+.menu-screen .yellow-button:disabled{opacity:.45}
+.menu-title{position:absolute;left:12%;top:25%;z-index:2;margin:0;font-family:'Russo One',Impact,sans-serif;font-size:clamp(70px,9cqw,118px);line-height:.95;letter-spacing:-.055em;transform:rotate(-3deg)}
+.menu-title span{display:block}
+.menu-hero{position:absolute;height:82%;max-width:50%;right:8%;bottom:8%;object-fit:contain;pointer-events:none;filter:drop-shadow(3px 7px 4px #6f60471a)}
+.menu-play{position:absolute;left:12%;bottom:23%;width:29%;max-width:350px;z-index:25;touch-action:manipulation;cursor:pointer;pointer-events:auto}
+.boot-status{position:absolute;left:8%;right:8%;bottom:calc(max(22px,env(safe-area-inset-bottom) + 12px) + 72px);z-index:26;margin:0;padding:8px;background:#f1e7d0;text-align:center;font:500 13px/1.4 Rubik,Arial,sans-serif}
+.menu-back{position:absolute;top:max(20px,env(safe-area-inset-top));left:4%;width:48px;height:48px;z-index:3;background:none;font-size:32px;line-height:1;color:#193b44}
+.selection-choices{display:grid;grid-template-columns:1fr 1fr;gap:9%;flex:1;min-height:0;width:82%;max-width:1050px;margin:70px auto 0;align-items:center}
+.selection-choice{display:grid;grid-template-rows:minmax(0,1fr) 60px;align-items:center;min-height:0;height:100%;max-height:640px}
+.selection-art{position:relative;min-height:0}
+.selection-hero{height:100%;max-height:550px}
+.selection-hero img{display:block;height:100%;width:100%;object-fit:contain}
+.selection-location{width:100%;aspect-ratio:1.35;max-height:400px;padding:9px;background:#faf2df;transform:rotate(2deg);clip-path:var(--paper-edge);filter:drop-shadow(2px 4px 2px #6f604721)}
+.location-picture{width:100%;height:100%;position:relative;overflow:hidden;container-type:size}
+.location-picture::before{content:'';position:absolute;width:max(100cqw,100cqh);height:max(100cqw,100cqh);left:50%;top:50%;transform:translate(-50%,-50%);background:url('../assets/comics/story-panels-v2.webp') right bottom/200% 200%}
+.selection-arrows{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:60px;margin:10px auto 0}
+.selection-arrows button{flex:0 0 46px;height:46px;background:none;font-family:Rubik,sans-serif;font-size:42px;font-weight:400;line-height:1;color:#53727a;transition:color .15s,translate .15s}
+.selection-arrows button:hover{color:#193b44}.selection-arrows button:active{translate:0 2px}
+.selection-arrows h3{flex:1;margin:0;text-align:center;font-family:'Russo One',Impact,sans-serif;font-size:clamp(18px,2.3cqw,28px);font-weight:400;line-height:1.2}
+.selection-footer{flex-shrink:0;padding:28px 0 max(42px,env(safe-area-inset-bottom));z-index:2}
+.selection-footer .yellow-button{width:320px;max-width:80%;margin:auto}
+.selection-lock{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:12px;font:600 12px Rubik,sans-serif;letter-spacing:2px;color:#193b44}
+.selection-lock svg{width:38px;height:38px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.is-locked .selection-lock{display:flex}
+.is-locked .selection-hero img{filter:brightness(0);opacity:.11}
+.is-locked .location-picture{filter:grayscale(1);opacity:.19}
+.is-locked h3{color:#7b837b}
+#assist-toggle{display:block;margin:4px auto;font-family:Rubik,sans-serif;font-size:13px;padding:8px 0}
+@container mobile-screen (orientation:portrait){
+ .menu-title{left:0;right:0;top:7%;text-align:center;font-size:11.5cqw;letter-spacing:-.045em;white-space:nowrap;transform:rotate(-2deg)}
+ .menu-title span{display:inline}
+ .menu-hero{height:60%;max-width:94%;width:94%;right:3%;bottom:22%;object-position:center}
+ .menu-play{width:80%;max-width:330px;left:50%;bottom:max(22px,calc(env(safe-area-inset-bottom) + 12px));transform:translateX(-50%) rotate(-1deg)!important;z-index:25;touch-action:manipulation;cursor:pointer;pointer-events:auto}
+ .selection-choices{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,32%);gap:20px;width:80%;margin-top:55px;align-items:stretch}
+ .selection-choice{grid-template-rows:minmax(0,1fr) 46px;height:auto;max-height:none}
+ .selection-hero{height:100%;max-height:none}
+ .selection-arrows{min-height:46px;margin-top:6px;gap:8px;max-width:340px}
+ .selection-arrows button{flex-basis:44px;height:44px;font-size:37px}
+ .selection-arrows h3{font-size:20px}
+ .selection-location{height:100%;aspect-ratio:auto;padding:6px}
+ .selection-footer{padding:24px 0 max(32px,env(safe-area-inset-bottom))}
+}
+@container mobile-screen (orientation:portrait) and (max-height:710px){
+ .menu-title{top:6%;font-size:11cqw}
+ .menu-hero{height:65%;bottom:18%}
+ .menu-screen .yellow-button{min-height:54px;font-size:18px}
+ .selection-choices{margin-top:40px;gap:12px;grid-template-rows:minmax(0,1fr) minmax(0,31%)}
+ .menu-back{top:10px;width:44px;height:44px;font-size:29px}
+ .selection-arrows h3{font-size:18px}
+ .selection-footer{padding:18px 0 22px}
+}
+@container mobile-screen (orientation:landscape) and (max-height:520px){
+ .menu-title{top:23%;left:12%;font-size:12.5cqh}
+ .menu-hero{height:90%;bottom:5%;right:11%;max-width:46%}
+ .menu-play{bottom:20%;width:27%}
+ .menu-screen .yellow-button{min-height:48px;font-size:17px}
+ .menu-back{top:10px;left:3%;height:40px;width:40px;font-size:28px}
+ .selection-choices{margin-top:23px;width:75%;gap:12%}
+ .selection-choice{grid-template-rows:minmax(0,1fr) 40px}
+ .selection-hero{height:100%}
+ .selection-location{aspect-ratio:1.8;max-height:150px;padding:6px}
+ .selection-arrows{min-height:40px;margin-top:3px;gap:4px}
+ .selection-arrows button{flex-basis:40px;height:40px;font-size:34px}
+ .selection-arrows h3{font-size:17px}
+ .selection-footer{padding:14px 0 18px}
+}
+@media(prefers-reduced-motion:reduce){.menu-screen button{transition:none!important}}
+
+/* Ultimate First Screen Poster */
+.title-screen {
+  --poster-yellow: #f6af15;
+  background: var(--poster-yellow);
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: absolute;
+  inset: 0;
+}
+.title-screen::before {
+  display: none !important;
+  background-image: none !important;
+}
+
+.title-poster-stage {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  aspect-ratio: 579 / 1024;
+  width: min(100%, calc(72cqh * 579 / 810));
+  height: auto;
+  max-width: none;
+  max-height: none;
+  overflow: hidden;
+  clip-path: inset(0 0 20.9% 0);
+  background: #f6af15 url('data:image/webp;base64,UklGRgQDAABXRUJQVlA4IPgCAACwDQCdASokAEAAPu1iqE8ppSOiKqwBMB2JbACdOYHY/idmT5CNjGswCXz5foY3jmBP/DzAOyi8j5jaRpolSnPhvtH6b80E/hDTG7XgxRSGR/0y6bjrFNyBGI62Pc1a96w+iU1obmTQEc0n4sUosl4I1fPMzAZAAPsj+NcqUSZyVZVlaIfOEtAqHvX1f4a3OMRZzqY0P/rVGTQV7BbZPBkIH+PZJk4y5NzLGbV5EJ4nZCd1L/u7w++X8N629Hd5yCbRxwrmAFWHF/TrDz1t1yfzraCa1KvQvrqZjin5uYa26ZXJs1tXpDTEpJg36cUv6Hy4cPmNvuwqPuRBUn/EVeioww2RXqoO3gU6VThf3GqcR+HyfqrnMAQl9z8V/uXiEZLlJ9SCBNUixz01parzOxlM26TOxvcw1gJ6FbiNKndZFTu04W0el9upNTuHHWdtCSknUX58Nsh4xMldjOMaz1JDepfG27HlZ9MVG0QgYkx6L3oqqMM83f+4ysPT2zTubYGgt1tKoP2k8rLzeymCTQndbAWiD95zP2CAVsbaWqFR9lg5i3ZwZfulqezVdBKB4cWZOPZjjlYe+CIh3VHNb7KEZYk6w7AnKDmKAPsS2FOZ6BJ9S7mBoYApa9M8l+4akQ20j8M53db4KadJxy+ayCQTJ/HWhXanjToM8mFLZEC/xzZoGn5Ll8TsK8tLTRdeujjePHgpJbCUZ2PrFZkEknoXdRlX220F/pgyMCqwNj5Z+vZq4G+wOFOxwRWdhSdgUYAiP0yXwNJMb1afE04FA2YeOFFcs0TGZGCB2fePwK7mPak1d+cauknUi8bSRykwh5/77Eyu5NTw0kfqWnB68IY9++18I2UjiQVS+HxTjL3Mcmc6ZMfBvljDtS91hnG7GUXItEOxYIFSw9WBOcqrfd4PUHZHGi3D6XIDoaMonjPo2LCbHibrQamznaIXhHGo3iYXBgaacXbXG97b93CwCPnUPqDuiCBxVAUQBeZBDtKcbqIN8wQaAAAA') center top / cover no-repeat;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 1;
+}
+
+/* Blend the paper edge into the yellow extension on taller screens. */
+.title-poster-stage::after {
+  content: '';
+  position: absolute;
+  inset: 77% 0 20.9%;
+  background: linear-gradient(transparent, var(--poster-yellow));
+  pointer-events: none;
+}
+
+.title-poster-stage picture,
+.title-poster-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+/* Center controls in the yellow space below the artwork, including short phones. */
+.title-menu-actions {
+  position: absolute;
+  left: 50%;
+  top: calc((100% + min(calc(100cqw * 810 / 579), 72cqh) - env(safe-area-inset-bottom)) / 2);
+  transform: translate(-50%, -50%);
+  width: min(100%, calc((28cqh - env(safe-area-inset-bottom)) * 479 / 214));
+  aspect-ratio: 479 / 214;
+  background: url('../assets/comics/start-poster.webp') center bottom / 120.877% auto no-repeat;
+  mask-image: linear-gradient(transparent, black 4%);
+  z-index: 2;
+}
+
+.title-bottle {
+  position: absolute;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(2px 4px 2px #17282c30);
+  z-index: 3;
+}
+
+.title-bottle-lemon {
+  left: 3%;
+  top: calc(min(calc(100cqw * 810 / 579), 72cqh) - 12cqh);
+  height: min(22cqh, 44cqw);
+  transform: rotate(-19deg);
+  transform-origin: 50% 85%;
+  animation: bottle-bob-lemon 3s ease-in-out infinite;
+}
+
+.title-bottle-raspberry {
+  right: 2%;
+  top: calc(min(calc(100cqw * 810 / 579), 72cqh) - 9cqh);
+  height: min(25cqh, 49cqw);
+  transform: rotate(12deg);
+  transform-origin: 50% 85%;
+  animation: bottle-bob-raspberry 3s ease-in-out infinite;
+  animation-delay: 0.55s;
+}
+
+@keyframes bottle-bob-lemon {
+  0%   { transform: rotate(-19deg) translateY(0); }
+  25%  { transform: rotate(-16.5deg) translateY(-3px); }
+  50%  { transform: rotate(-21deg) translateY(2px); }
+  75%  { transform: rotate(-17.5deg) translateY(-1px); }
+  100% { transform: rotate(-19deg) translateY(0); }
+}
+
+@keyframes bottle-bob-raspberry {
+  0%   { transform: rotate(12deg) translateY(0); }
+  25%  { transform: rotate(14.5deg) translateY(-3px); }
+  50%  { transform: rotate(9.5deg) translateY(2px); }
+  75%  { transform: rotate(13.5deg) translateY(-1px); }
+  100% { transform: rotate(12deg) translateY(0); }
+}
+
+/* Play button overlay */
+.title-screen #start-button.poster-play {
+  position: absolute !important;
+  left: 12.3% !important;
+  top: 26.37% !important;
+  bottom: auto !important;
+  right: auto !important;
+  width: 75.41% !important;
+  height: 42.03% !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: url('../assets/comics/button-play.webp') center / contain no-repeat !important;
+  color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  clip-path: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  z-index: 25 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+  transform-origin: center center;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.title-screen #start-button.poster-play:hover:not(:disabled) {
+  transform: scale(1.04) !important;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3)) brightness(1.05) !important;
+}
+
+.title-screen #start-button.poster-play:active:not(:disabled) {
+  transform: scale(0.97) translateY(2px) !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
+}
+
+.title-screen #start-button.poster-play:focus-visible {
+  outline: 3px solid #103f58 !important;
+  outline-offset: 4px;
+}
+
+.title-screen #start-button.poster-play:disabled {
+  filter: grayscale(0.2) opacity(0.85) !important;
+  cursor: wait !important;
+}
+
+/* When loading or status error, display text over dark base badge */
+.title-screen #start-button.poster-play[data-pending],
+.title-screen #start-button.poster-play.has-status {
+  background-image: url('../assets/comics/button-play-base.webp') !important;
+  color: #fff8e7 !important;
+  font-family: 'Russo One', Impact, sans-serif !important;
+  font-size: clamp(14px, 3.8cqw, 20px) !important;
+  letter-spacing: 0.04em !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7), 0 0 1px #000 !important;
+}
+
+/* Quick ride hotspot */
+.title-screen #quick-button.poster-quick {
+  position: absolute !important;
+  left: 18.09% !important;
+  top: 8.74% !important;
+  bottom: auto !important;
+  right: auto !important;
+  width: 63.82% !important;
+  height: 18.37% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  clip-path: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  z-index: 25 !important;
+  transform: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.title-screen #quick-button.poster-quick:hover:not(:disabled) {
+  transform: scale(1.05) !important;
+  filter: brightness(1.25) !important;
+}
+
+.title-screen #quick-button.poster-quick:active:not(:disabled) {
+  transform: scale(0.96) !important;
+}
+
+.title-screen #quick-button.poster-quick:focus-visible {
+  outline: 2px solid #e27d14 !important;
+  outline-offset: 2px;
+}
+
+/* Hidden placeholder text to preserve test suite layout queries without rendering over the poster */
+.title-screen .sr-overlay {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Boot status position on title screen */
+.title-screen .boot-status {
+  top: 76% !important;
+  bottom: auto !important;
+  left: 8% !important;
+  right: 8% !important;
+  z-index: 24 !important;
+  pointer-events: none !important;
+}

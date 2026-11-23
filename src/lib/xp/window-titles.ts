@@ -4,6 +4,8 @@ import type { Locale } from "@/lib/i18n";
 // They are translated at render time, so switching the language updates open windows too.
 const TITLES: Record<string, string> = {
   "Обо мне": "About me",
+  "Резюме": "Resume",
+  "Резюме — Влад Ахметов.pdf": "Resume — Vlad Akhmetov.pdf",
   "Портфолио": "Portfolio",
   "Мой компьютер": "My Computer",
   "Визуализатор": "Visualizer",
@@ -14,8 +16,6 @@ const TITLES: Record<string, string> = {
   "Справка": "Help",
   "Новая папка": "New Folder",
   "Заметка.txt": "Note.txt",
-  "Резюме_Влад_Ахметов.pdf — Executive Summary": "Resume_Vlad_Akhmetov.pdf — Executive Summary",
-  "Резюме_Влад_Ахметов.pdf — Резюме": "Resume_Vlad_Akhmetov.pdf — Resume",
   "Мои документы — Проекты": "My Documents — Projects",
   "Документы — Влад Ахметов": "Documents — Vlad Akhmetov",
   "dombro — браузер и спокойный дашборд": "dombro — a browser with a calm dashboard",

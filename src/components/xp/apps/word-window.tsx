@@ -8,9 +8,9 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { useWindowManager } from "../window-manager-context";
 import { useLocale } from "@/lib/i18n";
 
-/** One page, no navigation: who I am, then projects, resume and contacts. */
+/** One page, no navigation: who I am, then projects and contacts. */
 export function WordWindow() {
-  const { openWindow, openPortfolio } = useWindowManager();
+  const { openPortfolio } = useWindowManager();
   const { t, tr } = useLocale();
 
   const handleOpenPortfolio = () => {
@@ -18,20 +18,6 @@ export function WordWindow() {
     if (openPortfolio) {
       openPortfolio();
     }
-  };
-
-  const handleOpenResume = () => {
-    xpSound.click();
-    openWindow({
-      id: "resume",
-      type: "resume",
-      title: "Резюме_Влад_Ахметов.pdf — Executive Summary",
-      iconType: "resume",
-      x: 70,
-      y: 40,
-      width: 680,
-      height: 520,
-    });
   };
 
   return (
@@ -90,16 +76,6 @@ export function WordWindow() {
               >
                 <span>{tr("Посмотреть проекты", "View projects")}</span>
                 <span>→</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenResume}
-                data-ym-goal="word_open_resume"
-                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-900 border border-slate-300 font-semibold text-sm rounded shadow-xs transition"
-                style={{ cursor: xpCursors.pointer }}
-              >
-                <span>{tr("Резюме", "Resume")}</span>
-                <span>↗</span>
               </button>
             </div>
 

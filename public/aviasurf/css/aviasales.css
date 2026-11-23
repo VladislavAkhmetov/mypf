@@ -1,0 +1,253 @@
+/* Travel labels replace the beer-game HUD. All rules belong to this edition. */
+#app-container.aviasales-game {
+  --flight-blue:#0c73fe; --flight-paper:#fff1d3; --flight-danger:#c6402a; --message-top:125px;
+  --travel-paper:url('../assets/comics/hud/travel-paper.svg');
+  --boarding-paper:url('../assets/comics/hud/boarding-paper.svg');
+  --travel-ink:url('../assets/comics/hud/ink-blank-aviasales.webp');
+  overflow:clip;
+}
+#app-container.aviasales-game .hud {
+  top:max(14px,calc(env(safe-area-inset-top) + 8px)); left:12px; right:12px;
+  display:grid; grid-template-columns:minmax(82px,1fr) minmax(160px,1.8fr) 42px;
+  align-items:start; gap:9px; pointer-events:none;
+}
+#app-container.aviasales-game .hud > * { pointer-events:auto; }
+#app-container.aviasales-game .beer-ticket {
+  grid-column:1; grid-row:1; width:100%; height:64px; padding:9px 8px 8px 5px;
+  gap:3px; color:var(--flight-blue); transform:rotate(-2deg);
+  background:var(--travel-paper) center/100% 100% no-repeat;
+  border:0; box-shadow:none; filter:drop-shadow(0 2px 1px #143b4b30); clip-path:none;
+}
+#app-container.aviasales-game .passport-ticket::after {
+  content:''; position:absolute; top:10px; right:9px; bottom:10px;
+  border-right:1px dashed #0c73fe45; pointer-events:none;
+}
+#app-container.aviasales-game #beer-canvas { width:22px; height:35px; margin:4px 0 0; }
+#app-container.aviasales-game .beer-ticket > div { min-width:0; }
+#app-container.aviasales-game .beer-ticket .ticket-label { display:block; margin:0 0 3px; font:700 8px/1 Rubik,sans-serif; letter-spacing:.04em; }
+#app-container.aviasales-game .beer-ticket strong { font:900 clamp(23px,7cqw,31px)/1 Rubik,sans-serif; letter-spacing:-1px; }
+#app-container.aviasales-game .beer-ticket strong span { font-size:13px; letter-spacing:0; }
+#app-container.aviasales-game .beer-ticket[data-condition="critical"] { color:var(--flight-danger); }
+#app-container.aviasales-game .flight-ticket {
+  grid-column:2; grid-row:1; position:relative; padding:12px 10px 10px; text-align:center; color:var(--flight-blue);
+  background:var(--boarding-paper) center/100% 100% no-repeat;
+  clip-path:none;
+  filter:drop-shadow(0 2px 1px #143b4b30); transform:rotate(1deg);
+}
+#app-container.aviasales-game .flight-label { display:block; font:700 clamp(8px,2.25cqw,10px)/1.3 Rubik,sans-serif; letter-spacing:.055em; white-space:nowrap; }
+#app-container.aviasales-game #flight-timer { display:block; margin:3px 0 5px; font:400 clamp(35px,10.5cqw,46px)/1 'Russo One',sans-serif; letter-spacing:-.045em; font-variant-numeric:tabular-nums; }
+#app-container.aviasales-game .flight-distance { display:block; margin:0 3px; padding-top:8px; border-top:1px dashed #0c73fe65; font:500 8px/1.3 Rubik,sans-serif; letter-spacing:.035em; white-space:nowrap; }
+#app-container.aviasales-game .flight-distance b { font-size:10px; margin-left:4px; }
+#app-container.aviasales-game .flight-ticket[data-urgency="warning"] #flight-timer { color:#b45a18; }
+#app-container.aviasales-game .flight-ticket[data-urgency="critical"] { filter:drop-shadow(0 2px 1px #c6402a45); }
+#app-container.aviasales-game .flight-ticket[data-urgency="critical"] #flight-timer { color:var(--flight-danger); animation:departure-beat 1s ease-out infinite; }
+#app-container.aviasales-game #pause-button { grid-column:3; grid-row:1; width:42px; height:44px; min-width:0; margin:2px 0 0; padding:0; font-size:25px; color:var(--flight-blue); background:var(--travel-paper) center/100% 100% no-repeat; transform:rotate(4deg); pointer-events:auto; }
+#app-container.aviasales-game .beer-track,
+#app-container.aviasales-game #beer-mult,
+#app-container.aviasales-game .score-ticket,
+#app-container.aviasales-game .duel-ticket,
+#app-container.aviasales-game .duel-status,
+#app-container.aviasales-game #arcade-chain,
+#app-container.aviasales-game #chain-toast,
+#app-container.aviasales-game #rush-meter,
+#app-container.aviasales-game #bottom-hud,
+#app-container.aviasales-game #sound-button,
+#app-container.aviasales-game #touch-guide,
+#app-container.aviasales-game #moment .moment-points,
+#app-container.aviasales-game #moment .moment-mult,
+#app-container.aviasales-game #result-stars { display:none!important; }
+.flight-announcement { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+.flight-debug { position:absolute; z-index:15; bottom:115px; left:12px; right:12px; padding:7px; background:#fff1d3; color:#123b4c; font:10px/1.4 monospace; pointer-events:none; }
+#app-container.aviasales-game:not(.playing) .flight-debug { display:none; }
+#app-container.aviasales-game .steer-controls { display:flex!important; left:16px; right:auto; gap:10px; bottom:max(23px,calc(env(safe-area-inset-bottom) + 16px)); }
+#app-container.aviasales-game .steer-controls button,
+#app-container.aviasales-game #jump-button {
+  position:relative; width:clamp(66px,18cqw,80px); height:clamp(65px,18cqw,80px);
+  border:0; border-radius:0; box-shadow:none; padding:0; opacity:1;
+  background:none;
+  border-image:var(--travel-ink) 48 40 fill / 9px / 0 stretch;
+  clip-path:none;
+  filter:drop-shadow(1px 3px 1px #143b4b40); transform:rotate(-4deg);
+  color:#fff4dc; touch-action:none;
+}
+#app-container.aviasales-game .steer-controls button:last-child { transform:rotate(4deg); }
+#app-container.aviasales-game .steer-controls button::before,
+#app-container.aviasales-game #jump-button::before {
+  content:none;
+}
+#app-container.aviasales-game .steer-controls button::after { width:23%; height:23%; top:36%; left:42%; border-width:6px; border-color:currentColor; }
+#app-container.aviasales-game .steer-controls button:last-child::after { left:31%; }
+#app-container.aviasales-game #jump-button {
+  position:absolute; width:var(--action-size,76px); height:var(--action-size,76px); right:16px; left:auto;
+  bottom:max(23px,calc(env(safe-area-inset-bottom) + 16px));
+  transform:rotate(3deg); display:flex; align-items:center; justify-content:center;
+}
+#app-container.aviasales-game #jump-button .jump-icon { width:53%; height:53%; margin:-8px 0 0; stroke:currentColor; stroke-width:3; }
+#app-container.aviasales-game #jump-button .jump-action { left:0; right:0; bottom:11px; padding:0; font:800 8px/1 Rubik,sans-serif; color:currentColor; background:none; clip-path:none; transform:none; }
+#app-container.aviasales-game #jump-glyph { display:none; }
+#app-container.aviasales-game .steer-controls button.pressed,
+#app-container.aviasales-game #jump-button:active { color:#fff6e2; scale:.94; filter:brightness(1.12) drop-shadow(0 1px 1px #143b4b40); }
+#app-container.aviasales-game #jump-button.spin-ready,
+#app-container.aviasales-game #jump-button.special-ready { outline:0; filter:drop-shadow(0 0 5px #ffed90); }
+#app-container.aviasales-game[data-jump-side="left"] .steer-controls { left:auto; right:16px; }
+#app-container.aviasales-game[data-jump-side="left"] #jump-button { left:16px; right:auto; }
+#app-container.aviasales-game #ride-coach { top:132px; max-width:calc(100% - 38px); left:50%; right:auto; transform:translateX(-50%) rotate(-1deg); padding:10px 16px; background:var(--travel-paper) center/100% 100% no-repeat; }
+#app-container.aviasales-game #ride-coach strong { font-size:11px; }
+#app-container.aviasales-game #ride-coach span { font-size:10px; }
+#app-container.aviasales-game #moment { top:38%; max-width:85%; }
+#app-container.aviasales-game #moment strong { padding:6px 11px; font-size:clamp(17px,5.3cqw,23px); }
+#app-container.aviasales-game #moment span { font:600 11px/1.3 Rubik,sans-serif; }
+#app-container.aviasales-game #moment.visible {
+  padding:10px 16px; background:var(--travel-ink) center/100% 100% no-repeat;
+  clip-path:none; filter:drop-shadow(0 2px 1px #143b4b30);
+}
+#app-container.aviasales-game #moment strong,
+#app-container.aviasales-game #moment.big-reward strong { color:#fff4dc; text-shadow:none; background:none; }
+#app-container.aviasales-game #moment.bad { background-image:var(--travel-paper); }
+#app-container.aviasales-game #moment.bad strong { color:var(--flight-danger); }
+#app-container.aviasales-game #hint { padding:10px 18px; background:var(--travel-paper) center/100% 100% no-repeat; clip-path:none; }
+#app-container.aviasales-game :is(#pause-button,.steer-controls button,#jump-button):focus-visible {
+  outline:2px dashed var(--flight-blue); outline-offset:4px;
+}
+#app-container.aviasales-game #result-screen .result-card { grid-template-rows:auto minmax(120px,1fr) auto; overflow:hidden; }
+#app-container.aviasales-game #result-screen .result-heading { padding:max(20px,calc(env(safe-area-inset-top) + 10px)) 15px 12px; }
+#app-container.aviasales-game #result-screen .result-heading h2 { margin:8px 0; font-size:clamp(25px,8.2cqw,36px); letter-spacing:-.04em; }
+#app-container.aviasales-game #result-screen .eyebrow { font-size:9px; }
+#app-container.aviasales-game #result-screen #result-comment { margin:0; font:500 12px/1.4 Rubik,sans-serif; }
+#app-container.aviasales-game #result-screen[data-outcome="defeat"] h2 { color:var(--flight-danger); }
+#app-container.aviasales-game #result-scene { object-position:center 55%; }
+#app-container.aviasales-game #result-screen[data-reason="departed"] #result-scene { object-position:45% 50%; }
+#app-container.aviasales-game #result-screen .result-details { padding:17px 22px max(12px,calc(env(safe-area-inset-bottom) + 8px)); }
+#app-container.aviasales-game #result-screen .result-details::before { top:-15px; height:25px; }
+#app-container.aviasales-game #result-screen .duel-results { gap:14px; margin:0; }
+#app-container.aviasales-game #result-screen .duel-results .result-beer { font-size:27px; }
+#app-container.aviasales-game #result-screen .duel-results span { font-size:8px; }
+#app-container.aviasales-game #result-screen #result-beer-bonus { color:var(--flight-blue); }
+#app-container.aviasales-game #result-screen .result-summary { margin:7px 0; }
+#app-container.aviasales-game #result-screen .result-summary strong { font-size:22px; }
+#app-container.aviasales-game #result-screen .result-record { display:none; }
+#app-container.aviasales-game #result-screen #replay-button { min-height:53px; margin:8px 0 0; padding:10px; font-size:19px; }
+#app-container.aviasales-game #result-screen .result-share { margin-top:5px; }
+#app-container.aviasales-game #result-screen .result-share .text-button { min-height:32px; font-size:10px; }
+#app-container.aviasales-game #result-stamp[hidden] { display:none; }
+#app-container.aviasales-game .crab-callout { max-width:165px; font-size:13px; }
+#app-container.aviasales-game .crab-shark-warning { width:clamp(170px,48cqw,220px);max-width:none;padding:0;border:0;border-radius:0;background:none;box-shadow:none;filter:drop-shadow(1px 3px 0 #173f5430); }
+#app-container.aviasales-game .crab-shark-warning::before,#app-container.aviasales-game .crab-shark-warning::after { display:none; }
+.crab-shark-warning img { display:none;width:100%;height:auto; }
+.crab-shark-warning.has-lettering img { display:block; }
+.crab-shark-warning span { font:italic 900 48px/1 Impact,'Russo One',sans-serif;color:#0c73fe;-webkit-text-stroke:1px #fff5dc; }
+.crab-shark-warning.has-lettering span { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
+#app-container.aviasales-game.playing:not(.finale-active):not(.countdown) .crab-shark-warning.visible:not(.offscreen) { visibility:visible; }
+@container mobile-screen (max-width:350px) {
+  #app-container.aviasales-game .hud { left:8px; right:8px; gap:6px; grid-template-columns:minmax(72px,1fr) minmax(145px,1.8fr) 36px; }
+  #app-container.aviasales-game #pause-button { width:36px; height:39px; }
+  #app-container.aviasales-game .beer-ticket { padding-left:3px; }
+  #app-container.aviasales-game #beer-canvas { width:18px; height:31px; }
+  #app-container.aviasales-game .beer-ticket strong { font-size:24px; }
+  #app-container.aviasales-game .steer-controls { gap:8px; left:12px; }
+  #app-container.aviasales-game #jump-button { right:12px; }
+}
+@container mobile-screen (max-height:650px) {
+  #app-container.aviasales-game .hud { top:10px; }
+  #app-container.aviasales-game #flight-timer { font-size:34px; }
+  #app-container.aviasales-game .flight-ticket { padding-top:7px; padding-bottom:7px; }
+  #app-container.aviasales-game #ride-coach { top:111px; }
+  #app-container.aviasales-game #result-screen .result-heading { padding-top:12px; padding-bottom:8px; }
+  #app-container.aviasales-game #result-screen .result-heading h2 { font-size:26px; margin:5px 0; }
+  #app-container.aviasales-game #result-screen .result-details { padding-top:11px; padding-bottom:6px; }
+  #app-container.aviasales-game #result-screen .duel-results .result-beer { font-size:23px; }
+  #app-container.aviasales-game #result-screen #replay-button { min-height:46px; font-size:17px; margin-top:4px; }
+  #app-container.aviasales-game #result-screen .result-summary { margin:3px 0; }
+}
+@keyframes departure-beat { 0% { transform:scale(1.05); } 45%,100% { transform:scale(1); } }
+@media (prefers-reduced-motion:reduce) { #app-container.aviasales-game #flight-timer { animation:none!important; } }
+
+/* The finale keeps the clock in place and leaves the landing target clear. */
+.finale-cue { position:absolute;z-index:16;top:151px;left:16px;right:16px;text-align:center;color:#fff4d3;font:400 16px/1.25 'Russo One',sans-serif;text-shadow:0 2px 3px #163f54;pointer-events:none; }
+.finale-cue:empty { display:none; }
+#app-container.aviasales-game:not(.playing) .finale-cue { display:none; }
+#app-container.aviasales-game.finale-active #ride-coach,
+#app-container.aviasales-game.finale-active #moment,
+#app-container.aviasales-game.finale-active .crab-callout { display:none!important; }
+#app-container.aviasales-game.finale-active #jump-button { opacity:.32;filter:none;pointer-events:none; }
+#app-container.aviasales-game .flight-ticket[data-urgency="locked"] { filter:drop-shadow(0 2px 1px #143b4b30); }
+#app-container.aviasales-game .flight-ticket[data-urgency="locked"] #flight-timer { color:#0c73fe;animation:none; }
+.flight-ending {
+  --ending-ink:#193b44;--ending-paper:#fff4d7;
+  position:absolute;inset:0;z-index:65;display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:10px;
+  padding:max(14px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));
+  background:#f4e7c7 url('../assets/sprites/sky-paper-grain.svg') center/210px;color:var(--ending-ink);
+}
+.flight-ending.hidden { display:none; }
+.flight-ending:is([data-layout="comic"],[data-layout="timeout"]) { grid-template-rows:minmax(0,1fr) auto; }
+.flight-ending:is([data-layout="comic"],[data-layout="timeout"]) .ending-status,
+.flight-ending:is([data-layout="comic"],[data-layout="timeout"]) .ending-heading,
+.flight-ending:is([data-layout="comic"],[data-layout="timeout"]) .ending-line { display:none; }
+#app-container.aviasales-game.ending-open #ride-coach { display:none!important; }
+.ending-status { display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding-bottom:8px;border-bottom:1px dashed #193b4455; }
+.ending-passport { font:800 10px/1.2 Rubik,sans-serif; }
+.ending-label { font:500 10px/1.2 Rubik,sans-serif; }
+.ending-clock { grid-column:2;grid-row:1/3;font:400 22px/1 'Russo One',sans-serif;color:#0c73fe; }
+.ending-heading { text-align:center; }
+.ending-counter { font:700 8px/1.2 Rubik,sans-serif;letter-spacing:.14em; }
+.ending-heading h2 { margin:3px 0 0;font:400 clamp(26px,8cqw,34px)/1.05 'Russo One',sans-serif;color:#0c73fe; }
+.flight-ending[data-outcome="timeout"] h2,.flight-ending[data-outcome="soaked"] h2,.flight-ending[data-outcome="missed_boat"] h2 { color:#bd482c; }
+.ending-comic { display:grid;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:10px;min-height:0; }
+.flight-ending .ending-panel { position:relative;min-height:0;margin:0;isolation:isolate; }
+.flight-ending .ending-panel > img:not(.ending-title-art) { display:block;width:100%;height:100%;object-fit:cover;object-position:center;border:2px solid var(--ending-ink);box-sizing:border-box; }
+.flight-ending .ending-title-art { position:absolute;z-index:3;left:8%;bottom:10%;width:84%;height:auto;border:0;pointer-events:none; }
+.ending-panel-action { transform:rotate(-.8deg); }
+.ending-panel-pov { transform:rotate(.6deg); }
+.flight-ending .ending-bubble { position:absolute;z-index:2;margin:0;padding:10px 13px;max-width:60%;box-sizing:border-box;
+  border:2px solid var(--ending-ink);border-radius:48% 44% 47% 42% / 43% 48% 44% 49%;
+  background:var(--ending-paper);color:var(--ending-ink);box-shadow:2px 3px 0 #193b4420;
+  font:750 clamp(12px,3.7cqw,17px)/1.12 Rubik,sans-serif;text-align:center;white-space:pre-line;
+}
+.ending-bubble[hidden] { display:none; }
+.ending-speech { top:4%;right:3%;transform:rotate(2deg); }
+.ending-speech::before,.ending-speech::after { content:'';position:absolute;right:27%;top:calc(100% - 1px);width:21px;height:23px;background:var(--ending-ink);clip-path:polygon(0 0,100% 0,85% 100%); }
+.ending-speech::after { top:calc(100% - 4px);right:calc(27% + 2px);width:17px;height:21px;background:var(--ending-paper); }
+/* Preserve the whole landed board and place editable text inside the drawn balloon. */
+.flight-ending[data-layout="comic"] .ending-comic { grid-template-rows:auto minmax(0,1fr); }
+.flight-ending[data-layout="comic"] .ending-panel-action { aspect-ratio:3/2; }
+.flight-ending[data-layout="comic"] .ending-panel-action img { border:0; }
+.flight-ending[data-layout="comic"] .ending-speech {
+  top:3%;left:12%;right:auto;width:34%;height:16%;max-width:none;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;border:0;border-radius:0;
+  background:transparent;box-shadow:none;transform:none;font-size:clamp(9px,2.7cqw,12px);
+}
+.flight-ending[data-layout="comic"] .ending-speech::before,
+.flight-ending[data-layout="comic"] .ending-speech::after { content:none; }
+.ending-thought { top:5%;left:3%;transform:rotate(-2deg); }
+.ending-thought::before,.ending-thought::after { content:'';position:absolute;border:2px solid var(--ending-ink);border-radius:50%;background:var(--ending-paper); }
+.ending-thought::before { width:10px;height:8px;left:32%;top:calc(100% + 4px); }
+.ending-thought::after { width:5px;height:4px;left:39%;top:calc(100% + 18px); }
+.flight-ending figcaption:empty { display:none; }
+.flight-ending figcaption { position:absolute;bottom:0;background:var(--ending-paper);padding:8px;font:600 14px/1.2 Rubik,sans-serif; }
+.flight-ending .ending-line { margin:0;text-align:center;font:700 clamp(17px,5cqw,22px)/1.1 Caveat,cursive; }
+.flight-ending button { min-height:50px;margin:0;font-size:18px; }
+.flight-ending.panel-enter .ending-panel { animation:ending-reveal .35s ease-out both; }
+.flight-ending.panel-enter .ending-panel-pov { animation-delay:.18s; }
+@keyframes ending-reveal { from { opacity:0;translate:0 6px; } to { opacity:1;translate:0 0; } }
+@container mobile-screen (max-height:650px) {
+  .flight-ending { gap:6px;padding:9px 12px 10px; }
+  .ending-heading h2 { font-size:25px; }
+  .ending-status { padding-bottom:5px; }
+  .ending-comic { gap:7px; }
+  .flight-ending .ending-bubble { padding:6px 10px;font-size:12px; }
+  .flight-ending button { min-height:42px;font-size:16px; }
+  .finale-cue { top:127px;font-size:13px; }
+}
+@media (prefers-reduced-motion:reduce) { .flight-ending.panel-enter .ending-panel { animation:none; } }
+#app-container.aviasales-game.harbor-active #ride-coach { display:none!important; }
+
+/* Hold action words in screen space instead of letting the camera outrun them. */
+.aviasales-game .sfx-word.visible { animation:sfx-pop 1.5s ease-out forwards; }
+.finale-lens { position:absolute;inset:0;z-index:61;pointer-events:none;opacity:0;background:radial-gradient(ellipse 9px 18px at 18% 64%,#e0ffff24 45%,#fff9dfaa 60%,transparent 75%),radial-gradient(ellipse 12px 23px at 83% 36%,#e0ffff24 45%,#fff9dfaa 60%,transparent 75%),radial-gradient(ellipse 8px 20px at 62% 84%,#e0ffff24 45%,#fff9dfaa 60%,transparent 75%),radial-gradient(ellipse 9px 17px at 8% 24%,#e0ffff24 45%,#fff9dfaa 60%,transparent 75%),radial-gradient(ellipse 10px 22px at 92% 71%,#e0ffff24 45%,#fff9dfaa 60%,transparent 75%); }
+.finale-wipe { position:absolute;inset:-10% -25%;z-index:66;background:#f4e7c7 url('../assets/sprites/sky-paper-grain.svg') center/210px;pointer-events:none;transform:translateX(var(--wipe,-120%)) skewX(-12deg); }
+.ending-open .finale-wipe { animation:finale-page-reveal .24s ease-out forwards; }
+#app-container.aviasales-game[data-finale="contact"] .steer-controls,
+#app-container.aviasales-game[data-finale="contact"] #jump-button { opacity:0;pointer-events:none; }
+@keyframes finale-page-reveal { from { transform:translateX(0) skewX(-12deg); } to { transform:translateX(120%) skewX(-12deg); } }
+@media(prefers-reduced-motion:reduce) { .finale-lens { display:none; }.finale-wipe { display:none; }.aviasales-game .sfx-word.visible { animation-duration:1.5s; } }

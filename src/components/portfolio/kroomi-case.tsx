@@ -1,9 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useWindowManager } from "@/components/xp/window-manager-context";
-import { getPrimaryWindowBounds } from "@/lib/xp/navigation";
-import { xpSound } from "@/lib/xp/sound";
 import { CaseClip } from "./case-clip";
 import styles from "./kroomi-case.module.css";
 import { useLocale } from "@/lib/i18n";
@@ -14,13 +11,6 @@ type Zoom = (image: { src: string; alt: string }) => void;
 
 const media = (name: string) => `/images/kroomi-case/${name}`;
 
-const facts = (tr: Tr): Array<[string, string]> => [
-  [tr("Роль", "Role"), tr("Продукт, дизайн, разработка", "Product, design, development")],
-  [tr("Статус", "Status"), tr("В разработке", "In development")],
-  [tr("Платформа", "Platform"), tr("iOS и Android", "iOS and Android")],
-  [tr("Стек", "Stack"), "React, TypeScript, Motion"],
-];
-
 const screens = (tr: Tr): Array<{ name: string; alt: string }> => [
   { name: "app-together", alt: tr("Вкладка «Вместе»: игры и разговоры с персонажем", "The Together tab: games and chats with the character") },
   { name: "app-passport", alt: tr("Паспорт персонажа и путь знакомства", "The character passport and the getting-to-know path") },
@@ -29,11 +19,6 @@ const screens = (tr: Tr): Array<{ name: string; alt: string }> => [
 
 export function KroomiCase({ onZoom }: { onZoom: Zoom }) {
   const { tr } = useLocale();
-  const { openWindow } = useWindowManager();
-  const openLanding = () => {
-    xpSound.click();
-    openWindow({ id: "kroomi", type: "kroomi", title: "kroomi — языки с персонажем", iconType: "kroomi", ...getPrimaryWindowBounds() });
-  };
 
   return (
     <div className={styles.wrap}>
@@ -43,15 +28,26 @@ export function KroomiCase({ onZoom }: { onZoom: Zoom }) {
       </figure>
 
       <section className={styles.intro}>
-        <dl className={styles.facts}>{facts(tr).map(([term, value]) => <div key={term}><dt>{term}</dt><dd>{value}</dd></div>)}</dl>
-        <div className={styles.introText}>
-          <p>{tr("kroomi — приложение для изучения иностранного языка. В нём живёт персонаж со своим характером и своими делами: он зовёт в гости, теряет мяч, хочет есть.", "kroomi is an app for learning a foreign language. It is home to a character with its own personality and plans: it invites you over, loses a ball, gets hungry.")}</p>
-          <p>{tr("Чтобы ему помочь, нужно понять, о чём он просит, и ответить на языке, который вы учите.", "To help it, you need to understand what it asks for and answer in the language you are learning.")}</p>
-        </div>
+        <p className={styles.lead}>
+          {tr(
+            "kroomi — приложение для изучения иностранного языка через заботу о живом интерактивном персонаже. Моя роль — продукт, дизайн и разработка.",
+            "kroomi is a language learning app built around caring for a living interactive character. My role: product, design, and development."
+          )}
+        </p>
       </section>
 
       <figure className={styles.figure}>
-        <CaseClip src={media("hedgehog.mp4")} poster={media("hedgehog-poster.webp")} ratio="16 / 10" label={tr("Ёжик здоровается, пьёт из чашки, радуется и засыпает", "The hedgehog says hi, drinks from a cup, cheers and falls asleep")} />
+        <CaseClip
+          src={media("guitar-jam.mp4")}
+          poster={media("guitar-jam-poster.webp")}
+          sound
+          shadow={false}
+          className={styles.heroClip}
+          label={tr(
+            "Скринкаст: персонаж пытается играть на гитаре, стоя в комнате",
+            "Screencast: companion tries to play guitar while standing in their room"
+          )}
+        />
       </figure>
 
       <figure className={styles.figure}>
@@ -67,16 +63,6 @@ export function KroomiCase({ onZoom }: { onZoom: Zoom }) {
           ))}
         </div>
       </figure>
-
-      <section className={styles.tech}>
-        <span className={styles.label}>{tr("Технически", "Under the hood")}</span>
-        <div>
-          <p>{tr("React, TypeScript, Zustand и Motion. Персонаж — это SVG: силуэт, глаза, ушки и конечности считаются в коде, поэтому одно тело умеет много движений, а глаза следят за касанием.", "React, TypeScript, Zustand and Motion. The character is an SVG: the silhouette, eyes, ears and limbs are computed in code, so one body can do many moves and the eyes follow your touch.")}</p>
-          <div className={styles.links}>
-            <button type="button" onClick={openLanding} data-ym-goal="kroomi_case_landing">{tr("Лендинг kroomi", "kroomi landing page")} <span aria-hidden="true">↗</span></button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

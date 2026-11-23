@@ -10,7 +10,7 @@ import { useLocale } from "@/lib/i18n";
 
 export function Clippy() {
   const { locale, tr } = useLocale();
-  const { openWindow, openProject, activeWindowId } = useWindowManager();
+  const { openWindow, openProject, openProfile, openResume, activeWindowId } = useWindowManager();
   const [isOpen, setIsOpen] = useState(false); // Calm closed state by default (A01, A10, A11)
   const [currentPose, setCurrentPose] = useState<"rest" | "eyebrow" | "look-left" | "wave">("rest");
 
@@ -51,19 +51,10 @@ export function Clippy() {
     }, 1500);
   };
 
-  const handleOpenResume = () => {
+  const handleOpenProfile = () => {
     xpSound.click();
     setIsOpen(false);
-    openWindow({
-      id: "resume",
-      type: "resume",
-      title: "Резюме_Влад_Ахметов.pdf — Резюме",
-      iconType: "resume",
-      x: 70,
-      y: 40,
-      width: 680,
-      height: 520,
-    });
+    openProfile();
   };
 
   const handleOpenShowreel = () => {
@@ -107,7 +98,7 @@ export function Clippy() {
 
   return (
     <div
-      className={`fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)] ${!activeWindowId ? notesWidgetStyles.desktopHelper : "max-md:hidden"}`}
+      className={`xp-clippy fixed bottom-14 right-2 sm:right-5 z-[9990] flex flex-col items-end pointer-events-auto select-none max-w-[calc(100vw-16px)] ${!activeWindowId ? notesWidgetStyles.desktopHelper : "max-md:hidden"}`}
       style={{ cursor: xpCursors.default, display: activeWindowId === "notes" ? "none" : undefined }}
     >
       {/* Speech Bubble */}
@@ -141,12 +132,26 @@ export function Clippy() {
           <div className="flex flex-col gap-2">
             <button
               type="button"
-              onClick={handleOpenResume}
+              onClick={handleOpenProfile}
+              className="w-full text-left px-3 py-2 bg-white hover:bg-[#316ac5] hover:text-white border border-slate-400 rounded text-[12px] font-semibold transition-colors flex items-center gap-2 shadow-sm text-slate-900"
+              style={{ cursor: xpCursors.pointer }}
+            >
+              <span className="text-base">📝</span>
+              <span>{tr("Обо мне (Word)", "About me (Word)")}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                xpSound.click();
+                setIsOpen(false);
+                openResume();
+              }}
               className="w-full text-left px-3 py-2 bg-white hover:bg-[#316ac5] hover:text-white border border-slate-400 rounded text-[12px] font-semibold transition-colors flex items-center gap-2 shadow-sm text-slate-900"
               style={{ cursor: xpCursors.pointer }}
             >
               <span className="text-base">📄</span>
-              <span>{tr("Открыть резюме и навыки (CV / HR)", "Open resume and skills (CV / HR)")}</span>
+              <span>{tr("Резюме (PDF)", "Resume (PDF)")}</span>
             </button>
 
             <button

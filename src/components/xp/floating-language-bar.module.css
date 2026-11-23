@@ -1,0 +1,233 @@
+/* Windows XP Floating Language Bar (DeskBand docked to top edge) */
+
+.bar {
+  position: fixed;
+  top: 0;
+  right: 88px;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 29px;
+  padding: 0 5px 0 6px;
+  background: linear-gradient(180deg, #4793ff 0%, #2874ea 32%, #1455c8 68%, #0d46b2 100%);
+  border: 1px solid #002d96;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.25),
+    inset -1px 0 0 rgba(255, 255, 255, 0.25),
+    0 4px 12px rgba(0, 30, 95, 0.38),
+    0 1px 3px rgba(0, 0, 0, 0.22);
+  user-select: none;
+  transition: transform 0.18s ease-out, opacity 0.18s ease-out;
+}
+
+/* Authentic XP drag grip (embossed vertical dots) */
+.grip {
+  display: flex;
+  gap: 2px;
+  padding: 0 2px 0 1px;
+  cursor: grab;
+}
+
+.gripCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gripDot {
+  width: 2px;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 0.5px;
+  box-shadow: 1px 1px 0 rgba(0, 30, 95, 0.85);
+}
+
+/* Globe micro-icon */
+.globeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px rgba(0, 20, 70, 0.4));
+}
+
+/* Buttons container */
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(8, 38, 105, 0.35);
+  padding: 2px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 20, 70, 0.45);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Tactile language button */
+.langBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 20px;
+  padding: 0 7px;
+  font-family: var(--font-onest), system-ui, -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  border-radius: 2px;
+  border: 1px solid #4a7fd3;
+  background: linear-gradient(180deg, #ffffff 0%, #e1ebf9 100%);
+  color: #0c2b69;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(0, 20, 70, 0.25);
+  transition: all 0.1s ease-in-out;
+}
+
+.langBtn:hover:not(.active) {
+  background: linear-gradient(180deg, #fff9e8 0%, #ffd678 50%, #f6b432 100%);
+  border-color: #d17d0c;
+  color: #3b1c00;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 1px 3px rgba(209, 125, 12, 0.4);
+}
+
+.langBtn:active:not(.active) {
+  transform: translateY(1px);
+}
+
+/* Active pressed button state */
+.langBtn.active {
+  background: linear-gradient(180deg, #093792 0%, #1752bd 45%, #2267e2 100%);
+  border-color: #06225e;
+  color: #ffffff;
+  box-shadow:
+    inset 1px 1px 2px rgba(0, 0, 0, 0.55),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.25),
+    0 0 4px rgba(34, 103, 226, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 20, 60, 0.8);
+}
+
+.activeDot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin-left: 3px;
+  border-radius: 50%;
+  background: #60dc70;
+  box-shadow: 0 0 3px #60dc70;
+}
+
+/* Right micro controls (minimize, options) */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 2px;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  padding-left: 4px;
+}
+
+.ctrlBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #ffffff;
+  opacity: 0.85;
+  transition: all 0.1s;
+}
+
+.ctrlBtn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Quick options menu */
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid #002d96;
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 3px 0;
+  z-index: 100000;
+  font-family: var(--font-onest), system-ui, sans-serif;
+  font-size: 11px;
+  color: #000000;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: #316ac5;
+  color: #ffffff;
+}
+
+.menuDivider {
+  height: 1px;
+  background: #d8d4c2;
+  margin: 3px 0;
+}
+
+/* Mobile responsive mode: compact top pill / "челка" */
+@media (max-width: 767px) {
+  .bar {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+    height: 25px;
+    padding: 0 4px;
+    border-radius: 0 0 8px 8px;
+    gap: 4px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 3px 10px rgba(0, 25, 80, 0.4);
+  }
+
+  .grip,
+  .controls {
+    display: none;
+  }
+
+  .buttons {
+    padding: 1px;
+    gap: 1px;
+  }
+
+  .langBtn {
+    min-width: 34px;
+    height: 19px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+}

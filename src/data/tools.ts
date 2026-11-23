@@ -38,11 +38,11 @@ const communityPlugins = (locale: Locale): ToolItem[] => figmaPlugins.map(plugin
   version: "Community",
   updatedAt: "2026-10-01",
   community: true,
-  problem: plugin.pain[locale],
-  solution: plugin.solution[locale],
+  problem: plugin.description[locale],
+  solution: plugin.features[locale],
   highlights: locale === "en"
-    ? ["Works right inside Figma", "One-click install from Community"]
-    : ["Работает прямо в Figma", "Устанавливается в один клик из Community"],
+    ? ["Works right inside Figma", "Available in Figma Community"]
+    : ["Работает прямо в Figma", "Доступен в Figma Community"],
   primaryAction: { label: locale === "en" ? "Open in Figma Community" : "Открыть в Figma Community", url: plugin.url },
   instructions: locale === "en"
     ? ["Open the plugin page in Figma Community.", "Click Open in… or Save.", `Run it from Plugins → ${plugin.name}.`]

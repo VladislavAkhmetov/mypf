@@ -1,11 +1,12 @@
 "use client";
 
-import { hiddenApps, hiddenDesktopOnly } from "@/lib/xp/hidden-apps";
+import { hiddenApps, hiddenDesktopOnly, showJournalWidget, showClippy } from "@/lib/xp/hidden-apps";
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useWindowManager } from "./window-manager-context";
 import { WindowFrame } from "./window-frame";
 import { WindowContentRouter } from "./window-content-router";
 import { Taskbar } from "./taskbar";
+import { FloatingLanguageBar } from "./floating-language-bar";
 import { StartMenu } from "./start-menu";
 import { DesktopIcon } from "./desktop-icon";
 import { ContextMenu, ContextMenuState } from "./context-menu";
@@ -31,9 +32,11 @@ import {
   WordDocIcon,
   MinesweeperIcon,
   PaintIcon,
+  PdfIcon,
   InternetExplorerIcon,
   BaltikaIcon,
   DesignerGameIcon,
+  HyperPackerIcon,
 } from "./xp-icons";
 import { miniGames, getMobileGameWindowBounds } from "@/data/mini-games";
 
@@ -68,6 +71,7 @@ export function Desktop() {
     openPortfolio,
     openNotes,
     openProfile,
+    openResume,
     balloon,
     closeBalloon,
   } = useWindowManager();
@@ -193,6 +197,11 @@ export function Desktop() {
         icon: <DesignerGameIcon className="w-12 h-12" />,
       },
       {
+        id: "hyper-packer",
+        title: miniGames["hyper-packer"].title,
+        icon: <HyperPackerIcon className="w-12 h-12" />,
+      },
+      {
         id: "tools",
         title: "Инструменты",
         icon: <ToolsIcon className="w-12 h-12" />,
@@ -211,6 +220,11 @@ export function Desktop() {
         id: "paint",
         title: "Paint",
         icon: <PaintIcon className="w-12 h-12" />,
+      },
+      {
+        id: "resume",
+        title: "Резюме",
+        icon: <PdfIcon className="w-[50px] h-[50px]" />,
       },
       {
         id: "help",
@@ -288,7 +302,6 @@ export function Desktop() {
         const order = (id: string) => {
           if (id === "profile") return 0;
           if (id === "portfolio") return 1;
-          if (id === "resume") return 2;
           if (id.startsWith("folder-")) return 3;
           if (id.startsWith("doc-")) return 4;
           if (id === "my-computer" || id === "media-player") return 5;
@@ -463,18 +476,6 @@ export function Desktop() {
           openPortfolio();
           break;
 
-        case "resume":
-          openWindow({
-            id: "resume",
-            type: "resume",
-            title: "Резюме_Влад_Ахметов.pdf — Executive Summary",
-            iconType: "resume",
-            x: 70,
-            y: 40,
-            width: 680,
-            height: 520,
-          });
-          break;
 
         case "my-computer":
           openWindow({
@@ -596,6 +597,10 @@ export function Desktop() {
           });
           break;
 
+        case "resume":
+          openResume();
+          break;
+
         case "dombro":
           openWindow({
             id: "dombro",
@@ -608,6 +613,7 @@ export function Desktop() {
 
         case "baltika":
         case "designer-game":
+        case "hyper-packer":
           openWindow({
             id,
             type: id,
@@ -740,7 +746,7 @@ export function Desktop() {
         );
       })}
 
-      <NotesWidget />
+      {showJournalWidget && <NotesWidget />}
 
       {/* Render All Open Windows */}
       {windows.map((win) => (
@@ -750,7 +756,7 @@ export function Desktop() {
       ))}
 
       {/* Interactive Clippy Assistant */}
-      <Clippy />
+      {showClippy && <Clippy />}
 
       {/* Balloon Notification Tooltip */}
       {balloon && (
@@ -792,6 +798,10 @@ export function Desktop() {
       <Taskbar
         isStartOpen={isStartOpen}
         onToggleStart={() => setIsStartOpen(!isStartOpen)}
+      />
+
+      {/* Floating Language Bar */}
+      <FloatingLanguageBar
       />
 
       {/* Turn Off Computer Dialog */}

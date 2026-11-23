@@ -4,7 +4,10 @@ declare global {
   }
 }
 
-export const YM_COUNTER_ID = process.env.NEXT_PUBLIC_YM_ID || "";
+const configuredCounterId = process.env.NEXT_PUBLIC_YM_ID ||
+  (process.env.NODE_ENV === "production" ? "114157394" : "");
+
+export const YM_COUNTER_ID = /^[1-9]\d*$/.test(configuredCounterId) ? configuredCounterId : "";
 
 /**
  * Dispatches a goal event to Yandex.Metrika (with dev console fallback).
@@ -18,7 +21,7 @@ export function reachGoal(goal: string, params?: Record<string, unknown>): void 
     console.debug(`[YM Analytics] reachGoal: "${goal}"`, params ?? "");
   }
 
-  if (window.ym && YM_COUNTER_ID && YM_COUNTER_ID !== "mock") {
+  if (window.ym && YM_COUNTER_ID) {
     try {
       window.ym(YM_COUNTER_ID, "reachGoal", goal, params);
     } catch {

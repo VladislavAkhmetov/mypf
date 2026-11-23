@@ -1,5 +1,5 @@
 import type { Viewport } from "next";
-import { Onest, Manrope } from "next/font/google";
+import { Onest, Manrope, Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { YandexMetrika } from "@/components/analytics/yandex-metrika";
 import "./globals.css";
@@ -17,6 +17,11 @@ const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-display",
+  subsets: ["latin", "cyrillic"],
+});
+
 export const viewport: Viewport = {
   themeColor: "#0055ea",
   viewportFit: "cover",
@@ -29,10 +34,10 @@ export function RootShell({ lang, children }: { lang: "ru" | "en"; children: Rea
     <html
       lang={lang}
       suppressHydrationWarning
-      className={`${onest.variable} ${manrope.variable} h-full antialiased`}
+      className={`${onest.variable} ${manrope.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="h-full w-full overflow-hidden bg-[#004e98]">
-        <Providers>
+        <Providers initialLocale={lang}>
           <YandexMetrika />
           {children}
         </Providers>

@@ -1,0 +1,140 @@
+/* Minimalist Flat Device Mockup System */
+
+.duo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  margin: 32px 0 24px;
+}
+
+.tabletSlot {
+  flex: 1 1 68%;
+  min-width: 0;
+}
+
+.phoneSlot {
+  flex: 0 0 28%;
+  max-width: 290px;
+  min-width: 200px;
+}
+
+.deviceSlot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.deviceButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  border-radius: inherit;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.deviceButton:hover {
+  transform: translateY(-4px);
+  opacity: 0.97;
+}
+
+.deviceButton:focus-visible {
+  outline: 2px solid #252521;
+  outline-offset: 6px;
+}
+
+/* Superminimalist Flat Bezel: only pure rounded contour, completely flat without shadows */
+.tabletFrame {
+  position: relative;
+  width: 100%;
+  background: var(--frame-bg, #18251e);
+  border-radius: 24px;
+  padding: 10px;
+  box-shadow: none;
+}
+
+.phoneFrame {
+  position: relative;
+  width: 100%;
+  background: var(--frame-bg, #18251e);
+  border-radius: 36px;
+  padding: 9px;
+  box-shadow: none;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  display: block;
+}
+
+.tabletScreen {
+  border-radius: 15px;
+  aspect-ratio: 16 / 10;
+}
+
+.phoneScreen {
+  border-radius: 27px;
+  aspect-ratio: 377 / 860;
+}
+
+.screenImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deviceLabel {
+  font-size: 13px;
+  color: #77776d;
+  padding-left: 2px;
+}
+
+@container (max-width: 640px) {
+  .duo {
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    margin: 20px 0;
+  }
+
+  .tabletSlot {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .phoneSlot {
+    flex: 1 1 100%;
+    width: 78%;
+    max-width: 280px;
+  }
+
+  .tabletFrame {
+    border-radius: 18px;
+    padding: 7px;
+  }
+
+  .tabletScreen {
+    border-radius: 12px;
+  }
+
+  .phoneFrame {
+    border-radius: 28px;
+    padding: 7px;
+  }
+
+  .phoneScreen {
+    border-radius: 21px;
+  }
+}

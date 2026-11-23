@@ -12,6 +12,7 @@ import { xpCursors } from "@/lib/xp/cursors";
 import { getMinesweeperWindowBounds } from "@/lib/xp/minesweeper-game";
 import { minesweeperStore } from "@/lib/xp/games/game-session-store";
 import { getWordWindowBounds } from "@/lib/xp/navigation";
+import { miniGames, getMobileGameWindowBounds } from "@/data/mini-games";
 import {
   WindowsMediaPlayerIcon,
   InternetExplorerIcon,
@@ -29,6 +30,9 @@ import {
   MinesweeperIcon,
   PaintIcon,
   PdfIcon,
+  DesignerGameIcon,
+  BaltikaIcon,
+  HyperPackerIcon,
 } from "./xp-icons";
 
 interface StartMenuProps {
@@ -39,7 +43,7 @@ interface StartMenuProps {
 
 export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
   const { t, tr } = useLocale();
-  const { openWindow, openProject, openPortfolio, openNotes, openProfile } = useWindowManager();
+  const { openWindow, openProject, openPortfolio, openNotes, openProfile, openResume } = useWindowManager();
   const [showAllPrograms, setShowAllPrograms] = useState(false);
 
   if (!isOpen) return null;
@@ -230,6 +234,22 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             <span className="font-semibold text-xs">{tr("Обо мне (Word)", "About me (Word)")}</span>
           </div>
 
+          {/* Resume PDF */}
+          <div
+            onClick={() => {
+              xpSound.click();
+              onClose();
+              openResume();
+            }}
+            data-ym-goal="start_menu_item"
+            data-ym-params='{"app":"resume"}'
+            className="xp-start-item"
+            style={{ cursor: xpCursors.pointer }}
+          >
+            <PdfIcon className="w-7 h-7 flex-shrink-0" />
+            <span className="font-semibold text-xs">{tr("Резюме (PDF)", "Resume (PDF)")}</span>
+          </div>
+
           {/* Paint Studio */}
           <div
             onClick={() => {
@@ -269,34 +289,6 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
           >
             <StoriesIcon className="w-7 h-7 flex-shrink-0" />
             <span className="font-semibold text-xs">{tr("Журнал", "Journal")}</span>
-          </div>
-
-          {/* For Employers / HR & Leads */}
-          <div
-            onClick={() => {
-              xpSound.click();
-              onClose();
-              openWindow({
-                id: "resume",
-                type: "resume",
-                title: "Резюме_Влад_Ахметов.pdf — Executive Summary",
-                iconType: "resume",
-                x: 70,
-                y: 40,
-                width: 680,
-                height: 520,
-              });
-            }}
-            data-ym-goal="start_menu_item"
-            data-ym-params='{"app":"resume"}'
-            className="xp-start-item border border-blue-300 bg-blue-50 hover:bg-[#316ac5]"
-            style={{ cursor: xpCursors.pointer }}
-          >
-            <PdfIcon className="w-7 h-7 flex-shrink-0" />
-            <div>
-              <div className="xp-start-item-title text-blue-950 font-bold">{tr("Для работодателей / HR", "For employers / HR")}</div>
-              <div className="xp-start-subtext text-blue-800">{tr("Резюме, специализация, стек", "Resume, focus, stack")}</div>
-            </div>
           </div>
 
           {/* All Programs at bottom */}
@@ -390,6 +382,71 @@ export function StartMenu({ isOpen, onClose, onTurnOffClick }: StartMenuProps) {
             >
               <MinesweeperIcon className="w-5 h-5 flex-shrink-0" />
               <span className="truncate">{tr("Сапёр Pulse", "Minesweeper Pulse")}</span>
+            </div>
+
+            <div
+              onClick={() => {
+                xpSound.click();
+                onClose();
+                openWindow({
+                  id: "designer-game",
+                  type: "designer-game",
+                  title: miniGames["designer-game"].title,
+                  iconType: "designer-game",
+                  ...getMobileGameWindowBounds(),
+                });
+              }}
+              data-ym-goal="start_menu_item"
+              data-ym-params='{"app":"designer-game"}'
+              className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
+              style={{ cursor: xpCursors.pointer }}
+            >
+              <DesignerGameIcon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">{tr("Хочешь стать дизайнером?", "Want to be a designer?")}</span>
+            </div>
+
+            {!hiddenApps.includes("baltika") && (
+              <div
+                onClick={() => {
+                  xpSound.click();
+                  onClose();
+                  openWindow({
+                    id: "baltika",
+                    type: "baltika",
+                    title: miniGames.baltika.title,
+                    iconType: "baltika",
+                    ...getMobileGameWindowBounds(),
+                  });
+                }}
+                data-ym-goal="start_menu_item"
+                data-ym-params='{"app":"baltika"}'
+                className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
+                style={{ cursor: xpCursors.pointer }}
+              >
+                <BaltikaIcon className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate">{tr("Garret Surf", "Garret Surf")}</span>
+              </div>
+            )}
+
+            <div
+              onClick={() => {
+                xpSound.click();
+                onClose();
+                openWindow({
+                  id: "hyper-packer",
+                  type: "hyper-packer",
+                  title: miniGames["hyper-packer"].title,
+                  iconType: "hyper-packer",
+                  ...getMobileGameWindowBounds(),
+                });
+              }}
+              data-ym-goal="start_menu_item"
+              data-ym-params='{"app":"hyper-packer"}'
+              className="flex items-center gap-2.5 p-2 rounded hover:bg-[#316ac5] text-slate-900 hover:text-white cursor-pointer text-xs font-semibold transition"
+              style={{ cursor: xpCursors.pointer }}
+            >
+              <HyperPackerIcon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate">{tr("Hyper Packer", "Hyper Packer")}</span>
             </div>
           </div>
         )}

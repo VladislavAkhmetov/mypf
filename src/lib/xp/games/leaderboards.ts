@@ -20,9 +20,9 @@ export interface SolitaireRecord {
   isUser?: boolean;
 }
 
-const MINESWEEPER_STORAGE_KEY = "amazi.games.minesweeper.leaderboards.v2";
-const SOLITAIRE_STORAGE_KEY = "amazi.games.solitaire.leaderboards.v2";
-const PLAYER_NAME_KEY = "amazi.games.player_name.v2";
+const MINESWEEPER_STORAGE_KEY = "xp.games.minesweeper.leaderboards.v2";
+const SOLITAIRE_STORAGE_KEY = "xp.games.solitaire.leaderboards.v2";
+const PLAYER_NAME_KEY = "xp.games.player_name.v2";
 
 const DEFAULT_PLAYER_NAME = "Игрок XP";
 
