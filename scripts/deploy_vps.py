@@ -48,60 +48,87 @@ load_env_file()
 SERVER_HOST = os.environ.get("VPS_HOST", "103.31.76.140")
 SERVER_PORT = int(os.environ.get("VPS_PORT", 22))
 SERVER_USER = os.environ.get("VPS_USER", "root")
-KEY_PATH = Path(os.environ.get("VPS_KEY", Path.home() / ".ssh" / "id_ed25519"))
 ARCHIVE_PATH = PROJECT_ROOT / "site.tar.gz"
 
 
-def get_credentials():
+def get_candidate_keys():
+    env_key = os.environ.get("VPS_KEY")
+    if env_key:
+        return [Path(os.path.expanduser(env_key))]
+    return [
+        Path.home() / ".ssh" / "portfolio_vps_ed25519",
+        Path.home() / ".ssh" / "id_ed25519",
+    ]
+
+
+def get_env_secret():
     secret = os.environ.get("VPS_PASSPHRASE") or os.environ.get("VPS_PASSWORD")
     if secret:
         print("🔐 Реквизиты авторизации загружены из конфигурации (.env.deploy / переменные окружения)")
-    elif len(sys.argv) > 1:
-        secret = sys.argv[1]
-    if not secret:
-        print(f"Подключение к {SERVER_USER}@{SERVER_HOST}:{SERVER_PORT}")
-        print("Ключ: " + str(KEY_PATH))
-        secret = getpass.getpass("Введите пароль / passphrase для SSH-ключа id_ed25519: ")
-    return secret
+        return secret
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    return None
 
 
 def connect_ssh(secret):
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    keys = [k for k in get_candidate_keys() if k.exists()]
 
-    # Попытка 1: через ключ id_ed25519 с passphrase
-    if KEY_PATH.exists():
+    # Попытка 1: авторизация по SSH-ключу (сначала без пароля/через ssh-agent, затем с passphrase)
+    for key_path in keys:
+        for passphrase in ([None, secret] if secret else [None]):
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            try:
+                print(f"Попытка авторизации по ключу {key_path.name}...")
+                client.connect(
+                    SERVER_HOST,
+                    port=SERVER_PORT,
+                    username=SERVER_USER,
+                    key_filename=str(key_path),
+                    passphrase=passphrase,
+                    allow_agent=True,
+                    look_for_keys=False,
+                    timeout=10,
+                )
+                print(" Авторизован по SSH-ключу!")
+                return client
+            except Exception as e:
+                client.close()
+                print(f"Авторизация по ключу {key_path.name} не удалась: {e}")
+
+    # Если секрет не задан и мы в интерактивном терминале — запросим пароль/passphrase
+    if not secret and sys.stdin.isatty():
+        print(f"Подключение к {SERVER_USER}@{SERVER_HOST}:{SERVER_PORT}")
+        secret = getpass.getpass("Введите пароль root или passphrase для SSH-ключа: ")
+        if secret:
+            return connect_ssh(secret)
+
+    # Попытка 2: по паролю пользователя (если задан secret)
+    if secret:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            print(f"Попытка авторизации по ключу {KEY_PATH.name}...")
-            key = paramiko.Ed25519Key.from_private_key_file(str(KEY_PATH), password=secret if secret else None)
+            print(f"Попытка авторизации по паролю пользователя {SERVER_USER}...")
             client.connect(
                 SERVER_HOST,
                 port=SERVER_PORT,
                 username=SERVER_USER,
-                pkey=key,
+                password=secret,
+                allow_agent=False,
+                look_for_keys=False,
                 timeout=10,
             )
-            print(" Авторизован по SSH-ключу!")
+            print(" Авторизован по паролю!")
             return client
         except Exception as e:
-            print(f"Авторизация по ключу не удалась: {e}")
+            client.close()
+            print(f"Авторизация по паролю не удалась: {e}")
 
-    # Попытка 2: по паролю root
-    try:
-        print("Попытка авторизации по паролю пользователя root...")
-        client.connect(
-            SERVER_HOST,
-            port=SERVER_PORT,
-            username=SERVER_USER,
-            password=secret,
-            timeout=10,
-        )
-        print(" Авторизован по паролю root!")
-        return client
-    except Exception as e:
-        print(f"Авторизация по паролю не удалась: {e}")
-
-    raise RuntimeError("Не удалось подключиться к VPS. Проверьте пароль или passphrase.")
+    raise RuntimeError(
+        "Не удалось подключиться к VPS. Проверьте SSH-ключ (VPS_KEY / ~/.ssh/portfolio_vps_ed25519) "
+        "или укажите VPS_PASSWORD / VPS_PASSPHRASE в .env.deploy."
+    )
 
 
 def run_command(client, command, check=True):
@@ -139,19 +166,26 @@ def main():
     print("=" * 60)
     print(f"Размер архива: {ARCHIVE_PATH.stat().st_size / (1024 * 1024):.2f} MB")
 
-    secret = get_credentials()
+    secret = get_env_secret()
     client = connect_ssh(secret)
 
     try:
         # Определяем директорию сайта в nginx
         print("\n🔍 Определение директории сайта на сервере...")
-        web_root = None
-        try:
-            detected = run_command(client, "grep -m 1 -oP 'root\\s+\\K[^;]+' /etc/nginx/sites-enabled/* 2>/dev/null", check=False)
-            if detected and "/" in detected:
-                web_root = detected.strip()
-        except Exception:
-            pass
+        web_root = os.environ.get("VPS_WEB_ROOT") or None
+        if not web_root:
+            try:
+                detected = run_command(
+                    client,
+                    "grep -m 1 -oP 'root\\s+\\K[^;]+' /etc/nginx/sites-enabled/vladakhmetov* 2>/dev/null || "
+                    "grep -m 1 -oP 'root\\s+\\K[^;]+' /etc/nginx/sites-enabled/* 2>/dev/null || "
+                    "([ -d /var/www/vladakhmetov.com ] && echo /var/www/vladakhmetov.com)",
+                    check=False,
+                )
+                if detected and "/" in detected:
+                    web_root = detected.strip().splitlines()[0]
+            except Exception:
+                pass
 
         if not web_root:
             web_root = "/var/www/html"

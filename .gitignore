@@ -46,6 +46,9 @@ next-env.d.ts
 # local/temp
 .figaro/
 .tmp/
+/site.tar.gz
+*.key
+*_ed25519*
 
 # python
 __pycache__/
